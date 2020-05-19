@@ -76,7 +76,6 @@ class Backtester():
         if lookback is None:
             return self.prices[symbol,self.current_date,self.event]
         if lookback > 0:
-            i = self.i-lookback
             start = self.current_date-relativedelta(days=lookback)
             end = self.current_date
             return self.prices[symbol,start:end,self.event]
