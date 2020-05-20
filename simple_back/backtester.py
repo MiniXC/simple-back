@@ -2,6 +2,24 @@ from simple_back.price_providers import DailyPriceProvider
 import pandas as pd
 import pandas_market_calendars as mcal
 from dateutil.relativedelta import relativedelta
+from abc import ABC, abstractmethod
+import multiprocessing
+import numpy as np
+import copy
+
+class Strategy(ABC):
+
+    @abstractmethod
+    def open_close(self, day, bt):
+        pass
+
+    @abstractmethod
+    def open(self, day, bt):
+        pass
+
+    @abstractmethod
+    def close(self, day, bt):
+        pass
 
 class Backtester():
     
@@ -34,39 +52,71 @@ class Backtester():
             self.dates = [d.date() for d in self.dates]
         if strategy is not None:
             self.strategy = strategy
-            self.strategy.bt = self
         self.prices = prices
         self.portfolio = pd.DataFrame(columns=['symbol', 'date', 'event', 'number', 'price'])
         self.value_ot = pd.DataFrame(columns=['date','event','value'])
         self.value_ot['value'] = self.value_ot['value'].astype(float)
 
-    def run(self):
-        for date in self.dates:
-            self.current_date = date
+    def run_worker(self, num):
+        return self.workers[num].run(0)
 
-            self.event = 'open'
-            self.strategy.open()
+    def run(self, num_workers=-1):
+        if num_workers == -1:
+            num_workers = multiprocessing.cpu_count()
+        if num_workers == 0:
+            for date in self.dates:
+                self.current_date = date
+                
+                self.event = 'open'
+                self.update()
+                self.strategy.open(self.current_date, self)
+                self.strategy.open_close(self.current_date, self)
 
-            self.event = 'close'
-            self.strategy.close()
+                self.event = 'close'
+                self.update()
+                self.strategy.close(self.current_date, self)
+                self.strategy.open_close(self.current_date, self)
+
+            return self
+        else:
+            self.workers = []
+            date_splits = np.array_split(self.dates, num_workers)
+            for i in range(num_workers):
+                worker_bt = copy.deepcopy(self)
+                # share the prices object
+                worker_bt.prices = self.prices
+                # set dates
+                worker_bt.dates = date_splits[i]
+                self.workers.append(worker_bt)
+                # start multiprocessing
+            pool = multiprocessing.Pool(processes=num_workers)
+            backtesters = pool.map(self.run_worker, range(num_workers))
+            new_value_ot = None
+            for i, bt in enumerate(backtesters):
+                if i == 0:
+                    new_value_ot = bt.value_ot.copy()
+                else:
+                    temp_value_ot = bt.value_ot.copy()
+                    temp_value_ot['value'] = bt.value_ot['value'] * (new_value_ot['value'].iloc[-1]/self.start_capital)
+                    new_value_ot = new_value_ot.append(temp_value_ot)
+            self.value_ot = new_value_ot
 
     def __iter__(self):
-        self.current_date = self.dates[0]
         self.i = 0
-        self.event = 'open'
+        self.event = 'close'
         return self
 
     def __next__(self):
-        self.update()
         if self.event == 'open':
             self.event = 'close'
         elif self.event == 'close':
             try:
-                self.i += 1
                 self.current_date = self.dates[self.i]
+                self.i += 1
                 self.event = 'open'
             except:
                 raise StopIteration
+        self.update()
         return self.current_date, self.event, self
 
     def __len__(self):
