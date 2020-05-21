@@ -1,11 +1,43 @@
-from simple_back.price_providers import DailyPriceProvider
+from simple_back.price_providers import DailyPriceProvider, YahooFinanceProvider
 import pandas as pd
 import pandas_market_calendars as mcal
 from dateutil.relativedelta import relativedelta
+from datetime import date
 from abc import ABC, abstractmethod
 import multiprocessing
 import numpy as np
 import copy
+
+
+class Fee(ABC):
+
+    @abstractmethod
+    def __call__(self, price, num_shares, order_type):
+        pass
+
+class FlatPerTrade(Fee):
+
+    def __init__(self, fee):
+        self.fee = fee
+
+    def __call__(self, price, capital):
+        num_shares = (capital - self.fee) // price
+        return price * num_shares + self.fee, num_shares
+
+class FlatPerShare(Fee):
+
+    def __init__(self, fee):
+        self.fee = fee
+
+    def __call__(self, price, capital):
+        num_shares = capital // (self.fee + price)
+        return (price + self.fee) * num_shares, num_shares
+
+class NoFee(Fee):
+
+    def __call__(self, price, capital):
+        num_shares = capital // price
+        return num_shares * price, num_shares
 
 class Strategy(ABC):
 
@@ -26,7 +58,7 @@ class Backtester():
     def __init__(
         self, 
         start_capital, 
-        prices,
+        prices=None,
 
         strategy=None,
 
@@ -35,27 +67,46 @@ class Backtester():
 
         # if list of dates is not supplied, use pandas_market_calendars
         market_calendar=None,
+        cal=None,
+        start=None,
         start_date=None,
         end_date=None,
+        end=None,
 
-        trade_cost_function=None,
+        trade_cost_function=NoFee(),
     ):
         self.start_capital = start_capital
         self.capital = start_capital
         self.available_capital = start_capital
+
+        if prices is None:
+            prices = YahooFinanceProvider()
         if dates is not None:
             self.dates = dates
         else:
+            if start is not None:
+                start_date = start
+                end_date = end
+            if cal is not None:
+                market_calendar = cal
             cal = mcal.get_calendar(market_calendar)
-            sched = cal.schedule(start_date=start_date, end_date=end_date)
+            if start_date is not None:
+                if end_date is None:
+                    end_date = date.today()-relativedelta(days=1)
+                if type(start_date) == relativedelta:
+                    start_date = date.today()-start_date
+                if type(end_date) == relativedelta:
+                    end_date = date.today()-end_date
+                sched = cal.schedule(start_date=start_date, end_date=end_date)
             self.dates = mcal.date_range(sched, frequency='1D')
             self.dates = [d.date() for d in self.dates]
         if strategy is not None:
             self.strategy = strategy
         self.prices = prices
-        self.portfolio = pd.DataFrame(columns=['symbol', 'date', 'event', 'number', 'price'])
+        self.portfolio = pd.DataFrame(columns=['symbol', 'date', 'event', 'num_shares', 'price'])
         self.value_ot = pd.DataFrame(columns=['date','event','value'])
         self.value_ot['value'] = self.value_ot['value'].astype(float)
+        self.trade_cost = trade_cost_function
 
     def run_worker(self, num):
         return self.workers[num].run(0)
@@ -133,30 +184,35 @@ class Backtester():
     def update(self):
         self.capital = self.available_capital
         for _, pos in self.portfolio.iterrows():
-            if pos['number'] > 0:
-                self.capital += pos['number']*self.price(pos['symbol'])
+            if pos['num_shares'] > 0:
+                self.capital += pos['num_shares']*self.price(pos['symbol'])
             else:
-                cur_val = abs(pos['number'])*self.price(pos['symbol'])
-                old_val = abs(pos['number'])*pos['price']
+                cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
+                old_val = abs(pos['num_shares'])*pos['price']
                 self.capital += (old_val - cur_val)
-        self.value_ot.loc[len(self.value_ot)] = [self.current_date, self.event, self.capital]
+        self.value_ot.at[len(self.value_ot)] = [self.current_date, self.event, self.capital]
 
     def order(self, symbol, capital, short=False, as_percent=False):
         if not as_percent:
             if capital > self.available_capital:
                 raise Exception('not enough capital available')
         else:
-            if capital > 1:
-                raise Exception('not enough capital available')
+            if capital * self.capital > self.available_capital:
+                raise Exception(
+                    f"""
+                    not enough capital available:
+                    ordered {capital} * {self.capital} with only {self.available_capital} available
+                    """
+                )
         current_price = self.prices[symbol, self.current_date, self.event]
         if as_percent:
-            capital = capital*self.available_capital
-        num_shares = capital // current_price
+            capital = capital * self.available_capital
+        total, num_shares = self.trade_cost(current_price, capital)
         if short:
             num_shares *= -1
         else:
-            self.available_capital -= current_price * num_shares
-        self.portfolio.loc[len(self.portfolio)] = [symbol, self.current_date, self.event, num_shares, current_price]
+            self.available_capital -= total
+        self.portfolio.at[len(self.portfolio)] = [symbol, self.current_date, self.event, num_shares, current_price]
 
     @property
     def values(self):
@@ -186,12 +242,60 @@ class Backtester():
         comps = self.compare(symbol)
         return [comps[col].pct_change()[1:] for col in comps.columns]
 
-    def liquidate(self, pos_index):
-        for _, pos in self.portfolio[pos_index].iterrows():
-            if pos['number'] > 0:
-                self.available_capital += pos['number']*self.price(pos['symbol'])
+    def liquidate(self, symbol, num_shares=None, short=False):
+        if type(symbol) == list:
+            if num_shares == None:
+                for sym in symbol:
+                    self.liquidate(sym,None)
             else:
-                cur_val = abs(pos['number'])*self.price(pos['symbol'])
-                old_val = abs(pos['number'])*pos['price']
+                for sym, num in zip(symbol,num_shares):
+                    self.liquidate(sym,num)
+        else:
+            drop_i = []
+            for i, pos in self.portfolio[self.portfolio['symbol']==symbol].iterrows():
+                if pos['num_shares'] > 0 and not short:
+                    if num_shares is None or pos['num_shares'] <= num_shares:
+                        self.available_capital += pos['num_shares'] * self.price(pos['symbol'])
+                        drop_i.append(i)
+                        if num_shares is not None:
+                            num_shares -= pos['num_shares']
+                        if num_shares == 0:
+                            break
+                    if num_shares is not None and pos['num_shares'] > num_shares:
+                        self.available_capital += num_shares * self.price(pos['symbol'])
+                        self.portfolio.at[i]['num_shares'] -= num_shares
+                        break
+                if pos['num_shares'] < 0 and short:
+                    if num_shares is None or abs(pos['num_shares']) <= num_shares:
+                        cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
+                        old_val = abs(pos['num_shares'])*pos['price']
+                        self.available_capital += old_val - cur_val
+                        drop_i.append(i)
+                        if num_shares is not None:
+                            num_shares -= pos['num_shares']
+                        if num_shares == 0:
+                            break
+                    if num_shares is not None and abs(pos['num_shares']) > num_shares:
+                        cur_val = num_shares * self.price(pos['symbol'])
+                        old_val = num_shares * pos['price']
+                        self.available_capital += old_val - cur_val
+                        self.portfolio.at[i]['num_shares'] += num_shares
+                        break
+            self.portfolio = self.portfolio.drop(drop_i)
+
+    def liquidateIndex(self, pos_index=None):
+        if pos_index == None:
+            iter_port = self.portfolio
+        else:
+            iter_port = self.portfolio[pos_index]
+        for _, pos in iter_port.iterrows():
+            if pos['num_shares'] > 0:
+                self.available_capital += pos['num_shares']*self.price(pos['symbol'])
+            else:
+                cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
+                old_val = abs(pos['num_shares'])*pos['price']
                 self.available_capital += old_val - cur_val
-        self.portfolio = self.portfolio[~pos_index]
+        if pos_index == None:
+            self.portfolio = self.portfolio.iloc[0:0]
+        else:
+            self.portfolio = self.portfolio[~pos_index]
