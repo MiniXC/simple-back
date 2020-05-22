@@ -297,7 +297,7 @@ class Backtester():
                     )
         current_price = self.prices[symbol, self.current_date, self.event]
         if as_percent:
-            capital = capital * self.available_capital
+            capital = capital * self.capital
         total, num_shares = self.trade_cost(current_price, capital)
         if short:
             num_shares *= -1
