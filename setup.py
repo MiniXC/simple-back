@@ -14,7 +14,7 @@ readme = ''
 setup(
     long_description=readme,
     name='simple-back',
-    version='0.3.0',
+    version='0.4a0',
     python_requires='==3.*,>=3.7.0',
     author='Christoph Minixhofer',
     author_email='christoph.minixhofer@gmail.com',
