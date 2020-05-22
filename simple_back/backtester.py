@@ -39,6 +39,43 @@ class NoFee(Fee):
         num_shares = capital // price
         return num_shares * price, num_shares
 
+class SingleMetric(ABC):
+
+    @property
+    @abstractmethod
+    def name(self):
+        pass
+
+    @abstractmethod
+    def __call__(self, bt):
+        pass
+
+    def _isSingle(self):
+        return True
+
+class MaxDrawdown(SingleMetric):
+
+    @property
+    def name(self):
+        return 'Max Drawdown'
+
+    def __call__(self, bt):
+        return bt.profit_loss.min()['Backtest']
+
+class AnnualReturn(SingleMetric):
+
+    def __init__(self):
+        self.annual_return = 0
+
+    @property
+    def name(self):
+        return 'Annual Return'
+
+    def __call__(self, bt):
+        vals = bt.values['Backtest']
+        year = 1/((bt.dates[-1]-bt.dates[0]).days/365.25)
+        return (vals[-1]/vals[0])**year
+
 class Strategy(ABC):
 
     @abstractmethod
@@ -74,6 +111,7 @@ class Backtester():
         end=None,
 
         trade_cost_function=NoFee(),
+        metrics=[MaxDrawdown(), AnnualReturn()]
     ):
         self.start_capital = start_capital
         self.capital = start_capital
@@ -107,6 +145,7 @@ class Backtester():
         self.value_ot = pd.DataFrame(columns=['date','event','value'])
         self.value_ot['value'] = self.value_ot['value'].astype(float)
         self.trade_cost = trade_cost_function
+        self.metrics_classes = metrics
 
     def run_worker(self, num):
         return self.workers[num].run(0)
@@ -151,6 +190,16 @@ class Backtester():
                     temp_value_ot['value'] = bt.value_ot['value'] * (new_value_ot['value'].iloc[-1]/self.start_capital)
                     new_value_ot = new_value_ot.append(temp_value_ot)
             self.value_ot = new_value_ot
+            self._make_metrics()
+
+    def _make_metrics(self):
+        if self.metrics_classes is not None:
+            self.metrics = {}
+            if type(self.metrics_classes) != list:
+                self.metrics_classes = [self.metrics_classes]
+            for metric in self.metrics_classes:
+                self.metrics[metric.name] = metric(self)
+
 
     def __iter__(self):
         self.i = 0
@@ -166,6 +215,7 @@ class Backtester():
                 self.i += 1
                 self.event = 'open'
             except:
+                self._make_metrics()
                 raise StopIteration
         self.update()
         return self.current_date, self.event, self
@@ -213,6 +263,18 @@ class Backtester():
         else:
             self.available_capital -= total
         self.portfolio.at[len(self.portfolio)] = [symbol, self.current_date, self.event, num_shares, current_price]
+
+    @property
+    def portfolio_value(self):
+        value = 0
+        for _, pos in self.portfolio.iterrows():
+            if pos['num_shares'] > 0:
+                value += pos['num_shares']*self.price(pos['symbol'])
+            else:
+                cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
+                old_val = abs(pos['num_shares'])*pos['price']
+                value += (old_val - cur_val)
+        return value
 
     @property
     def values(self):
@@ -263,7 +325,7 @@ class Backtester():
                             break
                     if num_shares is not None and pos['num_shares'] > num_shares:
                         self.available_capital += num_shares * self.price(pos['symbol'])
-                        self.portfolio.at[i]['num_shares'] -= num_shares
+                        self.portfolio.at[i,'num_shares'] -= num_shares
                         break
                 if pos['num_shares'] < 0 and short:
                     if num_shares is None or abs(pos['num_shares']) <= num_shares:
@@ -279,7 +341,7 @@ class Backtester():
                         cur_val = num_shares * self.price(pos['symbol'])
                         old_val = num_shares * pos['price']
                         self.available_capital += old_val - cur_val
-                        self.portfolio.at[i]['num_shares'] += num_shares
+                        self.portfolio.at[i,'num_shares'] += num_shares
                         break
             self.portfolio = self.portfolio.drop(drop_i)
 
