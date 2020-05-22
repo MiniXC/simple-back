@@ -1,4 +1,4 @@
-__version__ = '0.4a1'
+__version__ = '0.4a2'
 
 from .backtester import Backtester, Strategy, Fee, FlatPerShare, FlatPerTrade
 from .price_providers import DailyPriceProvider, YahooFinanceProvider

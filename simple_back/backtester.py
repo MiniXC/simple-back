@@ -303,7 +303,10 @@ class Backtester():
             num_shares *= -1
         else:
             self.available_capital -= total
-        self.portfolio.at[len(self.portfolio)] = [symbol, self.current_date, self.event, num_shares, current_price]
+        j = len(self.portfolio)
+        while j in self.portfolio.index:
+            j += 1
+        self.portfolio.loc[j] = [symbol, self.current_date, self.event, num_shares, current_price]
 
     @property
     def portfolio_value(self):
