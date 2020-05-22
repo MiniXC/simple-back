@@ -39,6 +39,43 @@ class NoFee(Fee):
         num_shares = capital // price
         return num_shares * price, num_shares
 
+class SingleMetric(ABC):
+
+    @property
+    @abstractmethod
+    def name(self):
+        pass
+
+    @abstractmethod
+    def __call__(self, bt):
+        pass
+
+    def _isSingle(self):
+        return True
+
+class MaxDrawdown(SingleMetric):
+
+    @property
+    def name(self):
+        return 'Max Drawdown'
+
+    def __call__(self, bt):
+        return bt.profit_loss.min()['Backtest']
+
+class AnnualReturn(SingleMetric):
+
+    def __init__(self):
+        self.annual_return = 0
+
+    @property
+    def name(self):
+        return 'Annual Return'
+
+    def __call__(self, bt):
+        vals = bt.values['Backtest']
+        year = 1/((bt.dates[-1]-bt.dates[0]).days/365.25)
+        return (vals[-1]/vals[0])**year
+
 class Strategy(ABC):
 
     @abstractmethod
@@ -74,6 +111,12 @@ class Backtester():
         end=None,
 
         trade_cost_function=NoFee(),
+        metrics=[MaxDrawdown(), AnnualReturn()],
+
+        # this slows down testing, but leads to more accurate metrics
+        # and can be nice for the plotly candlestick chart
+        use_high_low=False,
+        highlow=False
     ):
         self.start_capital = start_capital
         self.capital = start_capital
@@ -107,6 +150,9 @@ class Backtester():
         self.value_ot = pd.DataFrame(columns=['date','event','value'])
         self.value_ot['value'] = self.value_ot['value'].astype(float)
         self.trade_cost = trade_cost_function
+        self.metrics_classes = metrics
+
+        self.use_high_low = use_high_low or highlow
 
     def run_worker(self, num):
         return self.workers[num].run(0)
@@ -151,6 +197,16 @@ class Backtester():
                     temp_value_ot['value'] = bt.value_ot['value'] * (new_value_ot['value'].iloc[-1]/self.start_capital)
                     new_value_ot = new_value_ot.append(temp_value_ot)
             self.value_ot = new_value_ot
+            self._make_metrics()
+
+    def _make_metrics(self):
+        if self.metrics_classes is not None:
+            self.metrics = {}
+            if type(self.metrics_classes) != list:
+                self.metrics_classes = [self.metrics_classes]
+            for metric in self.metrics_classes:
+                self.metrics[metric.name] = metric(self)
+
 
     def __iter__(self):
         self.i = 0
@@ -166,6 +222,7 @@ class Backtester():
                 self.i += 1
                 self.event = 'open'
             except:
+                self._make_metrics()
                 raise StopIteration
         self.update()
         return self.current_date, self.event, self
@@ -183,14 +240,37 @@ class Backtester():
 
     def update(self):
         self.capital = self.available_capital
+        cap_high = self.available_capital
+        cap_low = self.available_capital
+        addHighLow = (self.prices.hasHighLow and self.use_high_low)
         for _, pos in self.portfolio.iterrows():
+            if addHighLow:
+                high = self.prices[pos['symbol'],self.current_date,'high']
+                low = self.prices[pos['symbol'],self.current_date,'low']
             if pos['num_shares'] > 0:
                 self.capital += pos['num_shares']*self.price(pos['symbol'])
+                if addHighLow:
+                    cap_high += pos['num_shares']*high
+                    cap_low += pos['num_shares']*low
             else:
                 cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
                 old_val = abs(pos['num_shares'])*pos['price']
                 self.capital += (old_val - cur_val)
+                if addHighLow:
+                    cur_val_high = abs(pos['num_shares'])*high
+                    cur_val_low = abs(pos['num_shares'])*low
+                    old_val = abs(pos['num_shares'])*pos['price']
+                    cap_high += (old_val - cur_val_low)
+                    cap_low += (old_val - cur_val_high)
+        if addHighLow and self.event == 'close':
+            prev_high = self.value_ot.at[len(self.value_ot)-2,'value']
+            prev_low = self.value_ot.at[len(self.value_ot)-1,'value']
+            self.value_ot.at[len(self.value_ot)-2] = [self.current_date, 'high', max(cap_high,prev_high)]
+            self.value_ot.at[len(self.value_ot)-1] = [self.current_date, 'low', min(cap_low,prev_low)]
         self.value_ot.at[len(self.value_ot)] = [self.current_date, self.event, self.capital]
+        if addHighLow and self.event == 'open':
+            self.value_ot.at[len(self.value_ot)] = [self.current_date, 'high', cap_high]
+            self.value_ot.at[len(self.value_ot)] = [self.current_date, 'low', cap_low]
 
     def order(self, symbol, capital, short=False, as_percent=False):
         if not as_percent:
@@ -215,6 +295,18 @@ class Backtester():
         self.portfolio.at[len(self.portfolio)] = [symbol, self.current_date, self.event, num_shares, current_price]
 
     @property
+    def portfolio_value(self):
+        value = 0
+        for _, pos in self.portfolio.iterrows():
+            if pos['num_shares'] > 0:
+                value += pos['num_shares']*self.price(pos['symbol'])
+            else:
+                cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
+                old_val = abs(pos['num_shares'])*pos['price']
+                value += (old_val - cur_val)
+        return value
+
+    @property
     def values(self):
         vals = self.value_ot.drop(columns=['event']).groupby('date').mean().rename(columns={'value':'Backtest'})
         vals.index = pd.to_datetime(vals.index)
@@ -223,6 +315,35 @@ class Backtester():
     @property
     def profit_loss(self):
         return self.values.pct_change()[1:]
+
+    @property
+    def plotly(self):
+        try:
+            import plotly.graph_objs as go
+            date_vals = self.value_ot['date'].unique()
+            open_vals = self.value_ot[self.value_ot['event']=='open'].reset_index()['value']
+            close_vals = self.value_ot[self.value_ot['event']=='close'].reset_index()['value']
+            if self.prices.hasHighLow:
+                high_vals = self.value_ot[self.value_ot['event']=='high'].reset_index()['value']
+                low_vals = self.value_ot[self.value_ot['event']=='low'].reset_index()['value']
+            else:
+                high_vals = [max(v) for v in zip(open_vals, close_vals)]
+                low_vals = [min(v) for v in zip(open_vals, close_vals)]
+            all_dates = pd.date_range(self.dates[0],self.dates[-1])
+            bt_dates = pd.Series(self.dates)
+            fig = go.Figure(data=[go.Candlestick(x=date_vals,
+                open=open_vals,
+                close=close_vals,
+                high=high_vals,
+                low=low_vals)])
+            fig.update_xaxes(
+                rangebreaks=[
+                    dict(values=all_dates[~all_dates.isin(bt_dates)]), #hide weekends
+                ]
+            )
+            return fig
+        except ImportError:
+            raise('Please install plotly for charting to work.')
 
     def compare(self, symbol, vals=None):
         if type(symbol) == list:

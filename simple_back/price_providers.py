@@ -20,6 +20,11 @@ class DailyPriceProvider(ABC):
     def get_price(self, symbol, date=None, event=None):
         pass
 
+    @property
+    @abstractmethod
+    def hasHighLow(self):
+        pass
+
 
 class YahooFinanceProvider(DailyPriceProvider):
 
@@ -36,9 +41,10 @@ class YahooFinanceProvider(DailyPriceProvider):
             entry = df.loc[date]
         else:
             entry = df
+        adj = entry['adjclose']/entry['close']
         if event == 'open':
             if self.adjust_prices:
-                return entry['adjclose']/entry['close']*entry['open']
+                return adj*entry['open']
             else:
                 return entry['open']
         if event == 'close':
@@ -46,6 +52,19 @@ class YahooFinanceProvider(DailyPriceProvider):
                 return entry['adjclose']
             else:
                 return entry['close']
+        if event == 'high':
+            if self.adjust_prices:
+                return adj*entry['high']
+            else:
+                return entry['high']
+        if event == 'low':
+            if self.adjust_prices:
+                return adj*entry['low']
+            else:
+                return entry['low']
         if event is None:
             return entry
         raise Exception('event was neither "open" nor "close", but was still given')
+
+    def hasHighLow(self):
+        return True
