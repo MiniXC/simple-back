@@ -263,7 +263,7 @@ class Backtester():
                             break
                     if num_shares is not None and pos['num_shares'] > num_shares:
                         self.available_capital += num_shares * self.price(pos['symbol'])
-                        self.portfolio.at[i]['num_shares'] -= num_shares
+                        self.portfolio.at[i,'num_shares'] -= num_shares
                         break
                 if pos['num_shares'] < 0 and short:
                     if num_shares is None or abs(pos['num_shares']) <= num_shares:
@@ -279,7 +279,7 @@ class Backtester():
                         cur_val = num_shares * self.price(pos['symbol'])
                         old_val = num_shares * pos['price']
                         self.available_capital += old_val - cur_val
-                        self.portfolio.at[i]['num_shares'] += num_shares
+                        self.portfolio.at[i,'num_shares'] += num_shares
                         break
             self.portfolio = self.portfolio.drop(drop_i)
 
