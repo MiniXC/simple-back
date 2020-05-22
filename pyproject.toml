@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simple-back"
-version = "0.4a0"
+version = "0.4a1"
 description = ""
 authors = ["Christoph Minixhofer <christoph.minixhofer@gmail.com>"]
 

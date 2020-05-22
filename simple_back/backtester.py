@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 import multiprocessing
 import numpy as np
 import copy
-
+import math
 
 class Fee(ABC):
 
@@ -116,7 +116,9 @@ class Backtester():
         # this slows down testing, but leads to more accurate metrics
         # and can be nice for the plotly candlestick chart
         use_high_low=False,
-        highlow=False
+        highlow=False,
+
+        live_chart=True
     ):
         self.start_capital = start_capital
         self.capital = start_capital
@@ -154,6 +156,8 @@ class Backtester():
 
         self.use_high_low = use_high_low or highlow
 
+        self.live_chart = live_chart
+
     def run_worker(self, num):
         return self.workers[num].run(0)
 
@@ -161,7 +165,7 @@ class Backtester():
         if num_workers == -1:
             num_workers = multiprocessing.cpu_count()
         if num_workers == 0:
-            for date in self.dates:
+            for date in enumerate(self.dates):
                 self.current_date = date
                 
                 self.event = 'open'
@@ -174,6 +178,8 @@ class Backtester():
                 self.strategy.close(self.current_date, self)
                 self.strategy.open_close(self.current_date, self)
 
+                if self.live_chart:
+                    self.live_plot()
             return self
         else:
             self.workers = []
@@ -223,6 +229,8 @@ class Backtester():
                 self.event = 'open'
             except:
                 self._make_metrics()
+                if self.live_chart:
+                    self.live_plot()
                 raise StopIteration
         self.update()
         return self.current_date, self.event, self
@@ -252,7 +260,7 @@ class Backtester():
                 if addHighLow:
                     cap_high += pos['num_shares']*high
                     cap_low += pos['num_shares']*low
-            else:
+            elif pos['num_shares'] < 0:
                 cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
                 old_val = abs(pos['num_shares'])*pos['price']
                 self.capital += (old_val - cur_val)
@@ -271,6 +279,8 @@ class Backtester():
         if addHighLow and self.event == 'open':
             self.value_ot.at[len(self.value_ot)] = [self.current_date, 'high', cap_high]
             self.value_ot.at[len(self.value_ot)] = [self.current_date, 'low', cap_low]
+        if self.live_chart and self.i % 10 == 0:
+            self.live_plot()
 
     def order(self, symbol, capital, short=False, as_percent=False):
         if not as_percent:
@@ -278,12 +288,13 @@ class Backtester():
                 raise Exception('not enough capital available')
         else:
             if capital * self.capital > self.available_capital:
-                raise Exception(
-                    f"""
-                    not enough capital available:
-                    ordered {capital} * {self.capital} with only {self.available_capital} available
-                    """
-                )
+                if not math.isclose(capital * self.capital, self.available_capital):
+                    raise Exception(
+                        f"""
+                        not enough capital available:
+                        ordered {capital} * {self.capital} with only {self.available_capital} available
+                        """
+                    )
         current_price = self.prices[symbol, self.current_date, self.event]
         if as_percent:
             capital = capital * self.available_capital
@@ -300,7 +311,7 @@ class Backtester():
         for _, pos in self.portfolio.iterrows():
             if pos['num_shares'] > 0:
                 value += pos['num_shares']*self.price(pos['symbol'])
-            else:
+            elif pos['num_shares'] < 0:
                 cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
                 old_val = abs(pos['num_shares'])*pos['price']
                 value += (old_val - cur_val)
@@ -315,6 +326,29 @@ class Backtester():
     @property
     def profit_loss(self):
         return self.values.pct_change()[1:]
+
+    def live_plot(self):
+        try:
+            try:
+                _ = self.live_plot_first
+                self.live_plot_first = False
+            except:
+                self.live_plot_first = True
+            if self.live_plot_first:
+                from IPython import display
+                import pylab as pl
+                import matplotlib.pyplot as plt
+                self.ext = {}
+                self.ext['plt'] = plt
+                self.ext['display'] = display
+                self.ext['pl'] = pl
+            self.ext['plt'].plot(self.values)
+            self.ext['plt'].xlim([self.dates[0],self.dates[-1]])
+            self.ext['display'].clear_output(wait=True)
+            self.ext['display'].display(self.ext['pl'].gcf())
+            self.ext['plt'].close()
+        except ImportError:
+            raise('Live plots only work in Jupyter Lab or Notebook')
 
     @property
     def plotly(self):
@@ -377,6 +411,7 @@ class Backtester():
                 if pos['num_shares'] > 0 and not short:
                     if num_shares is None or pos['num_shares'] <= num_shares:
                         self.available_capital += pos['num_shares'] * self.price(pos['symbol'])
+                        self.portfolio.at[i,'num_shares'] = 0
                         drop_i.append(i)
                         if num_shares is not None:
                             num_shares -= pos['num_shares']
@@ -391,6 +426,7 @@ class Backtester():
                         cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
                         old_val = abs(pos['num_shares'])*pos['price']
                         self.available_capital += old_val - cur_val
+                        self.portfolio.at[i,'num_shares'] = 0
                         drop_i.append(i)
                         if num_shares is not None:
                             num_shares -= pos['num_shares']
