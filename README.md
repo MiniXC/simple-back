@@ -22,13 +22,13 @@ for day, event, b in tqdm(Backtester(10_000, cal='NYSE', start='2019-4-1', end=r
     # check if we already hold a position
     if ticker in b.portfolio['symbol']:
       # check if we are short or long
-      if b.portfolio['number'].sum() < 0:
+      if b.portfolio['number'].sum() > 0:
         if b.price(ticker) > avg:
-          b.liquidate()
+          b.liquidate(ticker)
           b.order(ticker, 1, as_percent=True)
       if b.portfolio['number'].sum() < 0:
-        if b.price(ticker) > avg:
-          b.liquidate()
+        if b.price(ticker) < avg:
+          b.liquidate(ticker, short=True)
           b.order(ticker, 1, as_percent=True)
 ````
 
