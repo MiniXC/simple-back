@@ -90,6 +90,14 @@ version = "1.1.0"
 
 [[package]]
 category = "main"
+description = "Disk Cache -- Disk and file backed persistent cache."
+name = "diskcache"
+optional = false
+python-versions = "*"
+version = "4.1.0"
+
+[[package]]
+category = "main"
 description = "Up to date simple useragent faker with real world database"
 name = "fake-useragent"
 optional = false
@@ -435,7 +443,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "cb51114d4f825602ff034f212d0e7e98ebf8d6bc1c440c60bf4b122b86dd2713"
+content-hash = "06d54bb690f4644bd4f6e735c8ec207f056a540eec0aca296ed55ba9c7fa81a9"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -474,6 +482,10 @@ colorama = [
 cssselect = [
     {file = "cssselect-1.1.0-py2.py3-none-any.whl", hash = "sha256:f612ee47b749c877ebae5bb77035d8f4202c6ad0f0fc1271b3c18ad6c4468ecf"},
     {file = "cssselect-1.1.0.tar.gz", hash = "sha256:f95f8dedd925fd8f54edb3d2dfb44c190d9d18512377d3c1e2388d16126879bc"},
+]
+diskcache = [
+    {file = "diskcache-4.1.0-py2.py3-none-any.whl", hash = "sha256:69b253a6ffe95bb4bafb483b97c24fca3c2c6c47b82e92b36486969a7e80d47d"},
+    {file = "diskcache-4.1.0.tar.gz", hash = "sha256:bcee5a59f9c264e2809e58d01be6569a3bbb1e36a1e0fb83f7ef9b2075f95ce0"},
 ]
 fake-useragent = [
     {file = "fake-useragent-0.1.11.tar.gz", hash = "sha256:c104998b750eb097eefc28ae28e92d66397598d2cf41a31aa45d5559ef1adf35"},

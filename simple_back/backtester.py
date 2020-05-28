@@ -8,100 +8,193 @@ import multiprocessing
 import numpy as np
 import copy
 import math
+import json
 
-class Fee(ABC):
+from .fees import NoFee
+from .metrics import MaxDrawdown, AnnualReturn, PortfolioValue, ProfitLoss, TotalValue
 
-    @abstractmethod
-    def __call__(self, price, num_shares, order_type):
-        pass
+class LongShortLiquidationError(Exception):
+    def __init__(self, message):
+        self.message = message
 
-class FlatPerTrade(Fee):
+class Position:
+    def __init__(self, bt, symbol, date, event, num_shares):
+        self.symbol = symbol
+        self.date = date
+        self.event = event
+        self.num_shares_int = num_shares
+        self.init_price = bt.price(symbol)
+        self.bt = bt
+        self.frozen = False
 
-    def __init__(self, fee):
-        self.fee = fee
-
-    def __call__(self, price, capital):
-        num_shares = (capital - self.fee) // price
-        return price * num_shares + self.fee, num_shares
-
-class FlatPerShare(Fee):
-
-    def __init__(self, fee):
-        self.fee = fee
-
-    def __call__(self, price, capital):
-        num_shares = capital // (self.fee + price)
-        return (price + self.fee) * num_shares, num_shares
-
-class NoFee(Fee):
-
-    def __call__(self, price, capital):
-        num_shares = capital // price
-        return num_shares * price, num_shares
-
-class SingleMetric(ABC):
-
-    @property
-    @abstractmethod
-    def name(self):
-        pass
-
-    @abstractmethod
-    def __call__(self, bt):
-        pass
-
-    def _isSingle(self):
-        return True
-
-class MaxDrawdown(SingleMetric):
+    def __repr__(self):
+        if self.short:
+            t = 'short'
+        if self.long:
+            t = 'long'
+        result = {
+            'symbol': self.symbol,
+            'date & event': str(self.date) + " " + self.event,
+            'type': t,
+            'shares': self.num_shares,
+            'profit/loss (abs)': f'{self.profit_loss_abs:.2f}',
+            'profit/loss (%)': f'{self.profit_loss_pct:.2f}',
+        }
+        if self.frozen:
+            result['end date & event'] = str(self.end_date) + " " + self.end_event
+        return json.dumps(result, sort_keys=True, indent=2)
 
     @property
-    def name(self):
-        return 'Max Drawdown'
-
-    def __call__(self, bt):
-        return bt.profit_loss.min()['Backtest']
-
-class AnnualReturn(SingleMetric):
-
-    def __init__(self):
-        self.annual_return = 0
+    def short(self):
+        return self.num_shares_int < 0
 
     @property
-    def name(self):
-        return 'Annual Return'
+    def long(self):
+        return self.num_shares_int > 0
 
-    def __call__(self, bt):
-        vals = bt.values['Backtest']
-        year = 1/((bt.dates[-1]-bt.dates[0]).days/365.25)
-        return (vals[-1]/vals[0])**year
+    @property
+    def value(self):
+        if self.short:
+            old_val = self.initial_value
+            cur_val = self.num_shares * self.bt.price(self.symbol)
+            return old_val + (old_val - cur_val)
+        if self.long:
+            return self.num_shares * self.bt.price(self.symbol)
 
-class Strategy(ABC):
+    @property
+    def price(self):
+        if self.frozen:
+            return self.bt.prices[self.symbol,self.end_date,self.end_event]
+        else:
+            return self.bt.price(self.symbol)
 
-    @abstractmethod
-    def open_close(self, day, bt):
-        pass
+    @property
+    def value_pershare(self):
+        if self.long:
+            return self.bt.price(self.symbol)
+        if self.short:
+            return self.init_price + (self.init_price - self.bt.price(self.symbol))
 
-    @abstractmethod
-    def open(self, day, bt):
-        pass
+    @property
+    def initial_value(self):
+        if self.short:
+            return self.num_shares * self.init_price
+        if self.long:
+            return self.num_shares * self.init_price
 
-    @abstractmethod
-    def close(self, day, bt):
-        pass
+    @property
+    def profit_loss_pct(self):
+            return self.value / self.initial_value - 1
 
-class Backtester():
+    @property
+    def profit_loss_abs(self):
+        return self.value - self.initial_value
+
+    @property
+    def num_shares(self):
+        return abs(self.num_shares_int)
+
+    def _remove_shares(self, n):
+        if self.short:
+            self.num_shares_int += n
+        if self.long:
+            self.num_shares_int -= n
+
+    def _freeze(self):
+        self.frozen = True
+        self.end_date = self.bt.current_date
+        self.end_event = self.bt.event
+
+class Portfolio:
+    def __init__(self, bt, positions=[]):
+        self.positions = positions
+        self.bt = bt
     
+    @property
+    def value(self):
+        val = 0
+        for pos in self.positions:
+            val += pos.value
+        return val
+
+    def __repr__(self):
+        return self.positions.__repr__()
+
+    def liquidate(self, num_shares=-1):
+        is_long = False
+        is_short = False
+        for pos in self.positions:
+            if pos.long:
+                is_long = True
+            if pos.short:
+                is_short = True
+        if is_long and is_short:
+            raise LongShortLiquidationError("liquidating a mix of long and short positions is not possible")
+        for pos in self.positions:
+            if num_shares == -1 or num_shares > pos.num_shares:
+                #self.bt.available_capital += pos.value
+                print(len(self.bt.portfolio_new.positions))
+                self.bt.portfolio_new._remove(pos)
+                
+                pos._freeze()
+                self.bt.trades._add(pos)
+                
+                print(len(self.bt.portfolio_new.positions))
+                num_shares -= pos.num_shares
+            elif num_shares > 0 and num_shares < pos.num_shares:
+                #self.bt.available_capital += pos.value_pershare * num_shares
+                pos._remove_shares(num_shares)
+                
+                # TODO: test how much this slows everything down, maybe make conditional
+                hist = copy.copy(pos)
+                hist._freeze()
+                if hist.short:
+                    hist.num_shares_int = (-1) * num_shares
+                if hist.long:
+                    hist.num_shares_int = num_shares
+                self.bt.trades._add(hist)
+                
+                break
+
+    def _add(self, position):
+        self.positions.append(position)
+
+    def _remove(self, position):
+        self.positions.remove(position)
+
+    def __getitem__(self, symbol):
+        new_pos = []
+        # TODO: add possibility for gt, lt...
+        if type(symbol) == str:
+            for pos in self.positions:
+                if pos.symbol == symbol:
+                    new_pos.append(pos)
+        return Portfolio(self.bt, new_pos)
+
+    @property
+    def short(self):
+        new_pos = []
+        for pos in self.positions:
+            if pos.short:
+                new_pos.append(pos)
+        return Portfolio(self.bt, new_pos)
+
+    @property
+    def long(self):
+        new_pos = []
+        for pos in self.positions:
+            if pos.long:
+                new_pos.append(pos)
+        return Portfolio(self.bt, new_pos)
+
+class Backtester:
     def __init__(
-        self, 
-        start_capital, 
+        self,
+        start_capital,
         prices=None,
-
         strategy=None,
-
         # list of dates to be used
-        dates=None, 
-
+        dates=None,
         # if list of dates is not supplied, use pandas_market_calendars
         market_calendar=None,
         cal=None,
@@ -109,16 +202,13 @@ class Backtester():
         start_date=None,
         end_date=None,
         end=None,
-
-        trade_cost_function=NoFee(),
-        metrics=[MaxDrawdown(), AnnualReturn()],
-
+        trade_cost_function=NoFee,
+        metrics=[MaxDrawdown(), AnnualReturn(), PortfolioValue(), TotalValue(), ProfitLoss()],
         # this slows down testing, but leads to more accurate metrics
         # and can be nice for the plotly candlestick chart
         use_high_low=False,
         highlow=False,
-
-        live_chart=True
+        live_chart=True,
     ):
         self.start_capital = start_capital
         self.capital = start_capital
@@ -126,6 +216,7 @@ class Backtester():
 
         if prices is None:
             prices = YahooFinanceProvider()
+        prices.bt = self
         if dates is not None:
             self.dates = dates
         else:
@@ -137,98 +228,70 @@ class Backtester():
             cal = mcal.get_calendar(market_calendar)
             if start_date is not None:
                 if end_date is None:
-                    end_date = date.today()-relativedelta(days=1)
+                    end_date = date.today() - relativedelta(days=1)
                 if type(start_date) == relativedelta:
-                    start_date = date.today()-start_date
+                    start_date = date.today() - start_date
                 if type(end_date) == relativedelta:
-                    end_date = date.today()-end_date
+                    end_date = date.today() - end_date
                 sched = cal.schedule(start_date=start_date, end_date=end_date)
-            self.dates = mcal.date_range(sched, frequency='1D')
+            self.dates = mcal.date_range(sched, frequency="1D")
             self.dates = [d.date() for d in self.dates]
         if strategy is not None:
             self.strategy = strategy
         self.prices = prices
-        self.portfolio = pd.DataFrame(columns=['symbol', 'date', 'event', 'num_shares', 'price'])
-        self.value_ot = pd.DataFrame(columns=['date','event','value'])
-        self.value_ot['value'] = self.value_ot['value'].astype(float)
+        self.portfolio = pd.DataFrame(
+            columns=["symbol", "date", "event", "num_shares", "price"]
+        )
+        self.portfolio_new = Portfolio(self)
+        self.trades = copy.deepcopy(Portfolio(self))
+        self.value_ot = pd.DataFrame(columns=["date", "event", "value"])
+        self.value_ot["value"] = self.value_ot["value"].astype(float)
         self.trade_cost = trade_cost_function
-        self.metrics_classes = metrics
+
+        self.metrics = {}
+        for m in metrics:
+            m.bt = self
+            self.metrics[m.name] = m
 
         self.use_high_low = use_high_low or highlow
 
         self.live_chart = live_chart
 
-    def run_worker(self, num):
-        return self.workers[num].run(0)
+    def run(self):
+        for i, date in enumerate(self.dates):
+            self.i = i
+            self.current_date = date
 
-    def run(self, num_workers=-1):
-        if num_workers == -1:
-            num_workers = multiprocessing.cpu_count()
-        if num_workers == 0:
-            for date in enumerate(self.dates):
-                self.current_date = date
-                
-                self.event = 'open'
-                self.update()
-                self.strategy.open(self.current_date, self)
-                self.strategy.open_close(self.current_date, self)
+            self.event = "open"
+            self.update()
+            self.strategy.run(self.current_date, self.event, self)
 
-                self.event = 'close'
-                self.update()
-                self.strategy.close(self.current_date, self)
-                self.strategy.open_close(self.current_date, self)
+            self.event = "close"
+            self.update()
+            self.strategy.run(self.current_date, self.event, self)
 
-                if self.live_chart:
-                    self.live_plot()
-            return self
-        else:
-            self.workers = []
-            date_splits = np.array_split(self.dates, num_workers)
-            for i in range(num_workers):
-                worker_bt = copy.deepcopy(self)
-                # share the prices object
-                worker_bt.prices = self.prices
-                # set dates
-                worker_bt.dates = date_splits[i]
-                self.workers.append(worker_bt)
-                # start multiprocessing
-            pool = multiprocessing.Pool(processes=num_workers)
-            backtesters = pool.map(self.run_worker, range(num_workers))
-            new_value_ot = None
-            for i, bt in enumerate(backtesters):
-                if i == 0:
-                    new_value_ot = bt.value_ot.copy()
-                else:
-                    temp_value_ot = bt.value_ot.copy()
-                    temp_value_ot['value'] = bt.value_ot['value'] * (new_value_ot['value'].iloc[-1]/self.start_capital)
-                    new_value_ot = new_value_ot.append(temp_value_ot)
-            self.value_ot = new_value_ot
-            self._make_metrics()
-
-    def _make_metrics(self):
-        if self.metrics_classes is not None:
-            self.metrics = {}
-            if type(self.metrics_classes) != list:
-                self.metrics_classes = [self.metrics_classes]
-            for metric in self.metrics_classes:
-                self.metrics[metric.name] = metric(self)
-
+            if self.live_chart:
+                self.live_plot()
+        return self
 
     def __iter__(self):
-        self.i = 0
-        self.event = 'close'
+        self.i = -1
+        self.event = "close"
         return self
 
     def __next__(self):
-        if self.event == 'open':
-            self.event = 'close'
-        elif self.event == 'close':
+        if self.event == "open":
+            self.event = "close"
+        elif self.event == "close":
             try:
-                self.current_date = self.dates[self.i]
                 self.i += 1
-                self.event = 'open'
-            except:
-                self._make_metrics()
+                self.current_date = self.dates[self.i]
+                self.event = "open"
+            except IndexError:
+                self.i -= 1
+                for metric in self.metrics.values():
+                    if metric._single:
+                        metric(write=True)
                 if self.live_chart:
                     self.live_plot()
                 raise StopIteration
@@ -236,56 +299,25 @@ class Backtester():
         return self.current_date, self.event, self
 
     def __len__(self):
-        return len(self.dates)*2-1
+        return len(self.dates) * 2
 
-    def price(self, symbol, lookback=None):
-        if lookback is None:
-            return self.prices[symbol,self.current_date,self.event]
-        if lookback > 0:
-            start = self.current_date-relativedelta(days=lookback)
-            end = self.current_date
-            return self.prices[symbol,start:end,self.event]
+    def price(self, symbol):
+        return self.prices[symbol, self.current_date, self.event]
 
     def update(self):
-        self.capital = self.available_capital
-        cap_high = self.available_capital
-        cap_low = self.available_capital
-        addHighLow = (self.prices.hasHighLow and self.use_high_low)
-        for _, pos in self.portfolio.iterrows():
-            if addHighLow:
-                high = self.prices[pos['symbol'],self.current_date,'high']
-                low = self.prices[pos['symbol'],self.current_date,'low']
-            if pos['num_shares'] > 0:
-                self.capital += pos['num_shares']*self.price(pos['symbol'])
-                if addHighLow:
-                    cap_high += pos['num_shares']*high
-                    cap_low += pos['num_shares']*low
-            elif pos['num_shares'] < 0:
-                cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
-                old_val = abs(pos['num_shares'])*pos['price']
-                self.capital += (old_val - cur_val)
-                if addHighLow:
-                    cur_val_high = abs(pos['num_shares'])*high
-                    cur_val_low = abs(pos['num_shares'])*low
-                    old_val = abs(pos['num_shares'])*pos['price']
-                    cap_high += (old_val - cur_val_low)
-                    cap_low += (old_val - cur_val_high)
-        if addHighLow and self.event == 'close':
-            prev_high = self.value_ot.at[len(self.value_ot)-2,'value']
-            prev_low = self.value_ot.at[len(self.value_ot)-1,'value']
-            self.value_ot.at[len(self.value_ot)-2] = [self.current_date, 'high', max(cap_high,prev_high)]
-            self.value_ot.at[len(self.value_ot)-1] = [self.current_date, 'low', min(cap_low,prev_low)]
-        self.value_ot.at[len(self.value_ot)] = [self.current_date, self.event, self.capital]
-        if addHighLow and self.event == 'open':
-            self.value_ot.at[len(self.value_ot)] = [self.current_date, 'high', cap_high]
-            self.value_ot.at[len(self.value_ot)] = [self.current_date, 'low', cap_low]
+        self.portfolio = self.portfolio[self.portfolio['num_shares'] != 0].copy()
+        self.portfolio["cur_price"] = self.portfolio["symbol"].apply(self.price)
+        for metric in self.metrics.values():
+            if metric._series:
+                metric(write=True)
+        self.capital = self.available_capital + self.metrics["Portfolio Value"][-1]
         if self.live_chart and self.i % 10 == 0:
             self.live_plot()
 
     def order(self, symbol, capital, short=False, as_percent=False):
         if not as_percent:
             if capital > self.available_capital:
-                raise Exception('not enough capital available')
+                raise Exception("not enough capital available")
         else:
             if capital * self.capital > self.available_capital:
                 if not math.isclose(capital * self.capital, self.available_capital):
@@ -295,40 +327,28 @@ class Backtester():
                         ordered {capital} * {self.capital} with only {self.available_capital} available
                         """
                     )
-        current_price = self.prices[symbol, self.current_date, self.event]
+        current_price = self.price(symbol)
         if as_percent:
             capital = capital * self.capital
         total, num_shares = self.trade_cost(current_price, capital)
         if short:
             num_shares *= -1
-        else:
-            self.available_capital -= total
-        j = len(self.portfolio)
-        while j in self.portfolio.index:
-            j += 1
-        self.portfolio.loc[j] = [symbol, self.current_date, self.event, num_shares, current_price]
-
-    @property
-    def portfolio_value(self):
-        value = 0
-        for _, pos in self.portfolio.iterrows():
-            if pos['num_shares'] > 0:
-                value += pos['num_shares']*self.price(pos['symbol'])
-            elif pos['num_shares'] < 0:
-                cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
-                old_val = abs(pos['num_shares'])*pos['price']
-                value += (old_val - cur_val)
-        return value
-
-    @property
-    def values(self):
-        vals = self.value_ot.drop(columns=['event']).groupby('date').mean().rename(columns={'value':'Backtest'})
-        vals.index = pd.to_datetime(vals.index)
-        return vals
-
-    @property
-    def profit_loss(self):
-        return self.values.pct_change()[1:]
+        self.available_capital -= total
+        self.portfolio_new._add(Position(
+            self,
+            symbol,
+            self.current_date,
+            self.event,
+            num_shares)
+        )
+        self.portfolio.at[len(self.portfolio)] = [
+            symbol,
+            self.current_date,
+            self.event,
+            num_shares,
+            current_price,
+            None
+        ]
 
     def live_plot(self):
         try:
@@ -341,57 +361,73 @@ class Backtester():
                 from IPython import display
                 import pylab as pl
                 import matplotlib.pyplot as plt
+
                 self.ext = {}
-                self.ext['plt'] = plt
-                self.ext['display'] = display
-                self.ext['pl'] = pl
-            self.ext['plt'].plot(self.values)
-            self.ext['plt'].xlim([self.dates[0],self.dates[-1]])
-            self.ext['display'].clear_output(wait=True)
-            self.ext['display'].display(self.ext['pl'].gcf())
-            self.ext['plt'].close()
+                self.ext["plt"] = plt
+                self.ext["display"] = display
+                self.ext["pl"] = pl
+            self.ext["plt"].plot(self.metrics['Total Value'].value)
+            #self.ext["plt"].xlim([self.dates[0], self.dates[-1]])
+            self.ext["display"].clear_output(wait=True)
+            self.ext["display"].display(self.ext["pl"].gcf())
+            self.ext["plt"].close()
         except ImportError:
-            raise('Live plots only work in Jupyter Lab or Notebook')
+            raise ("Live plots only work in Jupyter Lab or Notebook")
 
     @property
     def plotly(self):
         try:
             import plotly.graph_objs as go
-            date_vals = self.value_ot['date'].unique()
-            open_vals = self.value_ot[self.value_ot['event']=='open'].reset_index()['value']
-            close_vals = self.value_ot[self.value_ot['event']=='close'].reset_index()['value']
+
+            date_vals = self.value_ot["date"].unique()
+            open_vals = self.value_ot[self.value_ot["event"] == "open"].reset_index()[
+                "value"
+            ]
+            close_vals = self.value_ot[self.value_ot["event"] == "close"].reset_index()[
+                "value"
+            ]
             if self.prices.hasHighLow:
-                high_vals = self.value_ot[self.value_ot['event']=='high'].reset_index()['value']
-                low_vals = self.value_ot[self.value_ot['event']=='low'].reset_index()['value']
+                high_vals = self.value_ot[
+                    self.value_ot["event"] == "high"
+                ].reset_index()["value"]
+                low_vals = self.value_ot[self.value_ot["event"] == "low"].reset_index()[
+                    "value"
+                ]
             else:
                 high_vals = [max(v) for v in zip(open_vals, close_vals)]
                 low_vals = [min(v) for v in zip(open_vals, close_vals)]
-            all_dates = pd.date_range(self.dates[0],self.dates[-1])
+            all_dates = pd.date_range(self.dates[0], self.dates[-1])
             bt_dates = pd.Series(self.dates)
-            fig = go.Figure(data=[go.Candlestick(x=date_vals,
-                open=open_vals,
-                close=close_vals,
-                high=high_vals,
-                low=low_vals)])
+            fig = go.Figure(
+                data=[
+                    go.Candlestick(
+                        x=date_vals,
+                        open=open_vals,
+                        close=close_vals,
+                        high=high_vals,
+                        low=low_vals,
+                    )
+                ]
+            )
             fig.update_xaxes(
                 rangebreaks=[
-                    dict(values=all_dates[~all_dates.isin(bt_dates)]), #hide weekends
+                    dict(values=all_dates[~all_dates.isin(bt_dates)]),  # hide weekends
                 ]
             )
             return fig
         except ImportError:
-            raise('Please install plotly for charting to work.')
+            raise ("Please install plotly for charting to work.")
 
     def compare(self, symbol, vals=None):
         if type(symbol) == list:
             first = symbol[0]
             symbols = symbol[1:]
             symbol = first
-        c = self.prices[symbol,self.dates,'open']
-        c = c/c[0]*self.start_capital
+        c = self.prices[symbol, self.dates, "open"]
+        c = c / c[0] * self.start_capital
         if vals is None:
             vals = self.values.copy()
-        vals[symbol] = pd.DataFrame(c, columns=[symbol]) 
+        vals[symbol] = pd.DataFrame(c, columns=[symbol])
         if len(symbols) is not 0:
             vals = self.compare(symbols, vals)
         return vals
@@ -404,42 +440,42 @@ class Backtester():
         if type(symbol) == list:
             if num_shares == None:
                 for sym in symbol:
-                    self.liquidate(sym,None)
+                    self.liquidate(sym, None)
             else:
-                for sym, num in zip(symbol,num_shares):
-                    self.liquidate(sym,num)
+                for sym, num in zip(symbol, num_shares):
+                    self.liquidate(sym, num)
         else:
             drop_i = []
-            for i, pos in self.portfolio[self.portfolio['symbol']==symbol].iterrows():
-                if pos['num_shares'] > 0 and not short:
-                    if num_shares is None or pos['num_shares'] <= num_shares:
-                        self.available_capital += pos['num_shares'] * self.price(pos['symbol'])
-                        self.portfolio.at[i,'num_shares'] = 0
+            for i, pos in self.portfolio[self.portfolio["symbol"] == symbol].iterrows():
+                if pos["num_shares"] > 0 and not short:
+                    if num_shares is None or pos["num_shares"] <= num_shares:
+                        self.available_capital += pos["num_shares"] * pos["cur_price"]
+                        self.portfolio.at[i, "num_shares"] = 0
                         drop_i.append(i)
                         if num_shares is not None:
-                            num_shares -= pos['num_shares']
+                            num_shares -= pos["num_shares"]
                         if num_shares == 0:
                             break
-                    if num_shares is not None and pos['num_shares'] > num_shares:
-                        self.available_capital += num_shares * self.price(pos['symbol'])
-                        self.portfolio.at[i,'num_shares'] -= num_shares
+                    if num_shares is not None and pos["num_shares"] > num_shares:
+                        self.available_capital += num_shares * pos["cur_price"]
+                        self.portfolio.at[i, "num_shares"] -= num_shares
                         break
-                if pos['num_shares'] < 0 and short:
-                    if num_shares is None or abs(pos['num_shares']) <= num_shares:
-                        cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
-                        old_val = abs(pos['num_shares'])*pos['price']
-                        self.available_capital += old_val - cur_val
-                        self.portfolio.at[i,'num_shares'] = 0
+                if pos["num_shares"] < 0 and short:
+                    if num_shares is None or abs(pos["num_shares"]) <= num_shares:
+                        cur_val = abs(pos["num_shares"]) * pos["cur_price"]
+                        old_val = abs(pos["num_shares"]) * pos["price"]
+                        self.available_capital += old_val + (old_val - cur_val)
+                        self.portfolio.at[i, "num_shares"] = 0
                         drop_i.append(i)
                         if num_shares is not None:
-                            num_shares -= pos['num_shares']
+                            num_shares -= pos["num_shares"]
                         if num_shares == 0:
                             break
-                    if num_shares is not None and abs(pos['num_shares']) > num_shares:
-                        cur_val = num_shares * self.price(pos['symbol'])
-                        old_val = num_shares * pos['price']
-                        self.available_capital += old_val - cur_val
-                        self.portfolio.at[i,'num_shares'] += num_shares
+                    if num_shares is not None and abs(pos["num_shares"]) > num_shares:
+                        cur_val = num_shares * pos["cur_price"]
+                        old_val = num_shares * pos["price"]
+                        self.available_capital += old_val + (old_val - cur_val)
+                        self.portfolio.at[i, "num_shares"] += num_shares
                         break
             self.portfolio = self.portfolio.drop(drop_i)
 
@@ -449,13 +485,15 @@ class Backtester():
         else:
             iter_port = self.portfolio[pos_index]
         for _, pos in iter_port.iterrows():
-            if pos['num_shares'] > 0:
-                self.available_capital += pos['num_shares']*self.price(pos['symbol'])
+            if pos["num_shares"] > 0:
+                self.available_capital += pos["num_shares"] * pos["cur_price"]
             else:
-                cur_val = abs(pos['num_shares'])*self.price(pos['symbol'])
-                old_val = abs(pos['num_shares'])*pos['price']
-                self.available_capital += old_val - cur_val
+                cur_val = abs(pos["num_shares"]) * pos["cur_price"]
+                old_val = abs(pos["num_shares"]) * pos["price"]
+                self.available_capital += old_val + (old_val - cur_val)
         if pos_index == None:
-            self.portfolio = self.portfolio.iloc[0:0]
+            self.portfolio = pd.DataFrame(
+                columns=["symbol", "date", "event", "num_shares", "price"]
+            )
         else:
-            self.portfolio = self.portfolio[~pos_index]
+            self.portfolio = self.portfolio[~pos_index].copy()

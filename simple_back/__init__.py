@@ -1,11 +1,14 @@
-__version__ = '0.4a2'
-
-from .backtester import Backtester, Strategy, Fee, FlatPerShare, FlatPerTrade
-from .price_providers import DailyPriceProvider, YahooFinanceProvider
+__version__ = "0.4"
+"""
+import .backtester as backtester
+import .strategy as strategy
+import .fees as fees
+import .price_providers as price_providers
 
 __all__ = [
-    "Backtester",
-    "DailyPriceProvider",
-    "YahooFinanceProvider",
-    "Strategy"
+    "backtester",
+    "strategy",
+    "fees",
+    "price_providers"
 ]
+"""
