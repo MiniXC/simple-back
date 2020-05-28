@@ -123,7 +123,13 @@ class SeriesMetric(Metric):
 
     @property
     def df(self):
-        pd.DataFrame((self.value_open, self.value_close), columns=['open','close'])
+        df = pd.DataFrame()
+        df['date'] = self.bt.dates[:self.i+1]
+        df['open'] = self.value_open[:self.i+1]
+        df['close'] = self.value_close[:self.i+1]
+        if self.current_event == 'open':
+            df.at[-1, 'close'] = None
+        return df.set_index('date')
 
     @property
     @abstractmethod
@@ -191,20 +197,8 @@ class PortfolioValue(SeriesMetric):
     def name(self):
         return "Portfolio Value"
 
-    def portfolio_value(self, num_shares, cur_price, price):
-        if num_shares > 0:
-            return num_shares * cur_price
-        elif num_shares < 0:
-            cur_val = abs(num_shares) * cur_price
-            old_val = abs(num_shares) * price
-            return old_val + (old_val - cur_val)
-        return 0
-
     def get_value(self, bt):
-        value = 0
-        if len(bt.portfolio) > 0:
-            value = bt.portfolio.apply(lambda x: self.portfolio_value(x.num_shares, x.cur_price, x.price), axis=1).sum()
-        return value
+        return bt.portfolio.value
 
 
 class ProfitLoss(SeriesMetric):

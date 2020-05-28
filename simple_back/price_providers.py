@@ -72,7 +72,7 @@ class DailyDataProvider(ABC):
             List[str],
             Tuple[
                 Union[List[str], str],
-                Optional[Union[slice, date]],
+                Optional[Union[slice, type(date)]],
                 Optional[Union[List[str], str]],
             ],
         ],

@@ -132,17 +132,15 @@ class Portfolio:
             raise LongShortLiquidationError("liquidating a mix of long and short positions is not possible")
         for pos in self.positions:
             if num_shares == -1 or num_shares > pos.num_shares:
-                #self.bt.available_capital += pos.value
-                print(len(self.bt.portfolio_new.positions))
-                self.bt.portfolio_new._remove(pos)
+                self.bt.available_capital += pos.value
+                self.bt.portfolio._remove(pos)
                 
                 pos._freeze()
                 self.bt.trades._add(pos)
                 
-                print(len(self.bt.portfolio_new.positions))
                 num_shares -= pos.num_shares
             elif num_shares > 0 and num_shares < pos.num_shares:
-                #self.bt.available_capital += pos.value_pershare * num_shares
+                self.bt.available_capital += pos.value_pershare * num_shares
                 pos._remove_shares(num_shares)
                 
                 # TODO: test how much this slows everything down, maybe make conditional
@@ -186,6 +184,9 @@ class Portfolio:
             if pos.long:
                 new_pos.append(pos)
         return Portfolio(self.bt, new_pos)
+
+    def __len__(self):
+        return len(self.positions)
 
 class Backtester:
     def __init__(
@@ -239,10 +240,7 @@ class Backtester:
         if strategy is not None:
             self.strategy = strategy
         self.prices = prices
-        self.portfolio = pd.DataFrame(
-            columns=["symbol", "date", "event", "num_shares", "price"]
-        )
-        self.portfolio_new = Portfolio(self)
+        self.portfolio = Portfolio(self)
         self.trades = copy.deepcopy(Portfolio(self))
         self.value_ot = pd.DataFrame(columns=["date", "event", "value"])
         self.value_ot["value"] = self.value_ot["value"].astype(float)
@@ -305,8 +303,6 @@ class Backtester:
         return self.prices[symbol, self.current_date, self.event]
 
     def update(self):
-        self.portfolio = self.portfolio[self.portfolio['num_shares'] != 0].copy()
-        self.portfolio["cur_price"] = self.portfolio["symbol"].apply(self.price)
         for metric in self.metrics.values():
             if metric._series:
                 metric(write=True)
@@ -314,7 +310,12 @@ class Backtester:
         if self.live_chart and self.i % 10 == 0:
             self.live_plot()
 
-    def order(self, symbol, capital, short=False, as_percent=False):
+    def _order(self, symbol, capital, as_percent=False):
+        if capital < 0:
+            short = True
+            capital = (-1) * capital
+        else:
+            short = False
         if not as_percent:
             if capital > self.available_capital:
                 raise Exception("not enough capital available")
@@ -334,21 +335,19 @@ class Backtester:
         if short:
             num_shares *= -1
         self.available_capital -= total
-        self.portfolio_new._add(Position(
+        self.portfolio._add(Position(
             self,
             symbol,
             self.current_date,
             self.event,
             num_shares)
         )
-        self.portfolio.at[len(self.portfolio)] = [
-            symbol,
-            self.current_date,
-            self.event,
-            num_shares,
-            current_price,
-            None
-        ]
+    
+    def order_pct(self, symbol, capital):
+        self._order(symbol, capital, as_percent=True)
+
+    def order_abs(self, symbol, capital):
+        self._order(symbol, capital, as_percent=False)
 
     def live_plot(self):
         try:
@@ -417,83 +416,3 @@ class Backtester:
             return fig
         except ImportError:
             raise ("Please install plotly for charting to work.")
-
-    def compare(self, symbol, vals=None):
-        if type(symbol) == list:
-            first = symbol[0]
-            symbols = symbol[1:]
-            symbol = first
-        c = self.prices[symbol, self.dates, "open"]
-        c = c / c[0] * self.start_capital
-        if vals is None:
-            vals = self.values.copy()
-        vals[symbol] = pd.DataFrame(c, columns=[symbol])
-        if len(symbols) is not 0:
-            vals = self.compare(symbols, vals)
-        return vals
-
-    def compare_pl(self, symbol):
-        comps = self.compare(symbol)
-        return [comps[col].pct_change()[1:] for col in comps.columns]
-
-    def liquidate(self, symbol, num_shares=None, short=False):
-        if type(symbol) == list:
-            if num_shares == None:
-                for sym in symbol:
-                    self.liquidate(sym, None)
-            else:
-                for sym, num in zip(symbol, num_shares):
-                    self.liquidate(sym, num)
-        else:
-            drop_i = []
-            for i, pos in self.portfolio[self.portfolio["symbol"] == symbol].iterrows():
-                if pos["num_shares"] > 0 and not short:
-                    if num_shares is None or pos["num_shares"] <= num_shares:
-                        self.available_capital += pos["num_shares"] * pos["cur_price"]
-                        self.portfolio.at[i, "num_shares"] = 0
-                        drop_i.append(i)
-                        if num_shares is not None:
-                            num_shares -= pos["num_shares"]
-                        if num_shares == 0:
-                            break
-                    if num_shares is not None and pos["num_shares"] > num_shares:
-                        self.available_capital += num_shares * pos["cur_price"]
-                        self.portfolio.at[i, "num_shares"] -= num_shares
-                        break
-                if pos["num_shares"] < 0 and short:
-                    if num_shares is None or abs(pos["num_shares"]) <= num_shares:
-                        cur_val = abs(pos["num_shares"]) * pos["cur_price"]
-                        old_val = abs(pos["num_shares"]) * pos["price"]
-                        self.available_capital += old_val + (old_val - cur_val)
-                        self.portfolio.at[i, "num_shares"] = 0
-                        drop_i.append(i)
-                        if num_shares is not None:
-                            num_shares -= pos["num_shares"]
-                        if num_shares == 0:
-                            break
-                    if num_shares is not None and abs(pos["num_shares"]) > num_shares:
-                        cur_val = num_shares * pos["cur_price"]
-                        old_val = num_shares * pos["price"]
-                        self.available_capital += old_val + (old_val - cur_val)
-                        self.portfolio.at[i, "num_shares"] += num_shares
-                        break
-            self.portfolio = self.portfolio.drop(drop_i)
-
-    def liquidateIndex(self, pos_index=None):
-        if pos_index == None:
-            iter_port = self.portfolio
-        else:
-            iter_port = self.portfolio[pos_index]
-        for _, pos in iter_port.iterrows():
-            if pos["num_shares"] > 0:
-                self.available_capital += pos["num_shares"] * pos["cur_price"]
-            else:
-                cur_val = abs(pos["num_shares"]) * pos["cur_price"]
-                old_val = abs(pos["num_shares"]) * pos["price"]
-                self.available_capital += old_val + (old_val - cur_val)
-        if pos_index == None:
-            self.portfolio = pd.DataFrame(
-                columns=["symbol", "date", "event", "num_shares", "price"]
-            )
-        else:
-            self.portfolio = self.portfolio[~pos_index].copy()
