@@ -3,6 +3,7 @@ from typing import Union, List, Optional, Tuple, Dict
 import numpy as np
 import pandas as pd
 
+
 class MissingMetricsError(Exception):
     def __init__(self, metrics, message):
         self.metrics = metrics
@@ -15,18 +16,17 @@ class Metric(ABC):
         return None
 
     def __str__(self):
-        if self._single:
-            return f"{self.name}: {self.value:.2f}"
-        if self._series:
-            return f"Last {self.name}: {self.values[-1]:.2f}"
-        else:
-            return f"Empty {self.name}"
+        return self.__repr__()
 
     def __repr__(self):
+        if (self._single and self.value is None) or (
+            self._series and self.values is None
+        ):
+            return "None"
         if self._single:
             return f"{self.value:.2f}"
         if self._series:
-            return f"{self.values[-1]:.2f} (last)"
+            return f"{self.values[-1]:.2f}"
         else:
             return f"{self.name}"
 
@@ -35,7 +35,7 @@ class Metric(ABC):
         self._series = False
         self.value = None
         self.values = None
-        self.current_event = 'open'
+        self.current_event = "open"
         self.bt = None
 
     @property
@@ -47,9 +47,9 @@ class Metric(ABC):
         if self._single:
             self.value = self.get_value(bt)
         if self._series:
-            if bt.event == 'open':
+            if bt.event == "open":
                 self.value_open[self.i] = self.get_value(bt)
-            elif bt.event == 'close':
+            elif bt.event == "close":
                 self.value_close[self.i] = self.get_value(bt)
 
     def __call__(self, write=False):
@@ -57,14 +57,14 @@ class Metric(ABC):
             return self.get_value(self.bt)
         self.current_event = self.bt.event
         self.i = self.bt.i
-        if self._series and (self.bt.i == 0 and self.bt.event == 'open'):
-            self.value_open = np.zeros(len(self.bt)//2+1)
-            self.value_close = np.zeros(len(self.bt)//2+1)
+        if self._series and (self.bt.i == 0 and self.bt.event == "open"):
+            self.value_open = np.zeros(len(self.bt) // 2 + 1)
+            self.value_close = np.zeros(len(self.bt) // 2 + 1)
         if self.requires is None:
             self.set_values(self.bt)
         else:
             all_requires_present = True
-            missing = ''
+            missing = ""
             for req in self.requires:
                 if req not in self.bt.metrics.keys():
                     all_requires_present = False
@@ -75,7 +75,7 @@ class Metric(ABC):
             else:
                 raise MissingMetricsError(
                     self.requires,
-                    f"The following metric required by {type(self)} are missing: {req}",
+                    f"The following metric required by {type(self)} is missing: {missing}",
                 )
 
     @abstractmethod
@@ -113,23 +113,23 @@ class SeriesMetric(Metric):
     def values(self):
         if self.last_len != len(self):
             self.all_values = np.empty(len(self))
-            self.all_values[0::2] = self.value_open[:self.i+1]
-            if self.current_event == 'open':
-                self.all_values[1::2] = self.value_close[:self.i]
-            if self.current_event == 'close':
-                self.all_values[1::2] = self.value_close[:self.i+1]
+            self.all_values[0::2] = self.value_open[: self.i + 1]
+            if self.current_event == "open":
+                self.all_values[1::2] = self.value_close[: self.i]
+            if self.current_event == "close":
+                self.all_values[1::2] = self.value_close[: self.i + 1]
             self.last_len = len(self)
         return self.all_values
 
     @property
     def df(self):
         df = pd.DataFrame()
-        df['date'] = self.bt.dates[:self.i+1]
-        df['open'] = self.value_open[:self.i+1]
-        df['close'] = self.value_close[:self.i+1]
-        if self.current_event == 'open':
-            df.at[-1, 'close'] = None
-        return df.set_index('date')
+        df["date"] = self.bt.dates[: self.i + 1]
+        df["open"] = self.value_open[: self.i + 1]
+        df["close"] = self.value_close[: self.i + 1]
+        if self.current_event == "open":
+            df.at[-1, "close"] = None
+        return df.set_index("date").dropna(how="all")
 
     @property
     @abstractmethod
@@ -137,27 +137,27 @@ class SeriesMetric(Metric):
         pass
 
     def __len__(self):
-        if self.current_event == 'close':
-            return self.i*2 + 2
-        if self.current_event == 'open':
-            return self.i*2 + 1
+        if self.current_event == "close":
+            return self.i * 2 + 2
+        if self.current_event == "open":
+            return self.i * 2 + 1
 
     def __getitem__(self, i):
-        val_open = self.value_open[:self.i+1]
-        if self.current_event == 'open':
-            val_close = self.value_close[:self.i]
+        val_open = self.value_open[: self.i + 1]
+        if self.current_event == "open":
+            val_close = self.value_close[: self.i]
         else:
-            val_close = self.value_close[:self.i+1]
-        if i >= 0 or self.current_event == 'close':
+            val_close = self.value_close[: self.i + 1]
+        if i >= 0 or self.current_event == "close":
             if i % 2 == 0:
-                return val_open[i//2]
+                return val_open[i // 2]
             else:
-                return val_close[i//2]
+                return val_close[i // 2]
         else:
             if i % 2 == 0:
-                return val_close[i//2]
+                return val_close[i // 2]
             else:
-                return val_open[i//2]
+                return val_open[i // 2]
 
     @abstractmethod
     def get_value(self, bt):
@@ -216,6 +216,7 @@ class ProfitLoss(SeriesMetric):
         except IndexError:
             return 0
 
+
 class TotalValue(SeriesMetric):
     @property
     def name(self):
@@ -226,4 +227,4 @@ class TotalValue(SeriesMetric):
         return ["Portfolio Value"]
 
     def get_value(self, bt):
-        return bt.metrics["Portfolio Value"][-1] + bt.available_capital
+        return bt.metrics["Portfolio Value"][-1] + bt._available_capital

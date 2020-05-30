@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class FlatPerTrade():
+class FlatPerTrade:
     def __init__(self, fee):
         self.fee = fee
 
@@ -10,7 +10,7 @@ class FlatPerTrade():
         return price * num_shares + self.fee, num_shares
 
 
-class FlatPerShare():
+class FlatPerShare:
     def __init__(self, fee):
         self.fee = fee
 

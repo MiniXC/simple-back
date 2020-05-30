@@ -7,11 +7,13 @@ from datetime import date
 import numpy as np
 import diskcache as dc
 
+
 class TimeLeakError(Exception):
     def __init__(self, current_date, requested_date, message):
         self.current_date = current_date
         self.requested_date = (requested_date,)
         self.message = message
+
 
 class DailyDataProvider(ABC):
     def __init__(self):
@@ -72,7 +74,7 @@ class DailyDataProvider(ABC):
             List[str],
             Tuple[
                 Union[List[str], str],
-                Optional[Union[slice, type(date)]],
+                Optional[Union[slice, object]],
                 Optional[Union[List[str], str]],
             ],
         ],
@@ -86,7 +88,7 @@ class DailyDataProvider(ABC):
         """
         try:
             self.current_date = self.bt.current_date
-            self.current_event = self.bt.current_event
+            self.current_event = self.bt.event
         except AttributeError:
             pass
         if type(symbol_date_event) is not str:
@@ -116,11 +118,11 @@ class DailyDataProvider(ABC):
                     date = slice(date.start, self.current_date, date.step)
                 stop_date = date.stop
                 if type(date.stop) == relativedelta:
-                    date = slice(date.start, self.current_date - date.stop, date.step)
+                    date = slice(date.start, self.current_date + date.stop, date.step)
                 if type(date.start) == relativedelta:
                     if type(stop_date) == str:
                         stop_date = pd.to_datetime(stop_date)
-                    date = slice(stop_date - date.start, date.stop, date.step)
+                    date = slice(stop_date + date.start, date.stop, date.step)
                 stop_date = date.stop
                 if type(date.stop) == int and date.stop <= 0:
                     date = slice(
@@ -129,6 +131,7 @@ class DailyDataProvider(ABC):
                         date.step,
                     )
                 if type(date.start) == int and date.start <= 0:
+                    stop_date = date.stop
                     if type(stop_date) == str:
                         stop_date = pd.to_datetime(stop_date)
                     date = slice(
@@ -136,14 +139,6 @@ class DailyDataProvider(ABC):
                         date.stop,
                         date.step,
                     )
-        if len_t == 3:
-            event = symbol_date_event[2]
-            if type(event) == str and self._get_order(event) > self._max_order:
-                raise TimeLeakError(
-                    (self.current_date, self.current_event),
-                    (date, event),
-                    f"{event} is more recent than {self.current_event}, resulting in time leak",
-                )
         data = self._get_cached(symbol, date, event)
         return self._remove_leaky_vals(data, event, date)
 
@@ -172,13 +167,16 @@ class DailyDataProvider(ABC):
         pass
 
     def get_cache(self, key):
-        return self.cache[str(key)+str(type(self))]
+        return self.cache[str(key) + str(type(self))]
 
     def in_cache(self, key):
-        return str(key)+str(type(self)) in self.cache    
+        return str(key) + str(type(self)) in self.cache
 
     def set_cache(self, key, val):
-        return self.cache.set(str(key)+str(type(self)), val)
+        self.cache.set(str(key) + str(type(self)), val)
+
+    def rem_cache(self, key):
+        del self.cache[str(key) + str(type(self))]
 
     def clear_cache(self):
         self.cache.clear()

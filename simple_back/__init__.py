@@ -1,14 +1,15 @@
 __version__ = "0.4"
-"""
-import .backtester as backtester
-import .strategy as strategy
-import .fees as fees
-import .price_providers as price_providers
+
+from . import backtester
+from . import strategy
+from . import fees
+from . import price_providers
+from . import metrics
 
 __all__ = [
     "backtester",
     "strategy",
     "fees",
-    "price_providers"
+    "price_providers",
+    "metrics"
 ]
-"""
