@@ -1,6 +1,3 @@
-from abc import ABC, abstractmethod
-
-
 class FlatPerTrade:
     def __init__(self, fee):
         self.fee = fee

@@ -14,7 +14,6 @@ class TimeLeakError(Exception):
         self.requested_date = (requested_date,)
         self.message = message
 
-
 class DailyDataProvider(ABC):
     def __init__(self):
         self.current_date = date.today()
@@ -42,14 +41,20 @@ class DailyDataProvider(ABC):
                     raise TimeLeakError(
                         self.current_date,
                         df.index.date[-1],
-                        f"{sum_recent} dates in index more recent than {self.current_date}",
+                        f"""
+                        {sum_recent} dates in index
+                        more recent than {self.current_date}
+                        """,
                     )
             elif type(date) != slice:
                 if date > self.current_date:
                     raise TimeLeakError(
                         self.current_date,
                         date,
-                        f"{date} is more recent than {self.current_date}, resulting in time leak",
+                        f"""
+                        {date} is more recent than {self.current_date},
+                        resulting in time leak
+                        """,
                     )
         return df
 
@@ -81,7 +86,8 @@ class DailyDataProvider(ABC):
         ],
     ) -> pd.DataFrame:
         """
-        Expects a tuple of (ticker_symbol, date, 'open' or 'close') and returns the price
+        Expects a tuple of (ticker_symbol, date, 'open' or 'close')
+        and returns the price
         for said symbol at that point in time.
         ````
         my_price_provider['AAPL', date(2015,1,1), 'open']
@@ -110,7 +116,10 @@ class DailyDataProvider(ABC):
                     raise TimeLeakError(
                         self.current_date,
                         date,
-                        f"{date} is more recent than {self.current_date}, resulting in time leak",
+                        f"""
+                        {date} is more recent than {self.current_date},
+                        resulting in time leak
+                        """,
                     )
             if type(date) == slice:
                 if date == slice(None, None):

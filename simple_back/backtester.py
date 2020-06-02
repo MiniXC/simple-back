@@ -2,13 +2,11 @@ import pandas as pd
 import pandas_market_calendars as mcal
 from dateutil.relativedelta import relativedelta
 from datetime import date
-from abc import ABC, abstractmethod
-import multiprocessing
 import numpy as np
 import copy
 import math
 import json
-from typing import Union, List, Optional, Tuple, Dict, Callable
+from typing import Union, List, Tuple, Callable, overload
 from warnings import warn
 import os
 from IPython.display import clear_output
@@ -217,25 +215,33 @@ class Portfolio(MutableSequence):
     def _remove(self, position):
         self.positions.remove(position)
 
-    def _symbol(self, symbol: str):
-        new_pos = []
-        if type(symbol) == str:
-            for pos in self.positions:
-                if pos.symbol == symbol:
-                    new_pos.append(pos)
-        return Portfolio(self.bt, new_pos)
+    @overload
+    def __getitem__(self, index: Union[int, slice]):
+        ...
 
-    def __getitem__(self, index: Union[int, slice, List[bool]]):
-        if isinstance(index, np.ndarray) or isinstance(index, pd.Series):
+    @overload
+    def __getitem__(self, index: str):
+        ...
+
+    @overload
+    def __getitem__(self, index: Union[np.ndarray, pd.Series, List[bool]]):
+        ...
+
+    def __getitem__(self, index):
+        if isinstance(index, (int, slice)):
+            return Portfolio(self.bt, copy.copy(self.positions[index]))
+        if isinstance(index, str):
+            new_pos = []
+            for pos in self.positions:
+                if pos.symbol == index:
+                    new_pos.append(pos)
+            return Portfolio(self.bt, new_pos)
+        if isinstance(index, (np.ndarray, pd.Series, List[bool])):
             if len(index) > 0:
-                pos = list(np.array(self.bt.portfolio.positions)[index])
+                new_pos = list(np.array(self.bt.portfolio.positions)[index])
             else:
-                pos = []
-        elif isinstance(index, str):
-            return self._select(index)
-        else:
-            pos = copy.copy(self.positions[index])
-        return Portfolio(self.bt, pos)
+                new_pos = []
+            return Portfolio(self.bt, new_pos)
 
     def __setitem__(self, index, value):
         self.positions[index] = value
@@ -316,7 +322,10 @@ class BacktesterBuilder:
     def live_metrics(self, every: int = 10) -> "BacktesterBuilder":
         if self.bt._live_plot:
             warn(
-                "live plotting and metrics cannot be used together, setting live plotting to false"
+                """
+                live plotting and metrics cannot be used together,
+                 setting live plotting to false
+                """
             )
             self.bt._live_plot = False
         self.bt._live_metrics = True
@@ -332,7 +341,10 @@ class BacktesterBuilder:
     ) -> "BacktesterBuilder":
         if self.bt._live_metrics:
             warn(
-                "live metrics and plotting cannot be used together, setting live metrics to false"
+                """
+                live metrics and plotting cannot be used together,
+                 setting live metrics to false
+                """
             )
             self.bt._live_metrics = False
         self.bt._live_plot = True
@@ -529,7 +541,8 @@ class Backtester:
                     raise Exception(
                         f"""
                         not enough capital available:
-                        ordered {capital} * {self._capital} with only {self._available_capital} available
+                        ordered {capital} * {self._capital}
+                        with only {self._available_capital} available
                         """
                     )
         current_price = self.price(symbol)
@@ -547,7 +560,8 @@ class Backtester:
             raise Exception(
                 f"""
                 not enough capital specified to order a single share of {symbol}:
-                tried to order {capital} of {symbol} with {symbol} price at {current_price}
+                tried to order {capital} of {symbol}
+                with {symbol} price at {current_price}
                 """
             )
 

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union, List, Optional, Tuple, Dict
+from typing import List, Optional
 import numpy as np
 import pandas as pd
 
@@ -75,7 +75,10 @@ class Metric(ABC):
             else:
                 raise MissingMetricsError(
                     self.requires,
-                    f"The following metric required by {type(self)} is missing: {missing}",
+                    f"""
+                    The following metric required by {type(self)} is missing:
+                    {missing}
+                    """,
                 )
 
     @abstractmethod
