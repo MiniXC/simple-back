@@ -227,4 +227,4 @@ class TotalValue(SeriesMetric):
         return ["Portfolio Value"]
 
     def get_value(self, bt):
-        return bt.metrics["Portfolio Value"][-1] + bt._available_capital
+        return bt.metrics["Portfolio Value"]() + bt._available_capital

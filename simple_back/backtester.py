@@ -13,6 +13,7 @@ from warnings import warn
 import os
 from IPython.display import clear_output
 from dataclasses import dataclass
+from collections.abc import MutableSequence
 
 from .price_providers import DailyPriceProvider, YahooFinanceProvider, DailyDataProvider
 from .fees import NoFee
@@ -54,13 +55,18 @@ class Position:
         self.init_price = bt.price(symbol)
         self.bt = bt
         self.frozen = False
+        self.df_cols = [
+            "symbol",
+            "date",
+            "event",
+            "order_type",
+            "profit_loss_abs",
+            "profit_loss_pct",
+            "price",
+        ]
 
     def __repr__(self):
-        t = None
-        if self.short:
-            t = "short"
-        if self.long:
-            t = "long"
+        t = self.order_type
         result = {
             "symbol": self.symbol,
             "date & event": str(self.date) + " " + self.event,
@@ -68,6 +74,7 @@ class Position:
             "shares": self.num_shares,
             "profit/loss (abs)": f"{self.profit_loss_abs:.2f}",
             "profit/loss (%)": f"{self.profit_loss_pct:.2f}",
+            "price": f"{self.price:.2f}",
         }
         if self.frozen:
             result["end date & event"] = str(self.end_date) + " " + self.end_event
@@ -123,6 +130,15 @@ class Position:
     def num_shares(self):
         return abs(self.num_shares_int)
 
+    @property
+    def order_type(self):
+        t = None
+        if self.short:
+            t = "short"
+        if self.long:
+            t = "long"
+        return t
+
     def _remove_shares(self, n):
         if self.short:
             self.num_shares_int += n
@@ -135,8 +151,8 @@ class Position:
         self.end_event = self.bt.event
 
 
-class Portfolio:
-    def __init__(self, bt, positions=[]):
+class Portfolio(MutableSequence):
+    def __init__(self, bt, positions: List[Position] = []):
         self.positions = positions
         self.bt = bt
 
@@ -147,8 +163,18 @@ class Portfolio:
             val += pos.value
         return val
 
+    @property
+    def df(self):
+        pos_dict = {}
+        for pos in self.positions:
+            for col in pos.df_cols:
+                if col not in pos_dict:
+                    pos_dict[col] = []
+                pos_dict[col].append(getattr(pos, col))
+        return pd.DataFrame(pos_dict)
+
     def __repr__(self):
-        return self.positions.__repr__()
+        return self.df.__repr__()
 
     def liquidate(self, num_shares=-1):
         is_long = False
@@ -163,7 +189,7 @@ class Portfolio:
                 "liquidating a mix of long and short positions is not possible"
             )
         for pos in self.positions:
-            if num_shares == -1 or num_shares > pos.num_shares:
+            if num_shares == -1 or num_shares >= pos.num_shares:
                 self.bt._available_capital += pos.value
                 self.bt.portfolio._remove(pos)
 
@@ -191,14 +217,34 @@ class Portfolio:
     def _remove(self, position):
         self.positions.remove(position)
 
-    def __getitem__(self, symbol):
+    def _symbol(self, symbol: str):
         new_pos = []
-        # TODO: add possibility for gt, lt...
         if type(symbol) == str:
             for pos in self.positions:
                 if pos.symbol == symbol:
                     new_pos.append(pos)
         return Portfolio(self.bt, new_pos)
+
+    def __getitem__(self, index: Union[int, slice, List[bool]]):
+        if isinstance(index, np.ndarray) or isinstance(index, pd.Series):
+            if len(index) > 0:
+                pos = list(np.array(self.bt.portfolio.positions)[index])
+            else:
+                pos = []
+        elif isinstance(index, str):
+            return self._select(index)
+        else:
+            pos = copy.copy(self.positions[index])
+        return Portfolio(self.bt, pos)
+
+    def __setitem__(self, index, value):
+        self.positions[index] = value
+
+    def __delitem__(self, index: Union[int, slice]) -> None:
+        del self.positions[index]
+
+    def __len__(self):
+        return len(self.positions)
 
     @property
     def short(self):
@@ -216,8 +262,8 @@ class Portfolio:
                 new_pos.append(pos)
         return Portfolio(self.bt, new_pos)
 
-    def __len__(self):
-        return len(self.positions)
+    def insert(self, index: int, value: Position) -> None:
+        self.positions.insert(index, value)
 
 
 class BacktesterBuilder:
@@ -526,6 +572,10 @@ class Backtester:
             current: float = self._available_capital
 
         return Balance()
+
+    @property
+    def pf(self):
+        return self.portfolio.df
 
     def run(self, strategies: List[Callable[["Date", str, "Backtester"], None]]):
         for i in range(len(strategies)):

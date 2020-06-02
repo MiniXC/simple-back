@@ -22,34 +22,35 @@ class DailyDataProvider(ABC):
         self.cache = dc.Cache(".simple-back")
 
     def _remove_leaky_vals(self, df, cols, date):
-        if type(date) == str:
-            date = pd.to_datetime(date)
-        istoday = type(date) != slice and date == self.current_date
-        if istoday or self.current_date in df.index:
-            cur_order = self.columns.index(self.current_event)
-            if type(cols) == str:
-                cols = [cols]
-            for i, col in enumerate(cols):
-                if self.columns_order[i] > cur_order:
-                    if istoday:
-                        df[col] = None
-                    else:
-                        df.at[self.current_date, col] = None
-        if type(date) == slice:
-            sum_recent = (df.index.date > self.current_date).sum()
-            if sum_recent > 0:
-                raise TimeLeakError(
-                    self.current_date,
-                    df.index.date[-1],
-                    f"{sum_recent} dates in index more recent than {self.current_date}",
-                )
-        else:
-            if date > self.current_date:
-                raise TimeLeakError(
-                    self.current_date,
-                    date,
-                    f"{date} is more recent than {self.current_date}, resulting in time leak",
-                )
+        if isinstance(df, pd.DataFrame):
+            if type(date) == str:
+                date = pd.to_datetime(date)
+            istoday = type(date) != slice and date == self.current_date
+            if istoday or (df is not None and self.current_date in df.index):
+                cur_order = self.columns.index(self.current_event)
+                if type(cols) == str:
+                    cols = [cols]
+                for i, col in enumerate(cols):
+                    if self.columns_order[i] > cur_order:
+                        if istoday:
+                            df[col] = None
+                        else:
+                            df.at[self.current_date, col] = None
+            if type(date) == slice and not df.empty:
+                sum_recent = (df.index.date > self.current_date).sum()
+                if sum_recent > 0:
+                    raise TimeLeakError(
+                        self.current_date,
+                        df.index.date[-1],
+                        f"{sum_recent} dates in index more recent than {self.current_date}",
+                    )
+            elif type(date) != slice:
+                if date > self.current_date:
+                    raise TimeLeakError(
+                        self.current_date,
+                        date,
+                        f"{date} is more recent than {self.current_date}, resulting in time leak",
+                    )
         return df
 
     def _get_order(self, event):
@@ -146,7 +147,7 @@ class DailyDataProvider(ABC):
         if args in self.cache:
             return self.cache.get(args)
         else:
-            result = self.get(*args)
+            result = self.get(args[0], args[1], args[2])
             self.cache.set(args, result)
             return result
 
