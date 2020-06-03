@@ -1,0 +1,25 @@
+name: Python package
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        args: install
+    - name: Lint with flake8
+      uses: abatilo/actions-poetry@v1.5.0
+      with: 
+        args: run python -m flake8 . --count --exit-zero --max-complexity=10 --statistics
+    - name: Run pytest
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        args: run python -m pytest --cov=simple-back --cov-branch --cov-fail-under=100 tests/
