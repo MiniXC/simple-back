@@ -29,7 +29,5 @@ jobs:
       run: poetry run python -m flake8 . --count --exit-zero --max-complexity=10 --statistics
     - name: Test
       run: poetry run python -m pytest --cov=simple_back --cov-branch tests/
-    - name: Coverage
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+    - name: Codecov
+      uses: codecov/codecov-action@v1.0.7
