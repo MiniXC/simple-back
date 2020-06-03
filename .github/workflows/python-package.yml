@@ -11,10 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Setup Python
+      uses: actions/setup-python@v2
+    - name: Install Poetry
+      run: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
     - name: Poetry Lock
-      uses: abatilo/actions-poetry@v1.5.0
-      with:
-        args: lock
+      run: poetry lock
     - name: Poetry Install
       run: poetry install
     - name: Black
@@ -28,4 +30,8 @@ jobs:
     - name: Lint
       run: poetry run python -m flake8 . --count --exit-zero --max-complexity=10 --statistics
     - name: Test
-      run: poetry run python -m pytest --cov=simple_back --cov-branch --cov-fail-under=100 tests/
+      run: poetry run python -m pytest --cov=simple_back --cov-branch tests/
+    - name: Coveralls
+      uses: coverallsapp/github-action@v1.1.1
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
