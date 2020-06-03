@@ -19,6 +19,8 @@ pytest = "^5.2"
 flake8 = "^3.8.2"
 black = "^19.10b0"
 dephell = "^0.8.3"
+IPython = "^7.15.0"
+pytest-cov = "^2.9.0"
 
 [tool.dephell.main]
 from = {format = "poetry", path = "pyproject.toml"}
