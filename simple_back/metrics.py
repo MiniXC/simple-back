@@ -66,7 +66,7 @@ class Metric(ABC):
             all_requires_present = True
             missing = ""
             for req in self.requires:
-                if req not in self.bt.metrics.keys():
+                if req not in self.bt.metric.keys():
                     all_requires_present = False
                     missing = req
                     break
@@ -174,10 +174,10 @@ class MaxDrawdown(SingleMetric):
 
     @property
     def requires(self):
-        return ["Profit/Loss"]
+        return ["Daily Profit/Loss"]
 
     def get_value(self, bt):
-        return np.min(bt.metrics["Profit/Loss"].values)
+        return np.min(bt.metric["Daily Profit/Loss"].values)
 
 
 class AnnualReturn(SingleMetric):
@@ -190,7 +190,7 @@ class AnnualReturn(SingleMetric):
         return ["Portfolio Value"]
 
     def get_value(self, bt):
-        vals = bt.metrics["Total Value"]
+        vals = bt.metric["Total Value"]
         year = 1 / ((bt.dates[-1] - bt.dates[0]).days / 365.25)
         return (vals[-1] / vals[0]) ** year
 
@@ -204,10 +204,10 @@ class PortfolioValue(SeriesMetric):
         return bt.portfolio.value
 
 
-class ProfitLoss(SeriesMetric):
+class DailyProfitLoss(SeriesMetric):
     @property
     def name(self):
-        return "Profit/Loss"
+        return "Daily Profit/Loss"
 
     @property
     def requires(self):
@@ -215,7 +215,7 @@ class ProfitLoss(SeriesMetric):
 
     def get_value(self, bt):
         try:
-            return bt.metrics["Total Value"][-1] - bt.metrics["Total Value"][-2]
+            return bt.metric["Total Value"][-1] - bt.metric["Total Value"][-2]
         except IndexError:
             return 0
 
@@ -230,4 +230,4 @@ class TotalValue(SeriesMetric):
         return ["Portfolio Value"]
 
     def get_value(self, bt):
-        return bt.metrics["Portfolio Value"]() + bt._available_capital
+        return bt.metric["Portfolio Value"]() + bt._available_capital

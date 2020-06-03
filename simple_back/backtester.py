@@ -19,10 +19,11 @@ from .metrics import (
     MaxDrawdown,
     AnnualReturn,
     PortfolioValue,
-    ProfitLoss,
+    DailyProfitLoss,
     TotalValue,
     Metric,
 )
+from .strategy import Strategy, BuyAndHold
 
 try:
     from IPython import display
@@ -271,6 +272,12 @@ class Portfolio(MutableSequence):
     def insert(self, index: int, value: Position) -> None:
         self.positions.insert(index, value)
 
+    def filter(self, func: Callable[[Position], bool]):
+        new_pos = []
+        for pos in self.positions:
+            if func(pos):
+                new_pos.append(pos)
+        return Portfolio(self.bt, new_pos)
 
 class BacktesterBuilder:
     def __init__(self):
@@ -292,6 +299,10 @@ class BacktesterBuilder:
         data.bt = self.bt
         return self
 
+    def name(self, name: str) -> "BacktesterBuilder":
+        self.bt.name = name
+        return self
+
     def trade_cost(
         self, trade_cost: Callable[[float, float], Tuple[float, int]]
     ) -> "BacktesterBuilder":
@@ -303,16 +314,16 @@ class BacktesterBuilder:
             for m in metrics:
                 for m in metrics:
                     m.bt = self.bt
-                    self.bt.metrics[m.name] = m
+                    self.bt.metric[m.name] = m
         else:
             metrics.bt = self.bt
-            self.bt.metrics[metrics.name] = metrics
+            self.bt.metric[metrics.name] = metrics
         return self
 
     def clear_metrics(self) -> "BacktesterBuilder":
         metrics = [PortfolioValue()]
-        self.bt.metrics = {}
-        self.bt.metrics(metrics)
+        self.bt.metric = {}
+        self.bt.metric(metrics)
         return self
 
     def calendar(self, calendar: str) -> "BacktesterBuilder":
@@ -336,7 +347,6 @@ class BacktesterBuilder:
         self,
         every: int = 10,
         metric: str = "Total Value",
-        compare: List[str] = [],
         event: str = "open",
     ) -> "BacktesterBuilder":
         if self.bt._live_metrics:
@@ -350,8 +360,18 @@ class BacktesterBuilder:
         self.bt._live_plot = True
         self.bt._live_plot_every = every
         self.bt._live_plot_metric = metric
-        self.bt._live_plot_compare = compare
         self.bt._live_plot_event = event
+        return self
+
+    def strategies(self, strategies: List[Union[Callable[["Date", str, "Backtester"], None], Strategy, str]]) -> "BacktesterBuilder":
+        strats = []
+        for strat in strategies:
+            if isinstance(strat, str):
+                strats.append(BuyAndHold(strat))
+            else:
+                strats.append(strat)
+        self.bt._temp_strategies = strats
+        self.bt._has_strategies = True
         return self
 
     def build(self) -> "Backtester":
@@ -397,12 +417,12 @@ class Backtester:
             AnnualReturn(),
             PortfolioValue(),
             TotalValue(),
-            ProfitLoss(),
+            DailyProfitLoss(),
         ]
-        self.metrics = {}
+        self.metric = {}
         for m in metrics:
             m.bt = self
-            self.metrics[m.name] = m
+            self.metric[m.name] = m
 
         self.data = []
 
@@ -413,14 +433,19 @@ class Backtester:
         self._live_plot = False
         self._live_metrics = False
 
-        self._siblings = []
+        self._strategies = []
+        self._temp_strategies = []
+        self._has_strategies = False
+        self.name = None
+
+        self._no_iter = False
 
     def _set_self(self):
         self.portfolio.bt = self
         self.trades.bt = self
         self.prices.bt = self
 
-        for m in self.metrics.values():
+        for m in self.metric.values():
             m.bt = self
 
     def _init_iter(self, bt=None):
@@ -441,10 +466,8 @@ class Backtester:
         return self
 
     def _next_iter(self, bt=None):
-        no_bt = False
         if bt is None:
             bt = self
-            no_bt = True
         if bt.event == "open":
             bt.event = "close"
         elif bt.event == "close":
@@ -454,39 +477,48 @@ class Backtester:
                 bt.event = "open"
             except IndexError:
                 bt.i -= 1
-                for metric in bt.metrics.values():
+                for metric in bt.metric.values():
                     if metric._single:
                         metric(write=True)
-                if no_bt:
-                    if bt._live_metrics:
-                        bt._show_live_metrics()
-                    if bt._live_plot:
-                        bt._show_live_plot()
+                if self._has_strategies:
+                    for strat in self._strategies:
+                         for metric in strat.metric.values():
+                            if metric._single:
+                                metric(write=True)
                 raise StopIteration
-        bt._update(no_bt)
+        bt._update()
         return bt.current_date, bt.event, bt
 
     def __iter__(self):
+        if self._has_strategies:
+            self._set_strategies(self._temp_strategies)
         return self._init_iter()
 
     def __next__(self):
-        return self._next_iter()
+        if len(self._strategies) > 0:
+            result = self._next_iter()
+            self._run_once()
+            self.plot([self] + self._strategies)
+        else:
+            result = self._next_iter()
+            self.plot([self])
+        return result
 
     def __len__(self):
         return len(self.dates) * 2
 
     def _show_live_metrics(self, bts=None):
         _cls()
-        for mkey in self.metrics.keys():
+        for mkey in self.metric.keys():
             if bts is None:
-                metric = self.metrics[mkey]
+                metric = self.metric[mkey]
                 if str(metric) == "None":
                     metric = f"{metric():.2f}"
                 print(f"{mkey:20} {metric}")
             else:
                 metrics = []
                 for bt in bts:
-                    metric = bt.metrics[mkey]
+                    metric = bt.metric[mkey]
                     if str(metric) == "None":
                         metric = f"{metric():.2f}"
                     metric = f"{str(metric):15}"
@@ -499,32 +531,28 @@ class Backtester:
             self._live_plot = False
         plot_df = pd.DataFrame()
         if bts is None:
-            metric = self.metrics[self._live_plot_metric].df[self._live_plot_event]
+            metric = self.metric[self._live_plot_metric].df[self._live_plot_event]
             plot_df["Backtest"] = metric
         else:
             for i, bt in enumerate(bts):
-                metric = bt.metrics[self._live_plot_metric].df[self._live_plot_event]
-                plot_df[f"Backtest {i}"] = metric
-        for ticker in self._live_plot_compare:
-            comp = self.prices[ticker].loc[plot_df.index][self._live_plot_event]
-            comp = comp * (self.balance.start / comp.iloc[0])
-            plot_df[ticker] = comp
-        plot_df.plot()
+                metric = bt.metric[self._live_plot_metric].df[self._live_plot_event]
+                name = f"Backtest {i}"
+                if bt.name is not None:
+                    name = bt.name
+                plot_df[name] = metric
+        fig, ax = plt.subplots()
+        plot_df.plot(ax=ax)
+        fig.autofmt_xdate()
         plt.xlim([self.dates[0], self.dates[-1]])
         display.clear_output(wait=True)
         display.display(pl.gcf())
         plt.close()
 
-    def _update(self, no_bt):
-        for metric in self.metrics.values():
+    def _update(self):
+        for metric in self.metric.values():
             if metric._series:
                 metric(write=True)
-        self._capital = self._available_capital + self.metrics["Portfolio Value"][-1]
-        if no_bt:
-            if self._live_metrics and self.i % self._live_metrics_every == 0:
-                self._show_live_metrics()
-            if self._live_plot and self.i % self._live_plot_every == 0:
-                self._show_live_plot()
+        self._capital = self._available_capital + self.metric["Portfolio Value"][-1]
 
     def _order(self, symbol, capital, as_percent=False):
         if capital < 0:
@@ -584,27 +612,126 @@ class Backtester:
         class Balance:
             start: float = self._start_capital
             current: float = self._available_capital
-
         return Balance()
+
+    def _get_bts(self):
+        bts = [self]
+        if self._has_strategies:
+            if self._no_iter:
+                bts = self._strategies
+            else:
+                bts = bts + self._strategies
+        return bts
+
+    @property
+    def metrics(self):
+        bts = self._get_bts()
+        dfs = []
+        for i, bt in enumerate(bts):
+            df = pd.DataFrame()
+            df['Event'] = np.tile(['open', 'close'], len(bt)//2+1)[:len(bt)]
+            df['Date'] = np.repeat(bt.dates, 2)
+            if self._has_strategies:
+                if bt.name is not None:
+                    df['Backtest'] = np.repeat(bt.name, len(bt))
+                else:
+                    df['Backtest'] = np.repeat(f'Backtest {i}', len(bt))
+            for key in bt.metric.keys():
+                metric = bt.metric[key]
+                if metric._series:
+                    df[key] = metric.values
+                if metric._single:
+                    df[key] = np.repeat(metric.value, len(bt))
+            dfs.append(df)
+        if self._has_strategies:
+            return pd.concat(dfs).set_index(['Backtest','Date','Event'])
+        else:
+            return pd.concat(dfs).set_index(['Date','Event'])
+
+    @property
+    def summary(self):
+        bts = self._get_bts()
+        dfs = []
+        for i, bt in enumerate(bts):
+            df = pd.DataFrame()
+            if self._has_strategies:
+                if bt.name is not None:
+                    df['Backtest'] = [bt.name]
+                else:
+                    df['Backtest'] = [f'Backtest {i}']
+            for key in bt.metric.keys():
+                metric = bt.metric[key]
+                if metric._series:
+                    df[f"{key} (Last Value)"] = [metric[-1]]
+                if metric._single:
+                    df[key] = [metric.value]
+            dfs.append(df)
+        if self._has_strategies:
+            return pd.concat(dfs).set_index(['Backtest'])
+        else:
+            return df
+
+    @property
+    def strategies(self):
+        class StrategySequence:
+            def __init__(self, bt):
+                self.bt = bt
+
+            def __getitem__(self, index: Union[str, int]):
+                if isinstance(index, int):
+                    self.bt._get_bts()[index]
+                elif isinstance(index, str):
+                    for i, bt in enumerate(self.bt._get_bts()):
+                        if bt.name is not None:
+                            if bt.name == index:
+                                return bt
+                        else:
+                            if f"Backtest {i}" == index:
+                                return bt
+                    raise IndexError
+
+            def __len__(self):
+                return len(self.bt._get_bts())
+
+        if self._has_strategies:
+            return StrategySequence(self)
+
 
     @property
     def pf(self):
-        return self.portfolio.df
+        return self.portfolio
 
-    def run(self, strategies: List[Callable[["Date", str, "Backtester"], None]]):
-        for i in range(len(strategies)):
+    
+    def _set_strategies(self, strategies: List[Callable[["Date", str, "Backtester"], None]]):
+        self._strategies_call = strategies
+        for strat in strategies:
             new_bt = copy.deepcopy(self)
             new_bt._set_self()
+            new_bt.name = strat.name
+            new_bt._has_strategies = False
             self._init_iter(new_bt)
-            self._siblings.append(new_bt)
+            self._strategies.append(new_bt)
 
-        for i in range(len(self)):
-            for i, bt in enumerate(self._siblings):
-                strategies[i](*self._next_iter(bt))
-                sib_i = bt.i
-            if self._live_plot and sib_i % self._live_plot_every == 0:
-                self._show_live_plot(self._siblings)
-            if self._live_metrics and sib_i % self._live_metrics_every == 0:
-                self._show_live_metrics(self._siblings)
+    def _run_once(self):
+        for i, bt in enumerate(self._strategies):
+            self._strategies_call[i](*self._next_iter(bt))
 
-        return self._siblings
+    def plot(self, bts):
+        if self._live_plot and self.i % self._live_plot_every == 0:
+            self._show_live_plot(bts)
+        if self._live_metrics and self.i % self._live_metrics_every == 0:
+            self._show_live_metrics(bts)
+
+    def run(self):
+        self._set_strategies(self._temp_strategies)
+        self._no_iter = True
+
+        for _ in range(len(self)):
+            self._run_once()
+            self.i = self._strategies[-1].i
+            self.plot(self._strategies)
+
+        for strat in self._strategies:
+            for metric in strat.metric.values():
+                if metric._single:
+                    metric(write=True)

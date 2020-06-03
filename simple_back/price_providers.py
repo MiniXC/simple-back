@@ -3,9 +3,10 @@ from yahoo_fin.stock_info import get_data
 from typing import Union, List, Optional, Tuple
 import pandas as pd
 from dateutil.relativedelta import relativedelta
-from datetime import date
+from datetime import date, datetime
 import numpy as np
 import diskcache as dc
+import pytz
 
 
 class TimeLeakError(Exception):
