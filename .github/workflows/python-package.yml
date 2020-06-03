@@ -11,10 +11,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Lock
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        args: lock
     - name: Install
       uses: abatilo/actions-poetry@v1.5.0
       with:
         args: install
+    - name: Black
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        args: run python -m black .    
     - name: Lint with flake8
       uses: abatilo/actions-poetry@v1.5.0
       with: 
