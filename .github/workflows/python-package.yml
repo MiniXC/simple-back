@@ -11,12 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Setup Python
-      uses: actions/setup-python@v2
-    - name: Install Poetry
-      run: |
-           curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-           source $HOME/.poetry/env
+    - uses: actions/setup-python@v2
+    - uses: dschep/install-poetry-action@v1.3
     - name: Poetry Lock
       run: poetry lock
     - name: Poetry Install
