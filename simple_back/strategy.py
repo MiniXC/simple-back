@@ -13,6 +13,7 @@ class Strategy(ABC):
     def run(self, day, event, bt):
         pass
 
+
 class BuyAndHold(Strategy):
     def __init__(self, ticker):
         self.ticker = ticker
@@ -26,6 +27,7 @@ class BuyAndHold(Strategy):
     @property
     def name(self):
         return f"{self.ticker} (Buy & Hold)"
+
 
 class SellAndHold(Strategy):
     def __init__(self, ticker):

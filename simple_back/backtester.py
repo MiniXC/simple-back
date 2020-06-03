@@ -34,6 +34,13 @@ try:
 except ImportError:
     plt_exists = False
 
+try:
+    from tqdm import tqdm
+
+    tqdm_exists = True
+except ImportError:
+    tqdm_exists = False
+
 
 def _cls():
     clear_output(wait=True)
@@ -279,6 +286,7 @@ class Portfolio(MutableSequence):
                 new_pos.append(pos)
         return Portfolio(self.bt, new_pos)
 
+
 class BacktesterBuilder:
     def __init__(self):
         self.bt = copy.deepcopy(Backtester())
@@ -295,7 +303,7 @@ class BacktesterBuilder:
         return self
 
     def data(self, data: DailyDataProvider) -> "BacktesterBuilder":
-        self.bt.data.append(data)
+        self.bt.data[data.name] = data
         data.bt = self.bt
         return self
 
@@ -344,10 +352,7 @@ class BacktesterBuilder:
         return self
 
     def live_plot(
-        self,
-        every: int = 10,
-        metric: str = "Total Value",
-        event: str = "open",
+        self, every: int = 10, metric: str = "Total Value", event: str = "open",
     ) -> "BacktesterBuilder":
         if self.bt._live_metrics:
             warn(
@@ -363,7 +368,17 @@ class BacktesterBuilder:
         self.bt._live_plot_event = event
         return self
 
-    def strategies(self, strategies: List[Union[Callable[["Date", str, "Backtester"], None], Strategy, str]]) -> "BacktesterBuilder":
+    def live_progress(self, every: int = 10) -> "BacktesterBuilder":
+        self.bt._live_progress = True
+        self.bt._live_progress_every = every
+        return self
+
+    def strategies(
+        self,
+        strategies: List[
+            Union[Callable[["Date", str, "Backtester"], None], Strategy, str]
+        ],
+    ) -> "BacktesterBuilder":
         strats = []
         for strat in strategies:
             if isinstance(strat, str):
@@ -396,6 +411,7 @@ class Backtester:
         if type(end_date) == relativedelta:
             end_date = date.today() + end_date
         sched = cal.schedule(start_date=start_date, end_date=end_date)
+        self._schedule = sched
         self.dates = mcal.date_range(sched, frequency="1D")
         self.dates = [d.date() for d in self.dates]
         return self
@@ -424,7 +440,7 @@ class Backtester:
             m.bt = self
             self.metric[m.name] = m
 
-        self.data = []
+        self.data = {}
 
         self._start_capital = None
         self._available_capital = None
@@ -432,6 +448,7 @@ class Backtester:
 
         self._live_plot = False
         self._live_metrics = False
+        self._live_progress = False
 
         self._strategies = []
         self._temp_strategies = []
@@ -439,6 +456,8 @@ class Backtester:
         self.name = None
 
         self._no_iter = False
+
+        self._schedule = None
 
     def _set_self(self):
         self.portfolio.bt = self
@@ -449,6 +468,7 @@ class Backtester:
             m.bt = self
 
     def _init_iter(self, bt=None):
+        global _live_progress_pbar
         if bt is None:
             bt = self
         if bt.assume_nyse:
@@ -463,6 +483,9 @@ class Backtester:
             )
         bt.i = -1
         bt.event = "close"
+        if self._live_progress:
+            _live_progress_pbar = tqdm(total=len(self) // 2)
+            _cls()
         return self
 
     def _next_iter(self, bt=None):
@@ -482,12 +505,17 @@ class Backtester:
                         metric(write=True)
                 if self._has_strategies:
                     for strat in self._strategies:
-                         for metric in strat.metric.values():
+                        for metric in strat.metric.values():
                             if metric._single:
                                 metric(write=True)
+                self.plot(self._strategies, last=True)
                 raise StopIteration
         bt._update()
         return bt.current_date, bt.event, bt
+
+    @property
+    def timestamp(self):
+        return self._schedule.loc[self.current_date][f"market_{self.event}"]
 
     def __iter__(self):
         if self._has_strategies:
@@ -509,21 +537,38 @@ class Backtester:
 
     def _show_live_metrics(self, bts=None):
         _cls()
+        lines = []
+        bt_names = []
+        if bts is not None:
+            if not self._no_iter and self not in bts:
+                bts = [self] + bts
+            for i, bt in enumerate(bts):
+                if bt.name is None:
+                    name = f"Backtest {i}"
+                else:
+                    name = bt.name
+                name = f"{name:20}"
+                if len(name) > 20:
+                    name = name[:18]
+                    name += ".."
+                bt_names.append(name)
+            lines.append(f"{'':20} {''.join(bt_names)}")
+        if bts is None:
+            bts = [self]
         for mkey in self.metric.keys():
-            if bts is None:
-                metric = self.metric[mkey]
+            metrics = []
+            for bt in bts:
+                metric = bt.metric[mkey]
                 if str(metric) == "None":
                     metric = f"{metric():.2f}"
-                print(f"{mkey:20} {metric}")
-            else:
-                metrics = []
-                for bt in bts:
-                    metric = bt.metric[mkey]
-                    if str(metric) == "None":
-                        metric = f"{metric():.2f}"
-                    metric = f"{str(metric):15}"
-                    metrics.append(metric)
-                print(f"{mkey:20} {''.join(metrics)}")
+                metric = f"{str(metric):20}"
+                metrics.append(metric)
+            lines.append(f"{mkey:20} {''.join(metrics)}")
+        for line in lines:
+            print(line)
+        if self._live_progress:
+            print()
+            print(self._show_live_progress())
 
     def _show_live_plot(self, bts=None):
         if not plt_exists:
@@ -534,19 +579,25 @@ class Backtester:
             metric = self.metric[self._live_plot_metric].df[self._live_plot_event]
             plot_df["Backtest"] = metric
         else:
-            for i, bt in enumerate(bts):
+            for i, bt in enumerate([self] + bts):
                 metric = bt.metric[self._live_plot_metric].df[self._live_plot_event]
                 name = f"Backtest {i}"
                 if bt.name is not None:
                     name = bt.name
                 plot_df[name] = metric
         fig, ax = plt.subplots()
+        if self._live_progress:
+            ax.set_title(str(self._show_live_progress()))
         plot_df.plot(ax=ax)
         fig.autofmt_xdate()
         plt.xlim([self.dates[0], self.dates[-1]])
         display.clear_output(wait=True)
         display.display(pl.gcf())
         plt.close()
+
+    def _show_live_progress(self):
+        _live_progress_pbar.n = self.i + 1
+        return _live_progress_pbar
 
     def _update(self):
         for metric in self.metric.values():
@@ -612,6 +663,7 @@ class Backtester:
         class Balance:
             start: float = self._start_capital
             current: float = self._available_capital
+
         return Balance()
 
     def _get_bts(self):
@@ -629,13 +681,13 @@ class Backtester:
         dfs = []
         for i, bt in enumerate(bts):
             df = pd.DataFrame()
-            df['Event'] = np.tile(['open', 'close'], len(bt)//2+1)[:len(bt)]
-            df['Date'] = np.repeat(bt.dates, 2)
+            df["Event"] = np.tile(["open", "close"], len(bt) // 2 + 1)[: len(bt)]
+            df["Date"] = np.repeat(bt.dates, 2)
             if self._has_strategies:
                 if bt.name is not None:
-                    df['Backtest'] = np.repeat(bt.name, len(bt))
+                    df["Backtest"] = np.repeat(bt.name, len(bt))
                 else:
-                    df['Backtest'] = np.repeat(f'Backtest {i}', len(bt))
+                    df["Backtest"] = np.repeat(f"Backtest {i}", len(bt))
             for key in bt.metric.keys():
                 metric = bt.metric[key]
                 if metric._series:
@@ -644,9 +696,9 @@ class Backtester:
                     df[key] = np.repeat(metric.value, len(bt))
             dfs.append(df)
         if self._has_strategies:
-            return pd.concat(dfs).set_index(['Backtest','Date','Event'])
+            return pd.concat(dfs).set_index(["Backtest", "Date", "Event"])
         else:
-            return pd.concat(dfs).set_index(['Date','Event'])
+            return pd.concat(dfs).set_index(["Date", "Event"])
 
     @property
     def summary(self):
@@ -656,9 +708,9 @@ class Backtester:
             df = pd.DataFrame()
             if self._has_strategies:
                 if bt.name is not None:
-                    df['Backtest'] = [bt.name]
+                    df["Backtest"] = [bt.name]
                 else:
-                    df['Backtest'] = [f'Backtest {i}']
+                    df["Backtest"] = [f"Backtest {i}"]
             for key in bt.metric.keys():
                 metric = bt.metric[key]
                 if metric._series:
@@ -667,7 +719,7 @@ class Backtester:
                     df[key] = [metric.value]
             dfs.append(df)
         if self._has_strategies:
-            return pd.concat(dfs).set_index(['Backtest'])
+            return pd.concat(dfs).set_index(["Backtest"])
         else:
             return df
 
@@ -696,13 +748,13 @@ class Backtester:
         if self._has_strategies:
             return StrategySequence(self)
 
-
     @property
     def pf(self):
         return self.portfolio
 
-    
-    def _set_strategies(self, strategies: List[Callable[["Date", str, "Backtester"], None]]):
+    def _set_strategies(
+        self, strategies: List[Callable[["Date", str, "Backtester"], None]]
+    ):
         self._strategies_call = strategies
         for strat in strategies:
             new_bt = copy.deepcopy(self)
@@ -716,11 +768,16 @@ class Backtester:
         for i, bt in enumerate(self._strategies):
             self._strategies_call[i](*self._next_iter(bt))
 
-    def plot(self, bts):
-        if self._live_plot and self.i % self._live_plot_every == 0:
+    def plot(self, bts, last=False):
+        if self._live_plot and (self.i % self._live_plot_every == 0 or last):
             self._show_live_plot(bts)
-        if self._live_metrics and self.i % self._live_metrics_every == 0:
+        if self._live_metrics and (self.i % self._live_metrics_every == 0 or last):
             self._show_live_metrics(bts)
+        if not (self._live_metrics or self._live_plot) and (
+            self.i % self._live_progress_every == 0 or last
+        ):
+            _cls()
+            print(self._show_live_progress())
 
     def run(self):
         self._set_strategies(self._temp_strategies)
@@ -730,6 +787,8 @@ class Backtester:
             self._run_once()
             self.i = self._strategies[-1].i
             self.plot(self._strategies)
+
+        self.plot(self._strategies, last=True)
 
         for strat in self._strategies:
             for metric in strat.metric.values():

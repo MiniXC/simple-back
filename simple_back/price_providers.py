@@ -12,8 +12,48 @@ import pytz
 class TimeLeakError(Exception):
     def __init__(self, current_date, requested_date, message):
         self.current_date = current_date
-        self.requested_date = (requested_date,)
+        self.requested_date = requested_date
         self.message = message
+
+
+class DataProvider(ABC):
+    def __init__(self):
+        self.current_datetime = pd.Timestamp(datetime.utcnow(), tzinfo=pytz.utc)
+
+    def __getitem__(self, symbol_datetime=None) -> pd.DataFrame:
+        try:
+            self.current_datetime = self.bt.timestamp
+        except AttributeError:
+            pass
+        if isinstance(symbol_datetime, tuple):
+            symbol = symbol_datetime[0]
+            date = symbol_datetime[1]
+        elif isinstance(symbol_datetime, str):
+            symbol = symbol_datetime
+            date = self.current_datetime
+        elif isinstance(symbol_datetime, pd.Timestamp) or symbol_datetime is None:
+            symbol = None
+            date = self.current_datetime
+        if date > self.current_datetime:
+            raise TimeLeakError(
+                self.current_datetime,
+                date,
+                f"""
+                {date} is more recent than {self.current_datetime},
+                resulting in time leak
+                """,
+            )
+        return self.get(datetime, symbol)
+
+    @property
+    @abstractmethod
+    def name(self):
+        pass
+
+    @abstractmethod
+    def get(self, datetime: pd.Timestamp, symbol: str = None):
+        pass
+
 
 class DailyDataProvider(ABC):
     def __init__(self):

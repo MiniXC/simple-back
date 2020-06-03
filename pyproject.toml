@@ -16,6 +16,8 @@ pytz = "^2020.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
+flake8 = "^3.8.2"
+black = "^19.10b0"
 
 [tool.dephell.main]
 from = {format = "poetry", path = "pyproject.toml"}
