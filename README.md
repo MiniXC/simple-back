@@ -1,6 +1,10 @@
 # 📈📉&nbsp;&nbsp;simple-back
+![build](https://github.com/MiniXC/simple-back/workflows/build/badge.svg)
 ![PyPI](https://img.shields.io/pypi/v/simple-back)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![codecov](https://codecov.io/gh/MiniXC/simple-back/branch/master/graph/badge.svg)](https://codecov.io/gh/MiniXC/simple-back)
+
+
 
 ## Installation
 ````
@@ -15,8 +19,18 @@ from tqdm.auto import tqdm
 from dateutil.relativedelta import relativedelta
 
 ticker='QQQ'
+bt = (
+BacktesterBuilder()
+  .name('My Backtest')
+  .balance(1_000_000)
+  .strategies(['QQQ', SellAndHold('^VIX')])
+  .live_progress()
+  .live_metrics()
+  .calendar('NYSE')
+  .build()
+)
 
-for day, event, b in tqdm(Backtester(10_000, cal='NYSE', start='2019-4-1', end=relativedelta(days=1))):
+for day, event, b in bt:
   # calculate 30 day average
   avg = b.price(ticker, 30).mean()
   if event == 'open':
@@ -40,11 +54,6 @@ There are many backtesters out there, so inevitably, this is just another one of
 This utility is not built for intra-day trading strategies, as most free data sources only give access to open and close prices.
 
 Other things that make this backtester different are:
-### Speed over Accuracy
-``simple-back`` offers multiprocessing out of the box, making it blazingly fast, for a slight accuracy trade-off.
-In my tests, multiprocessing has only ever led to small changes in results.
-
-Once you have settled on a strategy, you can always run the backtester with multiprocessing disabled.
 
 ### Defaults over Configuration
 Many backtesters need a great deal of configuration and setup before they can be used. 
