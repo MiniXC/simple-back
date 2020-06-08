@@ -20,7 +20,7 @@ jobs:
     - name: requirements.txt
       run: poetry run pip freeze | awk '/==/' > requirements.txt
     - name: requirements-docs.txt
-      run: poetry run pip freeze | awk '/==/' | awk '/sphinx/' > docs/requirements-docs.txt
+      run: poetry run pip freeze | awk '/sphinx|-e/' > docs/requirements.txt
     - name: Black
       run: poetry run python -m black .
     - name: Dephell Convert
