@@ -47,6 +47,7 @@ try:
 except ImportError:
     tqdm_exists = False
 
+
 class StrategySequence:
     """A sequence of strategies than can be accessed by name or :class:`int` index.\
     Returned by :py:obj:`.Backtester.strategies` and should not be used elsewhere.
@@ -95,17 +96,21 @@ class StrategySequence:
     def __len__(self):
         return len(self.bt._get_bts())
 
+
 def _cls():
     clear_output(wait=True)
     os.system("cls" if os.name == "nt" else "clear")
+
 
 class LongShortLiquidationError(Exception):
     def __init__(self, message):
         self.message = message
 
+
 class InsufficientCapitalError(Exception):
     def __init__(self, message):
         self.message = message
+
 
 class Position:
     def __init__(self, bt, symbol, date, event, num_shares):
@@ -360,6 +365,7 @@ class BacktesterBuilder:
     .. _NYSE:
        https://www.nyse.com/index
     """
+
     def __init__(self):
         self.bt = copy.deepcopy(Backtester())
 
@@ -466,12 +472,13 @@ class BacktesterBuilder:
         self.bt._live_progress_every = every
         return self
 
-
-    def compare(self, strategies:  List[
+    def compare(
+        self,
+        strategies: List[
             Union[Callable[["datetime.date", str, "Backtester"], None], Strategy, str]
-        ]):
+        ],
+    ):
         return self.strategies(strategies)
-
 
     def strategies(
         self,
@@ -504,7 +511,9 @@ class Backtester:
         if date_range.stop is not None:
             end_date = date_range.stop
         else:
-            self._warn.append("backtests with no end date can lead to non-replicable results")
+            self._warn.append(
+                "backtests with no end date can lead to non-replicable results"
+            )
             end_date = date.today() - relativedelta(days=1)
         cal = mcal.get_calendar(self._calendar)
         if type(start_date) == relativedelta:
@@ -676,7 +685,9 @@ class Backtester:
 
     def _show_live_plot(self, bts=None):
         if not plt_exists:
-            self._warn.append("matplotlib not installed, setting live plotting to false")
+            self._warn.append(
+                "matplotlib not installed, setting live plotting to false"
+            )
             self._live_plot = False
             return None
         plot_df = pd.DataFrame()
