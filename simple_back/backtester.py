@@ -1,6 +1,7 @@
 import pandas as pd
 import pandas_market_calendars as mcal
 from dateutil.relativedelta import relativedelta
+import datetime
 from datetime import date
 import numpy as np
 import copy
@@ -20,7 +21,7 @@ from .data_providers import (
     PriceUnavailableError,
     DataProvider,
 )
-from .fees import NoFee
+from .fees import NoFee, Fee
 from .metrics import (
     MaxDrawdown,
     AnnualReturn,
@@ -369,9 +370,19 @@ class BacktesterBuilder:
     def __init__(self):
         self.bt = copy.deepcopy(Backtester())
 
-    def balance(self, amount: int) -> "BacktesterBuilder":
+    def name(self, name: str) -> "BacktesterBuilder":
+        """**Optional**, name will be set to "Backtest 0" if not specified.
+
+        Set the name of the strategy run using the :class:`.Backtester` iterator.
+
+        Args:
+            name: The strategy name.
         """
-        Set the starting balance for all :class:`.Strategy` objects
+        self.bt.name = name
+        return self
+
+    def balance(self, amount: int) -> "BacktesterBuilder":
+        """**Required**, set the starting balance for all :class:`.Strategy` objects
         run with the :class:`.Backtester`
 
         Args:
@@ -383,8 +394,7 @@ class BacktesterBuilder:
         return self
 
     def prices(self, prices: DailyPriceProvider) -> "BacktesterBuilder":
-        """
-        Set the :class:`.DailyPriceProvider` used to get prices during
+        """**Optional**, set the :class:`.DailyPriceProvider` used to get prices during
         a backtest. If this is not called, :class:`.YahooPriceProvider`
         is used.
 
@@ -396,8 +406,7 @@ class BacktesterBuilder:
         return self
 
     def data(self, data: DataProvider) -> "BacktesterBuilder":
-        """
-        Add a :class:`.DataProvider` to use external data without time leaks.
+        """**Optional**, add a :class:`.DataProvider` to use external data without time leaks.
 
         Args:
             data: The data provider.
@@ -406,13 +415,12 @@ class BacktesterBuilder:
         data.bt = self.bt
         return self
 
-    def name(self, name: str) -> "BacktesterBuilder":
-        self.bt.name = name
-        return self
-
     def trade_cost(
-        self, trade_cost: Callable[[float, float], Tuple[float, int]]
+        self, trade_cost: Union[Fee, Callable[[float, float], Tuple[float, int]]]
     ) -> "BacktesterBuilder":
+        """**Optional**, set a :class:`.Fee` to be applied when buying shares.
+        When not set, :class:`.NoFee` is used.
+        """
         self.bt._trade_cost = trade_cost
         return self
 
@@ -747,7 +755,7 @@ class Backtester:
         current_price = self.price(symbol)
         if as_percent:
             capital = capital * self._capital
-        total, num_shares = self._trade_cost(current_price, capital)
+        num_shares, total = self._trade_cost(current_price, capital)
         if short:
             num_shares *= -1
         if num_shares != 0:

@@ -152,3 +152,5 @@ Implementation
 .. autoclass:: StrategySequence
    :members:
    :undoc-members:
+.. py:currentmodule:: simple_back.fees
+.. autoclass:: NoFee
