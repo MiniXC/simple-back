@@ -14,5 +14,5 @@ python:
   version: 3
   install:
     - method: pip
-        path: .
+      path: .
     - requirements: docs/requirements.txt
