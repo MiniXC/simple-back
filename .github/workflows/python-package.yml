@@ -17,6 +17,8 @@ jobs:
       run: poetry lock
     - name: Poetry Install
       run: poetry install
+    - name: Requirements.txt
+      run: poetry run pip freeze > requirements.txt
     - name: Black
       run: poetry run python -m black .
     - name: Dephell Convert
