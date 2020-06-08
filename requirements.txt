@@ -57,7 +57,6 @@ pathspec==0.8.0
 pexpect==4.8.0
 pickleshare==0.7.5
 pluggy==0.13.1
-pockets==0.9.1
 prompt-toolkit==3.0.5
 ptyprocess==0.6.0
 py==1.8.1
@@ -82,7 +81,6 @@ six==1.15.0
 snowballstemmer==2.0.0
 soupsieve==1.9.6
 Sphinx==3.0.4
-sphinx-autodoc-napoleon-typehints==2.1.6
 sphinx-autodoc-typehints==1.10.3
 sphinx-copybutton==0.2.11
 sphinx-rtd-theme==0.4.3
@@ -90,7 +88,6 @@ sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
 sphinxcontrib-htmlhelp==1.0.3
 sphinxcontrib-jsmath==1.0.1
-sphinxcontrib-napoleon==0.7
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
 toml==0.10.1
@@ -98,7 +95,6 @@ tomlkit==0.6.0
 tqdm==4.46.1
 traitlets==4.3.3
 typed-ast==1.4.1
-typing==3.7.4.1
 urllib3==1.25.9
 w3lib==1.22.0
 wcwidth==0.2.4
