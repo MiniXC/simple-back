@@ -529,7 +529,7 @@ class Backtester:
         return self
 
     def __init__(self):
-        self.dates = None
+        self.dates = []
         self.assume_nyse = False
 
         self.prices = YahooFinanceProvider()
