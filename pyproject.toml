@@ -18,6 +18,7 @@ memoization = "^0.3.1"
 sphinx-rtd-theme = "^0.4.3"
 sphinx-copybutton = "^0.2.11"
 sphinx-autodoc-typehints = "^1.10.3"
+IPython = "^7.15.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
