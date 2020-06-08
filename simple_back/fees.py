@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class Fee(ABC):
     """
     Abstract ``Callable`` that calculates the total cost and number of shares
@@ -7,7 +8,7 @@ class Fee(ABC):
     It returns the total cost and the number of shares aquired for that cost.
     """
 
-    def __call__(self, price:float, capital:float):
+    def __call__(self, price: float, capital: float):
         shares = self.num_shares(price, capital)
         cost = self.cost(price, shares)
         if cost > capital:
@@ -22,6 +23,7 @@ class Fee(ABC):
     def cost(self, price, num_shares):
         pass
 
+
 class FlatPerTrade(Fee):
     def __init__(self, fee):
         self.fee = fee
@@ -32,6 +34,7 @@ class FlatPerTrade(Fee):
     def cost(self, price, num_shares):
         return price * num_shares + self.fee
 
+
 class FlatPerShare(Fee):
     def __init__(self, fee):
         self.fee = fee
@@ -41,6 +44,7 @@ class FlatPerShare(Fee):
 
     def cost(self, price, num_shares):
         return (price + self.fee) * num_shares
+
 
 class NoFee(Fee):
     """
@@ -54,6 +58,7 @@ class NoFee(Fee):
             >>> NoFee(10, 415)
             41, 410
     """
+
     def num_shares(self, price, capital):
         return capital // price
 
