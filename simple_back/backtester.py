@@ -497,11 +497,13 @@ class BacktesterBuilder:
         return self
 
     def build(self) -> "Backtester":
+        self.bt._builder = self
         return copy.deepcopy(self.bt)
 
 
 class Backtester:
     def __getitem__(self, date_range: slice) -> "Backtester":
+        self = self._builder.build()
         if self.assume_nyse:
             self._calendar = "NYSE"
         if date_range.start is not None:
