@@ -134,7 +134,7 @@ Strategies
 ----------
 
 You can also use :meth:`.Backtester.strategies` which returns a :class:`.StrategySequence`,
-whith their own :py:obj:`.Backtester.metrics` and :py:obj:`.Backtester.summary`::
+with their own :py:obj:`.Backtester.metrics` and :py:obj:`.Backtester.summary`::
 
    bt.strategies['JNUG 20-Day Crossover'].metrics
 
