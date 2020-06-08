@@ -21,7 +21,7 @@ At the same time, we aim to make it easy to use your own data and price sources.
 
 This package is especially useful when used in Jupyter Notebooks,
 as it provides ways to show you live feedback
-while your backtest while they are being run.
+while your backtests are being run.
 
 Getting Started
 ===============
