@@ -1,4 +1,4 @@
--e git+https://github.com/MiniXC/simple-back@418d33421af8a9a5df15e0ac6e74f1f9b3c35765#egg=simple_back
+-e git+https://github.com/MiniXC/simple-back@01ad85fae94118c4e418d6310a53b301eb9e0528#egg=simple_back
 sphinx-autodoc-napoleon-typehints==2.1.6
 sphinx-autodoc-typehints==1.10.3
 sphinx-copybutton==0.2.11
