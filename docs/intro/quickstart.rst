@@ -140,8 +140,8 @@ with their own :py:obj:`.Backtester.metrics` and :py:obj:`.Backtester.summary`::
 
 Implementation
 ==============
-.. py:currentmodule:: simple_back.backtester
 
+.. py:module:: simple_back
 .. autoclass:: simple_back.backtester.BacktesterBuilder
    :members:
    :undoc-members:
