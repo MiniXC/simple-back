@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "simple-back"
 version = "0.4.3"
-description = ""
+description = "A backtester with minimal setup and sensible defaults."
 authors = ["Christoph Minixhofer <christoph.minixhofer@gmail.com>"]
 
 [tool.poetry.dependencies]
