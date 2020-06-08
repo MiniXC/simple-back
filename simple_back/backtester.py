@@ -13,7 +13,13 @@ from IPython.display import clear_output
 from dataclasses import dataclass
 from collections.abc import MutableSequence
 
-from .price_providers import DailyPriceProvider, YahooFinanceProvider, DailyDataProvider
+from .data_providers import (
+    DailyPriceProvider,
+    YahooFinanceProvider,
+    DailyDataProvider,
+    PriceUnavailableError,
+    DataProvider,
+)
 from .fees import NoFee
 from .metrics import (
     MaxDrawdown,
@@ -41,16 +47,65 @@ try:
 except ImportError:
     tqdm_exists = False
 
+class StrategySequence:
+    """A sequence of strategies than can be accessed by name or :class:`int` index.\
+    Returned by :py:obj:`.Backtester.strategies` and should not be used elsewhere.
+
+    Examples:
+
+        Access by :class:`str`::
+
+            bt.strategies['Some Strategy Name']
+
+        Access by :class:`int`::
+
+            bt.strategies[0]
+
+        Use as iterator::
+
+            for strategy in bt.strategies:
+                # do something
+    """
+
+    def __init__(self, bt):
+        self.bt = bt
+        self.i = 0
+
+    def __getitem__(self, index: Union[str, int]):
+        if isinstance(index, int):
+            self.bt._get_bts()[index]
+        elif isinstance(index, str):
+            for i, bt in enumerate(self.bt._get_bts()):
+                if bt.name is not None:
+                    if bt.name == index:
+                        return bt
+                else:
+                    if f"Backtest {i}" == index:
+                        return bt
+            raise IndexError
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        i = self.i
+        self.i += 1
+        return self[i]
+
+    def __len__(self):
+        return len(self.bt._get_bts())
 
 def _cls():
     clear_output(wait=True)
     os.system("cls" if os.name == "nt" else "clear")
 
-
 class LongShortLiquidationError(Exception):
     def __init__(self, message):
         self.message = message
 
+class InsufficientCapitalError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 class Position:
     def __init__(self, bt, symbol, date, event, num_shares):
@@ -194,15 +249,16 @@ class Portfolio(MutableSequence):
             raise LongShortLiquidationError(
                 "liquidating a mix of long and short positions is not possible"
             )
-        for pos in self.positions:
+        for pos in copy.copy(self.positions):
             if num_shares == -1 or num_shares >= pos.num_shares:
                 self.bt._available_capital += pos.value
                 self.bt.portfolio._remove(pos)
 
                 pos._freeze()
-                self.bt.trades._add(pos)
+                self.bt.trades._add(copy.copy(pos))
 
-                num_shares -= pos.num_shares
+                if num_shares != -1:
+                    num_shares -= pos.num_shares
             elif num_shares > 0 and num_shares < pos.num_shares:
                 self.bt._available_capital += pos.value_pershare * num_shares
                 pos._remove_shares(num_shares)
@@ -260,6 +316,9 @@ class Portfolio(MutableSequence):
     def __len__(self):
         return len(self.positions)
 
+    def __bool__(self):
+        return len(self) != 0
+
     @property
     def short(self):
         new_pos = []
@@ -288,21 +347,55 @@ class Portfolio(MutableSequence):
 
 
 class BacktesterBuilder:
+    """
+    Used to configure a :class:`.Backtester`
+    and then creating it with :meth:`.build`
+
+    Example:
+        Create a new :class:`.Backtester` with 10,000 starting balance
+        which runs on days the `NYSE`_ is open::
+
+            bt = BacktesterBuilder().balance(10_000).calendar('NYSE').build()
+
+    .. _NYSE:
+       https://www.nyse.com/index
+    """
     def __init__(self):
         self.bt = copy.deepcopy(Backtester())
 
     def balance(self, amount: int) -> "BacktesterBuilder":
+        """
+        Set the starting balance for all :class:`.Strategy` objects
+        run with the :class:`.Backtester`
+
+        Args:
+            amount: The starting balance.
+        """
         self.bt._capital = amount
         self.bt._available_capital = amount
         self.bt._start_capital = amount
         return self
 
     def prices(self, prices: DailyPriceProvider) -> "BacktesterBuilder":
+        """
+        Set the :class:`.DailyPriceProvider` used to get prices during
+        a backtest. If this is not called, :class:`.YahooPriceProvider`
+        is used.
+
+        Args:
+            prices: The price provider.
+        """
         self.bt.prices = prices
         self.bt.prices.bt = self.bt
         return self
 
-    def data(self, data: DailyDataProvider) -> "BacktesterBuilder":
+    def data(self, data: DataProvider) -> "BacktesterBuilder":
+        """
+        Add a :class:`.DataProvider` to use external data without time leaks.
+
+        Args:
+            data: The data provider.
+        """
         self.bt.data[data.name] = data
         data.bt = self.bt
         return self
@@ -340,7 +433,7 @@ class BacktesterBuilder:
 
     def live_metrics(self, every: int = 10) -> "BacktesterBuilder":
         if self.bt._live_plot:
-            warn(
+            self.bt._warn.append(
                 """
                 live plotting and metrics cannot be used together,
                  setting live plotting to false
@@ -355,7 +448,7 @@ class BacktesterBuilder:
         self, every: int = 10, metric: str = "Total Value", event: str = "open",
     ) -> "BacktesterBuilder":
         if self.bt._live_metrics:
-            warn(
+            self.bt._warn.append(
                 """
                 live metrics and plotting cannot be used together,
                  setting live metrics to false
@@ -373,10 +466,17 @@ class BacktesterBuilder:
         self.bt._live_progress_every = every
         return self
 
+
+    def compare(self, strategies:  List[
+            Union[Callable[["datetime.date", str, "Backtester"], None], Strategy, str]
+        ]):
+        return self.strategies(strategies)
+
+
     def strategies(
         self,
         strategies: List[
-            Union[Callable[["Date", str, "Backtester"], None], Strategy, str]
+            Union[Callable[["datetime.date", str, "Backtester"], None], Strategy, str]
         ],
     ) -> "BacktesterBuilder":
         strats = []
@@ -390,7 +490,7 @@ class BacktesterBuilder:
         return self
 
     def build(self) -> "Backtester":
-        return self.bt
+        return copy.deepcopy(self.bt)
 
 
 class Backtester:
@@ -404,6 +504,7 @@ class Backtester:
         if date_range.stop is not None:
             end_date = date_range.stop
         else:
+            self._warn.append("backtests with no end date can lead to non-replicable results")
             end_date = date.today() - relativedelta(days=1)
         cal = mcal.get_calendar(self._calendar)
         if type(start_date) == relativedelta:
@@ -458,6 +559,7 @@ class Backtester:
         self._no_iter = False
 
         self._schedule = None
+        self._warn = []
 
     def _set_self(self):
         self.portfolio.bt = self
@@ -472,7 +574,7 @@ class Backtester:
         if bt is None:
             bt = self
         if bt.assume_nyse:
-            warn("no market calendar specified, assuming NYSE calendar")
+            self._warn.append("no market calendar specified, assuming NYSE calendar")
         if bt._available_capital is None or bt._capital is None:
             raise ValueError(
                 "initial balance not specified, you can do so using .balance"
@@ -509,6 +611,8 @@ class Backtester:
                             if metric._single:
                                 metric(write=True)
                 self.plot(self._strategies, last=True)
+                for w in self._warn:
+                    warn(w)
                 raise StopIteration
         bt._update()
         return bt.current_date, bt.event, bt
@@ -572,14 +676,17 @@ class Backtester:
 
     def _show_live_plot(self, bts=None):
         if not plt_exists:
-            warn("matplotlib not installed, setting live plotting to false")
+            self._warn.append("matplotlib not installed, setting live plotting to false")
             self._live_plot = False
+            return None
         plot_df = pd.DataFrame()
         if bts is None:
             metric = self.metric[self._live_plot_metric].df[self._live_plot_event]
             plot_df["Backtest"] = metric
         else:
-            for i, bt in enumerate([self] + bts):
+            if not self._no_iter:
+                bts = [self] + bts
+            for i, bt in enumerate(bts):
                 metric = bt.metric[self._live_plot_metric].df[self._live_plot_event]
                 name = f"Backtest {i}"
                 if bt.name is not None:
@@ -613,11 +720,11 @@ class Backtester:
             short = False
         if not as_percent:
             if capital > self._available_capital:
-                raise Exception("not enough capital available")
+                raise InsufficientCapitalError("not enough capital available")
         else:
             if capital * self._capital > self._available_capital:
                 if not math.isclose(capital * self._capital, self._available_capital):
-                    raise Exception(
+                    raise InsufficientCapitalError(
                         f"""
                         not enough capital available:
                         ordered {capital} * {self._capital}
@@ -652,10 +759,28 @@ class Backtester:
 
     def price(self, symbol):
         try:
-            return self.prices[symbol, self.current_date][self.event]
+            price = self.prices[symbol, self.current_date][self.event]
         except KeyError:
-            self.prices.rem_cache(symbol)
-            return self.prices[symbol, self.current_date][self.event]
+            try:
+                self.prices.rem_cache(symbol)
+                price = self.prices[symbol, self.current_date][self.event]
+            except KeyError:
+                raise PriceUnavailableError(
+                    symbol,
+                    self.current_date,
+                    f"""
+                    Price for {symbol} on {self.current_date} could not be found.
+                    """.strip(),
+                )
+        if math.isnan(price) or price is None:
+            raise PriceUnavailableError(
+                symbol,
+                self.current_date,
+                f"""
+                    Price for {symbol} on {self.current_date} is nan or None.
+                    """.strip(),
+            )
+        return price
 
     @property
     def balance(self):
@@ -725,31 +850,15 @@ class Backtester:
 
     @property
     def strategies(self):
-        class StrategySequence:
-            def __init__(self, bt):
-                self.bt = bt
-
-            def __getitem__(self, index: Union[str, int]):
-                if isinstance(index, int):
-                    self.bt._get_bts()[index]
-                elif isinstance(index, str):
-                    for i, bt in enumerate(self.bt._get_bts()):
-                        if bt.name is not None:
-                            if bt.name == index:
-                                return bt
-                        else:
-                            if f"Backtest {i}" == index:
-                                return bt
-                    raise IndexError
-
-            def __len__(self):
-                return len(self.bt._get_bts())
-
         if self._has_strategies:
             return StrategySequence(self)
 
     @property
     def pf(self):
+        return self.portfolio
+
+    @property
+    def portfolio(self):
         return self.portfolio
 
     def _set_strategies(
@@ -781,6 +890,7 @@ class Backtester:
 
     def run(self):
         self._set_strategies(self._temp_strategies)
+        self._init_iter()
         self._no_iter = True
 
         for _ in range(len(self)):

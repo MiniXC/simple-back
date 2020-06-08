@@ -4,3 +4,4 @@ __pycache__
 dist
 .simple-back
 .coverage
+docs/_build

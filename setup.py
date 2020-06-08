@@ -9,27 +9,32 @@ try:
 except ImportError:
     from distutils.core import setup
 
-readme = ''
+readme = ""
 
 setup(
     long_description=readme,
-    name='simple-back',
-    version='0.4.2',
-    python_requires='==3.*,>=3.7.0',
-    author='Christoph Minixhofer',
-    author_email='christoph.minixhofer@gmail.com',
-    packages=['simple_back'],
+    name="simple-back",
+    version="0.4.2",
+    python_requires="==3.*,>=3.7.0",
+    author="Christoph Minixhofer",
+    author_email="christoph.minixhofer@gmail.com",
+    packages=["simple_back"],
     package_dir={"": "."},
     package_data={},
     install_requires=[
-        'diskcache==4.*,>=4.1.0', 'numpy==1.*,>=1.18.4', 'pandas==1.*,>=1.0.3',
-        'pandas-market-calendars==1.*,>=1.3.5', 'pytz==2020.*,>=2020.1.0',
-        'requests-html==0.*,>=0.10.0', 'yahoo-fin==0.*,>=0.8.5'
+        "diskcache==4.*,>=4.1.0",
+        "numpy==1.*,>=1.18.4",
+        "pandas==1.*,>=1.0.3",
+        "pandas-market-calendars==1.*,>=1.3.5",
+        "pytz==2020.*,>=2020.1.0",
+        "requests-html==0.*,>=0.10.0",
+        "yahoo-fin==0.*,>=0.8.5",
     ],
     extras_require={
         "dev": [
-            "black==19.*,>=19.10.0.b0", "flake8==3.*,>=3.8.2",
-            "pytest==5.*,>=5.2.0"
+            "black==19.*,>=19.10.0.b0",
+            "flake8==3.*,>=3.8.2",
+            "pytest==5.*,>=5.2.0",
         ]
     },
 )
