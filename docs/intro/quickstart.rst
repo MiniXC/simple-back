@@ -120,18 +120,18 @@ Inspecting Metrics
 Now that our Backtest is complete, we can use :py:obj:`.Backtester.metrics` and :py:obj:`.Backtester.summary`
 to get more details. Both of these will return `DataFrames`.
 
-:py:obj:`.Backtester.metrics`
------------------------------
+Metrics
+-------
 
 .. image:: img/quickstart-df-01.png
 
-:py:obj:`.Backtester.summary`
------------------------------
+Summary
+-------
 
 .. image:: img/quickstart-df-02.png
 
-:py:obj:`.Backtester.strategies`
---------------------------------
+Strategies
+----------
 
 You can also use :meth:`.Backtester.strategies` which returns a :class:`.StrategySequence`,
 whith their own :py:obj:`.Backtester.metrics` and :py:obj:`.Backtester.summary`::
