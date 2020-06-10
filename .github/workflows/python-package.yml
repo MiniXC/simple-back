@@ -25,6 +25,8 @@ jobs:
       run: poetry run python -m black .
     - name: Dephell Convert
       run: poetry run python -m dephell convert
+    - name: install pandoc
+      run: sudo apt-get install pandoc
     - name: Replace Notebook References
       run: poetry run bash -c "cd docs && make html && cd scripts && python replace_nbsphinx_ref.py"
     - name: Git Auto Commit
