@@ -4,6 +4,7 @@ from typing import Union, List, Optional, Tuple
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 from datetime import date, datetime
+import datetime
 import numpy as np
 import diskcache as dc
 import pytz
@@ -218,12 +219,12 @@ class DailyDataProvider(ABC):
 
     def _remove_leaky_vals(self, df, cols, date):
         if isinstance(df, pd.DataFrame):
-            if type(date) == str:
+            if isinstance(date, str):
                 date = pd.to_datetime(date)
-            istoday = type(date) != slice and date == self.current_date
+            istoday = ((not isinstance(date, slice)) and date == self.current_date)
             if istoday or (df is not None and self.current_date in df.index):
                 cur_order = self.columns.index(self.current_event)
-                if type(cols) == str:
+                if isinstance(cols, str):
                     cols = [cols]
                 for i, col in enumerate(cols):
                     if self.columns_order[i] > cur_order:
@@ -231,7 +232,7 @@ class DailyDataProvider(ABC):
                             df[col] = None
                         else:
                             df.at[self.current_date, col] = None
-            if type(date) == slice and not df.empty:
+            if isinstance(date, slice) and not df.empty:
                 sum_recent = (df.index.date > self.current_date).sum()
                 if sum_recent > 0:
                     raise TimeLeakError(
@@ -242,7 +243,7 @@ class DailyDataProvider(ABC):
                         more recent than {self.current_date}
                         """,
                     )
-            elif type(date) != slice:
+            elif not isinstance(date, slice):
                 if date > self.current_date:
                     raise TimeLeakError(
                         self.current_date,
@@ -260,12 +261,12 @@ class DailyDataProvider(ABC):
     @property
     def _max_order(self):
         max_order = min(self.columns_order)
-        if type(self.current_event) == list:
+        if isinstance(self.current_event, list):
             for event in self.current_event:
                 order = self._get_order(event)
                 if order > max_order:
                     max_order = order
-        if type(self.current_event) == str:
+        if isinstance(self.current_event, str):
             max_order = self._get_order(self.current_event)
         return max_order
 
@@ -294,7 +295,7 @@ class DailyDataProvider(ABC):
             self.current_event = self.bt.event
         except AttributeError:
             pass
-        if type(symbol_date_event) is not str:
+        if not isinstance(symbol_date_event, str):
             len_t = len(symbol_date_event)
         else:
             len_t = 0
@@ -307,7 +308,7 @@ class DailyDataProvider(ABC):
             symbol = symbol_date_event[0]
         if len_t >= 2:
             date = symbol_date_event[1]
-            if type(date) is date:
+            if isinstance(date, datetime.date):
                 if date > self.current_date:
                     raise TimeLeakError(
                         self.current_date,
@@ -317,28 +318,28 @@ class DailyDataProvider(ABC):
                         resulting in time leak
                         """,
                     )
-            if type(date) == slice:
+            if isinstance(date, slice):
                 if date == slice(None, None):
                     date = slice(None, self.current_date)
                 if date.stop is None:
                     date = slice(date.start, self.current_date, date.step)
                 stop_date = date.stop
-                if type(date.stop) == relativedelta:
+                if isinstance(date.stop, relativedelta):
                     date = slice(date.start, self.current_date + date.stop, date.step)
-                if type(date.start) == relativedelta:
-                    if type(stop_date) == str:
+                if isinstance(date.start, relativedelta):
+                    if isinstance(stop_date, str):
                         stop_date = pd.to_datetime(stop_date)
                     date = slice(stop_date + date.start, date.stop, date.step)
                 stop_date = date.stop
-                if type(date.stop) == int and date.stop <= 0:
+                if isinstance(date.stop, int) and date.stop <= 0:
                     date = slice(
                         date.start,
                         self.current_date - relativedelta(days=-1 * date.stop),
                         date.step,
                     )
-                if type(date.start) == int and date.start <= 0:
+                if isinstance(date.start, int) and date.start <= 0:
                     stop_date = date.stop
-                    if type(stop_date) == str:
+                    if isinstance(stop_date, str):
                         stop_date = pd.to_datetime(stop_date)
                     date = slice(
                         stop_date - relativedelta(days=-1 * date.start),
@@ -417,7 +418,6 @@ class DailyPriceProvider(DailyDataProvider):
         self, symbol: str, date: Union[slice, date], event: Union[str, List[str]]
     ) -> pd.DataFrame:
         pass
-
 
 class YahooFinanceProvider(DailyPriceProvider):
     def __init__(self, highlow=False, adjust_prices=True):

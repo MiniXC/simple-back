@@ -20,7 +20,7 @@ Use :class:`.BacktesterBuilder` to configure and create a :class:`.Backtester` o
       .name('JNUG 20-Day Crossover')
       .balance(10_000)
       .calendar('NYSE')
-      .compare(['JNUG']) # stragies to compare with
+      .compare(['JNUG']) # strategies to compare with
       .live_plot() # we assume we are running this in a Jupyter Notebook
       .build()
    )
@@ -59,7 +59,7 @@ We then calculate the 20-day moving average of JNUGs close prices::
          jnug_ma = b.prices['JNUG',-20:]['close'].mean()
 
 .. note::
-   The second argument of ``b.prices`` (implemented in :class:`.DailyPriceProvider`)
+   The second indexer of ``b.prices`` (implemented in :class:`.DailyPriceProvider`)
    can be a date range or single date
    that allows you to use :class:`int`, :class:`dateutil.relativedelta.relativedelta`
    or :class:`datetime.date` values.

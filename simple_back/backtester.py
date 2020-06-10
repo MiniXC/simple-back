@@ -425,7 +425,7 @@ class BacktesterBuilder:
         return self
 
     def metrics(self, metrics: Union[Metric, List[Metric]]) -> "BacktesterBuilder":
-        if type(metrics) == list:
+        if isinstance(metrics, list):
             for m in metrics:
                 for m in metrics:
                     m.bt = self.bt
@@ -526,9 +526,9 @@ class Backtester:
             )
             end_date = date.today() - relativedelta(days=1)
         cal = mcal.get_calendar(self._calendar)
-        if type(start_date) == relativedelta:
+        if isinstance(start_date, relativedelta):
             start_date = date.today() + start_date
-        if type(end_date) == relativedelta:
+        if isinstance(end_date, relativedelta):
             end_date = date.today() + end_date
         sched = cal.schedule(start_date=start_date, end_date=end_date)
         self._schedule = sched
