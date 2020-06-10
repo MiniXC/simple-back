@@ -14,37 +14,31 @@ pip install simple_back
 > The following buys QQQ everytime it is above its 30-day average and shorts when it is below. It only does this on market open.
 
 ````python
-from simple_back import Backtester
-from tqdm.auto import tqdm
-from dateutil.relativedelta import relativedelta
+from simple_back.backtester import BacktesterBuilder
 
-ticker='QQQ'
 bt = (
-BacktesterBuilder()
-  .name('My Backtest')
-  .balance(1_000_000)
-  .strategies(['QQQ', SellAndHold('^VIX')])
-  .live_progress()
-  .live_metrics()
-  .calendar('NYSE')
-  .build()
+   BacktesterBuilder()
+   .name('JNUG 20-Day Crossover')
+   .balance(10_000)
+   .calendar('NYSE')
+   .compare(['JNUG']) # strategies to compare with
+   .live_plot() # we assume we are running this in a Jupyter Notebook
+   .build()
 )
 
-for day, event, b in bt:
-  # calculate 30 day average
-  avg = b.price(ticker, 30).mean()
-  if event == 'open':
-    # check if we already hold a position
-    if ticker in b.portfolio['symbol']:
-      # check if we are short or long
-      if b.portfolio['number'].sum() > 0:
-        if b.price(ticker) > avg:
-          b.liquidate(ticker)
-          b.order(ticker, 1, as_percent=True)
-      if b.portfolio['number'].sum() < 0:
-        if b.price(ticker) < avg:
-          b.liquidate(ticker, short=True)
-          b.order(ticker, 1, as_percent=True)
+for day, event, b in bt['2019-1-1':'2020-1-1']:
+    if event == 'open':
+        jnug_ma = b.prices['JNUG',-20:]['close'].mean()
+
+        if b.price('JNUG') > jnug_ma:
+            if not b.portfolio['JNUG'].long: # check if we already are long JNUG
+                b.portfolio['JNUG'].short.liquidate() # liquidate any/all short JNUG positions
+                b.order_pct('JNUG', 1) # long JNUG
+
+        if b.price('JNUG') < jnug_ma:
+            if not b.portfolio['JNUG'].short: # check if we already are short JNUG
+                b.portfolio['JNUG'].long.liquidate() # liquidate any/all long JNUG positions
+                b.order_pct('JNUG', -1) # short JNUG
 ````
 
 
