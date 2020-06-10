@@ -32,7 +32,8 @@ jobs:
     - name: Git Auto Commit
       uses: stefanzweifel/git-auto-commit-action@v4.3.0
       with:
-        commit_message: "build"    
+        commit_message: "build"
+        branch: ${{ github.head_ref }} 
     - name: Lint
       run: poetry run python -m flake8 . --count --exit-zero --max-complexity=10 --statistics
     - name: Test
