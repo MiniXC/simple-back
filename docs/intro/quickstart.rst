@@ -59,7 +59,7 @@ We then calculate the 20-day moving average of JNUGs close prices::
          jnug_ma = b.prices['JNUG',-20:]['close'].mean()
 
 .. note::
-   The second argument of ``b.prices`` (implemented in :class:`.DailyPriceProvider.__getitem__`)
+   The second argument of ``b.prices`` (implemented in :class:`.DailyPriceProvider`)
    can be a date range or single date
    that allows you to use :class:`int`, :class:`dateutil.relativedelta.relativedelta`
    or :class:`datetime.date` values.
@@ -137,20 +137,3 @@ You can also use :meth:`.Backtester.strategies` which returns a :class:`.Strateg
 with their own :py:obj:`.Backtester.metrics` and :py:obj:`.Backtester.summary`::
 
    bt.strategies['JNUG 20-Day Crossover'].metrics
-
-Implementation
-==============
-
-.. py:currentmodule:: simple_back.backtester
-.. autoclass:: BacktesterBuilder
-   :members:
-   :undoc-members:
-   :member-order: bysource
-.. autoclass:: Backtester
-   :members:
-   :undoc-members:
-.. autoclass:: StrategySequence
-   :members:
-   :undoc-members:
-.. py:currentmodule:: simple_back.fees
-.. autoclass:: NoFee

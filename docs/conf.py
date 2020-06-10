@@ -29,6 +29,7 @@ author = "Christoph Minixhofer"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "nbsphinx",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx.ext.autodoc",
@@ -66,3 +67,6 @@ html_static_path = ["_static"]
 # needed for readthedocs.io
 # https://github.com/readthedocs/readthedocs.org/issues/2569
 master_doc = "index"
+
+# https://stackoverflow.com/questions/18969093/how-to-include-the-toctree-in-the-sidebar-of-each-page
+html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'] }

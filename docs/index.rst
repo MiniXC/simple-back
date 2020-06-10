@@ -26,35 +26,37 @@ while your backtests are being run.
 Getting Started
 ===============
 
-.. toctree::
-   :caption: Getting Started
-   :hidden:
-
-   intro/quickstart
-   intro/strategies
-   intro/data
-   intro/example
-
-
 :doc:`intro/quickstart`
 -----------------------
 Build and test a simple strategy using simple-back.
 
 :doc:`intro/strategies`
 -----------------------
-Create a :class:`~simple_back.strategies.Strategy` object and run multiple strategies at the same time.
+Create a :class:`.Strategy` object and run multiple strategies at the same time.
 
 :doc:`intro/data`
 -----------------
-Write your first :class:`~simple_back.data_provider.DataProvider`
+Write your first :class:`.DataProvider`
 
 :doc:`intro/example`
 --------------------
 Just copy example code and get started yourself.
 
-Indices and tables
-==================
+.. toctree::
+   :maxdepth: 5
+   :caption: Getting Started
+   :hidden:
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   intro/quickstart
+   intro/quickstart_nb
+   intro/strategies
+   intro/data
+   intro/example
+   usage_examples
+
+.. toctree::
+   :maxdepth: 5
+   :caption: API
+   :hidden:
+
+   api/simple_back
