@@ -546,7 +546,7 @@ class Backtester:
         self.portfolio = Portfolio(self)
         self.trades = copy.deepcopy(Portfolio(self))
 
-        self._trade_cost = NoFee
+        self._trade_cost = NoFee()
 
         metrics = [
             MaxDrawdown(),
@@ -876,10 +876,6 @@ class Backtester:
 
     @property
     def pf(self):
-        return self.portfolio
-
-    @property
-    def portfolio(self):
         return self.portfolio
 
     def _set_strategies(

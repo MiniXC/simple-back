@@ -15,11 +15,6 @@ diskcache = "^4.1.0"
 pytz = "^2020.1"
 beautifulsoup4 = "^4.9.1"
 memoization = "^0.3.1"
-sphinx-rtd-theme = "^0.4.3"
-sphinx-copybutton = "^0.2.11"
-sphinx-autodoc-typehints = "^1.10.3"
-IPython = "^7.15.0"
-nbsphinx = "^0.7.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -29,6 +24,11 @@ dephell = "^0.8.3"
 IPython = "^7.15.0"
 pytest-cov = "^2.9.0"
 sphinx = "^3.0.4"
+sphinx-rtd-theme = "^0.4.3"
+sphinx-copybutton = "^0.2.11"
+sphinx-autodoc-typehints = "^1.10.3"
+nbsphinx = "^0.7.0"
+IPython = "^7.15.0"
 
 [tool.dephell.main]
 from = {format = "poetry", path = "pyproject.toml"}
