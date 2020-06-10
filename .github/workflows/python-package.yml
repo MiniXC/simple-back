@@ -26,7 +26,7 @@ jobs:
     - name: Dephell Convert
       run: poetry run python -m dephell convert
     - name: Replace Notebook References
-      run: poetry run bash -c "cd docs/scripts && python replace_nbsphinx_ref.py"
+      run: poetry run bash -c "cd docs/scripts && make html && python replace_nbsphinx_ref.py"
     - name: Git Auto Commit
       uses: stefanzweifel/git-auto-commit-action@v4.3.0
       with:
