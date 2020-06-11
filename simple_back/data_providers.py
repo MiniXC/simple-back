@@ -221,7 +221,7 @@ class DailyDataProvider(ABC):
         if isinstance(df, pd.DataFrame):
             if isinstance(date, str):
                 date = pd.to_datetime(date)
-            istoday = ((not isinstance(date, slice)) and date == self.current_date)
+            istoday = (not isinstance(date, slice)) and date == self.current_date
             if istoday or (df is not None and self.current_date in df.index):
                 cur_order = self.columns.index(self.current_event)
                 if isinstance(cols, str):
@@ -418,6 +418,7 @@ class DailyPriceProvider(DailyDataProvider):
         self, symbol: str, date: Union[slice, date], event: Union[str, List[str]]
     ) -> pd.DataFrame:
         pass
+
 
 class YahooFinanceProvider(DailyPriceProvider):
     def __init__(self, highlow=False, adjust_prices=True):
