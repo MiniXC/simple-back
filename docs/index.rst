@@ -23,6 +23,16 @@ This package is especially useful when used in Jupyter Notebooks,
 as it provides ways to show you live feedback
 while your backtests are being run.
 
+.. warning::
+    **simple-back** is under active development.
+    Any update could introduce breaking changes or even bugs (although we try to avoid the latter as much as possible).
+    As soon as the API is finalized, version 1.0 will be released and this disclaimer will be removed.
+    
+    To get a sense of how far we are along, you can have a look at the `1.0 milestone`_.
+
+.. _1.0 milestone:
+   https://github.com/MiniXC/simple-back/milestone/1
+
 Getting Started
 ===============
 
