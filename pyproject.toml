@@ -15,6 +15,7 @@ diskcache = "^4.1.0"
 pytz = "^2020.1"
 beautifulsoup4 = "^4.9.1"
 memoization = "^0.3.1"
+pandoc = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
