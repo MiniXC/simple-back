@@ -12,10 +12,13 @@ sphinx:
   configuration: docs/conf.py
 
 # Optionally set the version of Python and requirements required to build your docs
-python:
-  version: 3
-  install:
-    - method: pip
-      path: .
-    - requirements: docs/requirements.txt
-  system_packages: true
+#python:
+#  version: 3
+#  install:
+#    - method: pip
+#      path: .
+#    - requirements: docs/requirements.txt
+#  system_packages: true
+
+conda:
+  file: doc/environment.yml
