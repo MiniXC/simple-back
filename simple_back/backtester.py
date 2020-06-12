@@ -43,21 +43,26 @@ except ImportError:
 
 try:
     from tqdm import tqdm
+
     tqdm_exists = True
 except ImportError:
     tqdm_exists = False
+
 
 class BacktestRunException(Exception):
     def __init__(self, message):
         self.message = message
 
+
 class LongShortLiquidationError(Exception):
     def __init__(self, message):
         self.message = message
 
+
 class InsufficientCapitalError(Exception):
     def __init__(self, message):
         self.message = message
+
 
 class StrategySequence:
     """A sequence of strategies than can be accessed by name or :class:`int` index.\
@@ -459,7 +464,10 @@ class BacktesterBuilder:
         return self
 
     def live_plot(
-        self, every: int = 10, metric: str = "Total Value", figsize: Tuple[float, float]=None
+        self,
+        every: int = 10,
+        metric: str = "Total Value",
+        figsize: Tuple[float, float] = None,
     ) -> "BacktesterBuilder":
         if self.bt._live_metrics:
             self.bt._warn.append(
@@ -512,7 +520,9 @@ class BacktesterBuilder:
 class Backtester:
     def __getitem__(self, date_range: slice) -> "Backtester":
         if self._run_before:
-            raise BacktestRunException("Backtest has already run, build a new backtester to run again.")
+            raise BacktestRunException(
+                "Backtest has already run, build a new backtester to run again."
+            )
         self._run_before = True
         if self.assume_nyse:
             self._calendar = "NYSE"
@@ -538,8 +548,11 @@ class Backtester:
         self.datetimes = []
         self.dates = [d.date() for d in self.dates]
         for date in self.dates:
-            self.datetimes += [sched.loc[date]['market_open'], sched.loc[date]['market_close']]
-    
+            self.datetimes += [
+                sched.loc[date]["market_open"],
+                sched.loc[date]["market_close"],
+            ]
+
         if self._has_strategies:
             self._set_strategies(self._temp_strategies)
 
@@ -640,7 +653,7 @@ class Backtester:
         elif bt.event == "close":
             try:
                 bt.i += 1
-                bt.current_date = bt.dates[bt.i//2]
+                bt.current_date = bt.dates[bt.i // 2]
                 bt.event = "open"
             except IndexError:
                 bt.i -= 1
@@ -661,7 +674,10 @@ class Backtester:
 
     def add_metric(self, key, value):
         if key not in self._add_metrics:
-            self._add_metrics[key] = (np.repeat(np.nan, len(self)), np.repeat(True, len(self)))
+            self._add_metrics[key] = (
+                np.repeat(np.nan, len(self)),
+                np.repeat(True, len(self)),
+            )
         self._add_metrics[key][0][self.i] = value
         self._add_metrics[key][1][self.i] = False
 
@@ -728,8 +744,8 @@ class Backtester:
             self._live_plot = False
             return None
         plot_df = pd.DataFrame()
-        plot_df['Date'] = self.datetimes
-        plot_df = plot_df.set_index('Date')
+        plot_df["Date"] = self.datetimes
+        plot_df = plot_df.set_index("Date")
         plot_add_df = plot_df.copy()
         add_metric_exists = False
         for i, bt in enumerate(bts):
@@ -746,9 +762,9 @@ class Backtester:
 
         if self._live_plot_figsize is None:
             if add_metric_exists:
-                self._live_plot_figsize = (10,13)
+                self._live_plot_figsize = (10, 13)
             else:
-                self._live_plot_figsize = (10,6.5)
+                self._live_plot_figsize = (10, 6.5)
 
         if self.add_metric_exists:
             fig, axes = plt.subplots(2, 1, sharex=True, figsize=self._live_plot_figsize)
@@ -760,14 +776,14 @@ class Backtester:
             axes[0].set_title(str(self._show_live_progress()))
         plot_df.plot(ax=axes[0])
         axes[0].set_ylim(bottom=0)
-        
+
         if self.add_metric_exists:
             try:
-                interp_df = plot_add_df.interpolate(method='linear')
-                interp_df.plot(ax=axes[1], cmap='Accent')
+                interp_df = plot_add_df.interpolate(method="linear")
+                interp_df.plot(ax=axes[1], cmap="Accent")
             except TypeError:
                 pass
-        
+
         fig.autofmt_xdate()
         plt.xlim([self.dates[0], self.dates[-1]])
         display.clear_output(wait=True)
