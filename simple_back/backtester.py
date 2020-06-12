@@ -43,11 +43,21 @@ except ImportError:
 
 try:
     from tqdm import tqdm
-
     tqdm_exists = True
 except ImportError:
     tqdm_exists = False
 
+class BacktestRunException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+class LongShortLiquidationError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+class InsufficientCapitalError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 class StrategySequence:
     """A sequence of strategies than can be accessed by name or :class:`int` index.\
@@ -101,16 +111,6 @@ class StrategySequence:
 def _cls():
     clear_output(wait=True)
     os.system("cls" if os.name == "nt" else "clear")
-
-
-class LongShortLiquidationError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
-class InsufficientCapitalError(Exception):
-    def __init__(self, message):
-        self.message = message
 
 
 class Position:
@@ -459,7 +459,7 @@ class BacktesterBuilder:
         return self
 
     def live_plot(
-        self, every: int = 10, metric: str = "Total Value", event: str = "open",
+        self, every: int = 10, metric: str = "Total Value", figsize: Tuple[float, float]=None
     ) -> "BacktesterBuilder":
         if self.bt._live_metrics:
             self.bt._warn.append(
@@ -472,7 +472,7 @@ class BacktesterBuilder:
         self.bt._live_plot = True
         self.bt._live_plot_every = every
         self.bt._live_plot_metric = metric
-        self.bt._live_plot_event = event
+        self.bt._live_plot_figsize = figsize
         return self
 
     def live_progress(self, every: int = 10) -> "BacktesterBuilder":
@@ -511,7 +511,9 @@ class BacktesterBuilder:
 
 class Backtester:
     def __getitem__(self, date_range: slice) -> "Backtester":
-        self = self._builder.build()
+        if self._run_before:
+            raise BacktestRunException("Backtest has already run, build a new backtester to run again.")
+        self._run_before = True
         if self.assume_nyse:
             self._calendar = "NYSE"
         if date_range.start is not None:
@@ -524,16 +526,23 @@ class Backtester:
             self._warn.append(
                 "backtests with no end date can lead to non-replicable results"
             )
-            end_date = date.today() - relativedelta(days=1)
+            end_date = datetime.date.today() - relativedelta(days=1)
         cal = mcal.get_calendar(self._calendar)
         if isinstance(start_date, relativedelta):
-            start_date = date.today() + start_date
+            start_date = datetime.date.today() + start_date
         if isinstance(end_date, relativedelta):
-            end_date = date.today() + end_date
+            end_date = datetime.date.today() + end_date
         sched = cal.schedule(start_date=start_date, end_date=end_date)
         self._schedule = sched
         self.dates = mcal.date_range(sched, frequency="1D")
+        self.datetimes = []
         self.dates = [d.date() for d in self.dates]
+        for date in self.dates:
+            self.datetimes += [sched.loc[date]['market_open'], sched.loc[date]['market_close']]
+    
+        if self._has_strategies:
+            self._set_strategies(self._temp_strategies)
+
         return self
 
     def __init__(self):
@@ -567,6 +576,7 @@ class Backtester:
         self._capital = None
 
         self._live_plot = False
+        self._live_plot_figsize = None
         self._live_metrics = False
         self._live_progress = False
 
@@ -580,12 +590,22 @@ class Backtester:
         self._schedule = None
         self._warn = []
 
-    def _set_self(self):
+        self._add_metrics = {}
+
+        self.datetimes = None
+        self.add_metric_exists = False
+
+        self._run_before = False
+
+    def _set_self(self, new_self=None):
+        if new_self is not None:
+            self = new_self
         self.portfolio.bt = self
         self.trades.bt = self
         self.prices.bt = self
 
         for m in self.metric.values():
+            m.__init__()
             m.bt = self
 
     def _init_iter(self, bt=None):
@@ -605,19 +625,22 @@ class Backtester:
         bt.i = -1
         bt.event = "close"
         if self._live_progress:
-            _live_progress_pbar = tqdm(total=len(self) // 2)
+            _live_progress_pbar = tqdm(total=len(self))
             _cls()
         return self
 
     def _next_iter(self, bt=None):
         if bt is None:
             bt = self
+        if bt.i == len(self):
+            bt._init_iter()
         if bt.event == "open":
             bt.event = "close"
+            bt.i += 1
         elif bt.event == "close":
             try:
                 bt.i += 1
-                bt.current_date = bt.dates[bt.i]
+                bt.current_date = bt.dates[bt.i//2]
                 bt.event = "open"
             except IndexError:
                 bt.i -= 1
@@ -629,20 +652,24 @@ class Backtester:
                         for metric in strat.metric.values():
                             if metric._single:
                                 metric(write=True)
-                self.plot(self._strategies, last=True)
+                self.plot(self._get_bts(), last=True)
                 for w in self._warn:
                     warn(w)
                 raise StopIteration
         bt._update()
         return bt.current_date, bt.event, bt
 
+    def add_metric(self, key, value):
+        if key not in self._add_metrics:
+            self._add_metrics[key] = (np.repeat(np.nan, len(self)), np.repeat(True, len(self)))
+        self._add_metrics[key][0][self.i] = value
+        self._add_metrics[key][1][self.i] = False
+
     @property
     def timestamp(self):
         return self._schedule.loc[self.current_date][f"market_{self.event}"]
 
     def __iter__(self):
-        if self._has_strategies:
-            self._set_strategies(self._temp_strategies)
         return self._init_iter()
 
     def __next__(self):
@@ -701,22 +728,46 @@ class Backtester:
             self._live_plot = False
             return None
         plot_df = pd.DataFrame()
-        if bts is None:
-            metric = self.metric[self._live_plot_metric].df[self._live_plot_event]
-            plot_df["Backtest"] = metric
+        plot_df['Date'] = self.datetimes
+        plot_df = plot_df.set_index('Date')
+        plot_add_df = plot_df.copy()
+        add_metric_exists = False
+        for i, bt in enumerate(bts):
+            metric = bt.metric[self._live_plot_metric].values
+            name = f"Backtest {i}"
+            if bt.name is not None:
+                name = bt.name
+            plot_df[name] = metric
+            for mkey in bt._add_metrics.keys():
+                add_metric = bt._add_metrics[mkey]
+                plot_add_df[mkey] = np.ma.masked_where(add_metric[1], add_metric[0])
+                if not self.add_metric_exists:
+                    self.add_metric_exists = True
+
+        if self._live_plot_figsize is None:
+            if add_metric_exists:
+                self._live_plot_figsize = (10,13)
+            else:
+                self._live_plot_figsize = (10,6.5)
+
+        if self.add_metric_exists:
+            fig, axes = plt.subplots(2, 1, sharex=True, figsize=self._live_plot_figsize)
         else:
-            if not self._no_iter:
-                bts = [self] + bts
-            for i, bt in enumerate(bts):
-                metric = bt.metric[self._live_plot_metric].df[self._live_plot_event]
-                name = f"Backtest {i}"
-                if bt.name is not None:
-                    name = bt.name
-                plot_df[name] = metric
-        fig, ax = plt.subplots()
+            fig, axes = plt.subplots(1, 1, sharex=True, figsize=self._live_plot_figsize)
+            axes = [axes]
+
         if self._live_progress:
-            ax.set_title(str(self._show_live_progress()))
-        plot_df.plot(ax=ax)
+            axes[0].set_title(str(self._show_live_progress()))
+        plot_df.plot(ax=axes[0])
+        axes[0].set_ylim(bottom=0)
+        
+        if self.add_metric_exists:
+            try:
+                interp_df = plot_add_df.interpolate(method='linear')
+                interp_df.plot(ax=axes[1], cmap='Accent')
+            except TypeError:
+                pass
+        
         fig.autofmt_xdate()
         plt.xlim([self.dates[0], self.dates[-1]])
         display.clear_output(wait=True)
@@ -764,6 +815,7 @@ class Backtester:
                 Position(self, symbol, self.current_date, self.event, num_shares)
             )
         else:
+            _cls()
             raise Exception(
                 f"""
                 not enough capital specified to order a single share of {symbol}:
@@ -881,7 +933,7 @@ class Backtester:
     def _set_strategies(
         self, strategies: List[Callable[["Date", str, "Backtester"], None]]
     ):
-        self._strategies_call = strategies
+        self._strategies_call = copy.deepcopy(strategies)
         for strat in strategies:
             new_bt = copy.deepcopy(self)
             new_bt._set_self()
@@ -895,18 +947,20 @@ class Backtester:
             self._strategies_call[i](*self._next_iter(bt))
 
     def plot(self, bts, last=False):
-        if self._live_plot and (self.i % self._live_plot_every == 0 or last):
-            self._show_live_plot(bts)
-        if self._live_metrics and (self.i % self._live_metrics_every == 0 or last):
-            self._show_live_metrics(bts)
-        if not (self._live_metrics or self._live_plot) and (
-            self.i % self._live_progress_every == 0 or last
-        ):
-            _cls()
-            print(self._show_live_progress())
+        try:
+            if self._live_plot and (self.i % self._live_plot_every == 0 or last):
+                self._show_live_plot(bts)
+            if self._live_metrics and (self.i % self._live_metrics_every == 0 or last):
+                self._show_live_metrics(bts)
+            if not (self._live_metrics or self._live_plot) and (
+                self.i % self._live_progress_every == 0 or last
+            ):
+                _cls()
+                print(self._show_live_progress())
+        except:
+            pass
 
     def run(self):
-        self._set_strategies(self._temp_strategies)
         self._init_iter()
         self._no_iter = True
 

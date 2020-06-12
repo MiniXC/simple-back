@@ -47,19 +47,16 @@ class Metric(ABC):
         if self._single:
             self.value = self.get_value(bt)
         if self._series:
-            if bt.event == "open":
-                self.value_open[self.i] = self.get_value(bt)
-            elif bt.event == "close":
-                self.value_close[self.i] = self.get_value(bt)
+            self.all_values[self.i] = self.get_value(bt)
 
     def __call__(self, write=False):
         if not write:
             return self.get_value(self.bt)
+
         self.current_event = self.bt.event
         self.i = self.bt.i
         if self._series and (self.bt.i == 0 and self.bt.event == "open"):
-            self.value_open = np.zeros(len(self.bt) // 2 + 1)
-            self.value_close = np.zeros(len(self.bt) // 2 + 1)
+            self.all_values = np.repeat(np.nan, len(self.bt))
         if self.requires is None:
             self.set_values(self.bt)
         else:
@@ -114,22 +111,14 @@ class SeriesMetric(Metric):
 
     @property
     def values(self):
-        if self.last_len != len(self):
-            self.all_values = np.empty(len(self))
-            self.all_values[0::2] = self.value_open[: self.i + 1]
-            if self.current_event == "open":
-                self.all_values[1::2] = self.value_close[: self.i]
-            if self.current_event == "close":
-                self.all_values[1::2] = self.value_close[: self.i + 1]
-            self.last_len = len(self)
         return self.all_values
 
     @property
     def df(self):
         df = pd.DataFrame()
-        df["date"] = self.bt.dates[: self.i + 1]
-        df["open"] = self.value_open[: self.i + 1]
-        df["close"] = self.value_close[: self.i + 1]
+        df["date"] = self.bt.dates[: self.i//2 + 1]
+        df["open"] = self.all_values[0::2][: self.i//2 + 1]
+        df["close"] = self.all_values[1::2][: self.i//2 + 1]
         if self.current_event == "open":
             df.at[-1, "close"] = None
         return df.set_index("date").dropna(how="all")
@@ -140,27 +129,10 @@ class SeriesMetric(Metric):
         pass
 
     def __len__(self):
-        if self.current_event == "close":
-            return self.i * 2 + 2
-        if self.current_event == "open":
-            return self.i * 2 + 1
+        return self.i + 1
 
     def __getitem__(self, i):
-        val_open = self.value_open[: self.i + 1]
-        if self.current_event == "open":
-            val_close = self.value_close[: self.i]
-        else:
-            val_close = self.value_close[: self.i + 1]
-        if i >= 0 or self.current_event == "close":
-            if i % 2 == 0:
-                return val_open[i // 2]
-            else:
-                return val_close[i // 2]
-        else:
-            if i % 2 == 0:
-                return val_close[i // 2]
-            else:
-                return val_open[i // 2]
+        return self.all_values[:self.i+1][i]
 
     @abstractmethod
     def get_value(self, bt):
@@ -215,7 +187,7 @@ class DailyProfitLoss(SeriesMetric):
 
     def get_value(self, bt):
         try:
-            return bt.metric["Total Value"][-1] - bt.metric["Total Value"][-2]
+            return bt.metric["Total Value"][-1] - bt.metric["Total Value"][-3]
         except IndexError:
             return 0
 

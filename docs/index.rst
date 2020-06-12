@@ -58,7 +58,6 @@ Just copy example code and get started yourself.
    :hidden:
 
    intro/quickstart
-   intro/quickstart_nb
    intro/strategies
    intro/data
    intro/example

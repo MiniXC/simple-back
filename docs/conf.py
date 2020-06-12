@@ -67,3 +67,6 @@ html_static_path = ["_static"]
 # needed for readthedocs.io
 # https://github.com/readthedocs/readthedocs.org/issues/2569
 master_doc = "index"
+
+# never executre notebooks
+nbsphinx_execute = "never"

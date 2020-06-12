@@ -29,8 +29,6 @@ jobs:
       run: sudo apt-get install pandoc
     - name: generate api doc
       run: sphinx-apidoc -M -T -f -o docs/api simple_back
-    - name: Replace Notebook References
-      run: poetry run bash -c "cd docs && make html && cd scripts && python replace_nbsphinx_ref.py"
     - name: Git Auto Commit
       uses: stefanzweifel/git-auto-commit-action@v4.3.0
       with:
