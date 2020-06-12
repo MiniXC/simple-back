@@ -116,9 +116,9 @@ class SeriesMetric(Metric):
     @property
     def df(self):
         df = pd.DataFrame()
-        df["date"] = self.bt.dates[: self.i//2 + 1]
-        df["open"] = self.all_values[0::2][: self.i//2 + 1]
-        df["close"] = self.all_values[1::2][: self.i//2 + 1]
+        df["date"] = self.bt.dates[: self.i // 2 + 1]
+        df["open"] = self.all_values[0::2][: self.i // 2 + 1]
+        df["close"] = self.all_values[1::2][: self.i // 2 + 1]
         if self.current_event == "open":
             df.at[-1, "close"] = None
         return df.set_index("date").dropna(how="all")
@@ -132,7 +132,7 @@ class SeriesMetric(Metric):
         return self.i + 1
 
     def __getitem__(self, i):
-        return self.all_values[:self.i+1][i]
+        return self.all_values[: self.i + 1][i]
 
     @abstractmethod
     def get_value(self, bt):
