@@ -10,7 +10,13 @@ formats: all
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
   configuration: docs/conf.py
+  fail_on_warning: true
 
-# install conda env
-conda:
-  file: environment.yml
+# Optionally set the version of Python and requirements required to build your docs
+python:
+  version: 3.7
+  install:
+    - method: pip
+      path: .
+    - requirements: docs/requirements.txt
+  system_packages: true
