@@ -25,8 +25,6 @@ jobs:
       run: poetry run python -m black .
     - name: Dephell Convert
       run: poetry run python -m dephell convert
-    - name: install pandoc
-      run: sudo apt-get install pandoc
     - name: generate api doc
       run: sphinx-apidoc -M -T -f -o docs/api simple_back
     - name: Git Auto Commit

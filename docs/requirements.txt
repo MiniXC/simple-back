@@ -1,5 +1,8 @@
+ipython==7.15.0
+ipython-genutils==0.2.0
 nbsphinx==0.7.0
 Sphinx==3.1.0
+sphinx-autodoc-napoleon-typehints==2.1.6
 sphinx-autodoc-typehints==1.10.3
 sphinx-copybutton==0.2.11
 sphinx-rtd-theme==0.4.3
@@ -7,5 +10,6 @@ sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
 sphinxcontrib-htmlhelp==1.0.3
 sphinxcontrib-jsmath==1.0.1
+sphinxcontrib-napoleon==0.7
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
