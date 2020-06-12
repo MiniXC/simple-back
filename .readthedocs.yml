@@ -21,4 +21,4 @@ sphinx:
 #  system_packages: true
 
 conda:
-  file: doc/environment.yml
+  file: docs/environment.yml
