@@ -5,3 +5,4 @@ dist
 .simple-back
 .coverage
 docs/_build
+.pytest-cache
