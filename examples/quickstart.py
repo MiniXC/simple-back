@@ -1,6 +1,6 @@
 from simple_back.backtester import BacktesterBuilder
 
-bt = (
+builder = (
     BacktesterBuilder()
     .name("My First Strategy")
     .balance(10_000)  # define your starting balance
@@ -8,8 +8,9 @@ bt = (
     # .live_plot()      # shows a live plot when working in a notebook
     .compare(["MSFT"])  # compare to buying and holding MSFT
     .calendar("NYSE")  # trade on days the NYSE is open
-    .build()  # build a Backtester object
 )
+
+bt = builder.build() # build the backtester
 
 # you can now use bt like you would any iterator
 # specify a date range, and the code inside will be run
@@ -22,9 +23,10 @@ for day, event, b in bt["2019-1-1":"2020-1-1"]:
     # ^ gets the mean open price over the last 30 days
 
     # you can now order stocks using
-    b.order_pct("MSFT", 0.5)  # allocate .5 of your funds to MSFT
-    b.order_abs("MSFT", 1_000)  # buy 1,000 worth of MSFT
-    b.order_shr("MSFT", 1)  # buy 1 MSFT share
+    b.long("MSFT", percent=0.5)  # allocate .5 of your funds to MSFT
+    b.long("MSFT", percent_available=0.1)  # allocate .1 of your cash still available to MSFT
+    b.long("MSFT", absolute=1_000)  # buy 1,000 worth of MSFT
+    b.long("MSFT", nshares=1)  # buy 1 MSFT share
 
     # you can access your protfolio using
     b.portfolio

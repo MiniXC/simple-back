@@ -40,13 +40,9 @@ Getting Started
 -----------------------
 Build and test a simple strategy using simple-back.
 
-:doc:`intro/strategies`
+:doc:`intro/debugging`
 -----------------------
-Create a :class:`.Strategy` object and run multiple strategies at the same time.
-
-:doc:`intro/data`
------------------
-Write your first :class:`.DataProvider`
+Visualize and improve your strategy.
 
 :doc:`intro/example`
 --------------------
