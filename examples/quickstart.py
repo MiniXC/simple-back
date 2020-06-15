@@ -10,7 +10,7 @@ builder = (
     .calendar("NYSE")  # trade on days the NYSE is open
 )
 
-bt = builder.build() # build the backtester
+bt = builder.build()  # build the backtester
 
 # you can now use bt like you would any iterator
 # specify a date range, and the code inside will be run
@@ -24,7 +24,9 @@ for day, event, b in bt["2019-1-1":"2020-1-1"]:
 
     # you can now order stocks using
     b.long("MSFT", percent=0.5)  # allocate .5 of your funds to MSFT
-    b.long("MSFT", percent_available=0.1)  # allocate .1 of your cash still available to MSFT
+    b.long(
+        "MSFT", percent_available=0.1
+    )  # allocate .1 of your cash still available to MSFT
     b.long("MSFT", absolute=1_000)  # buy 1,000 worth of MSFT
     b.long("MSFT", nshares=1)  # buy 1 MSFT share
 
