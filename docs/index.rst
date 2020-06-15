@@ -58,10 +58,12 @@ Just copy example code and get started yourself.
    :hidden:
 
    intro/quickstart
+   intro/debugging
+   intro/example
+
+..
    intro/strategies
    intro/data
-   intro/example
-   usage_examples
 
 .. toctree::
    :maxdepth: 5

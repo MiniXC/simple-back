@@ -21,7 +21,7 @@ class BuyAndHold(Strategy):
 
     def run(self, day, event, bt):
         if not self.is_bought:
-            bt.order_pct(self.ticker, 1)
+            bt.long(self.ticker, percent=1)
             self.is_bought = True
 
     @property
@@ -36,7 +36,7 @@ class SellAndHold(Strategy):
 
     def run(self, day, event, bt):
         if not self.is_bought:
-            bt.order_pct(self.ticker, -1)
+            bt.short(self.ticker, percent=1)
             self.is_bought = True
 
     @property

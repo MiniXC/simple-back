@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+class InsufficientCapitalError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 class Fee(ABC):
     """
@@ -8,11 +11,14 @@ class Fee(ABC):
     It returns the total cost and the number of shares aquired for that cost.
     """
 
-    def __call__(self, price: float, capital: float):
-        shares = self.num_shares(price, capital)
+    def __call__(self, price: float, capital: float=None, num_shares: int=None):
+        if num_shares is None:
+            shares = self.num_shares(price, capital)
+        else:
+            shares = num_shares
         cost = self.cost(price, shares)
         if cost > capital:
-            raise ValueError("Cost cannot be higher than capital.")
+            raise InsufficientCapitalError(f"Tried to buy {shares} shares at {price} with only {capital}.")
         return shares, cost
 
     @abstractmethod

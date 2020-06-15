@@ -12,6 +12,8 @@ from warnings import warn
 import os
 from IPython.display import clear_output
 from dataclasses import dataclass
+import multiprocessing
+import threading
 from collections.abc import MutableSequence
 
 from .data_providers import (
@@ -21,7 +23,7 @@ from .data_providers import (
     PriceUnavailableError,
     DataProvider,
 )
-from .fees import NoFee, Fee
+from .fees import NoFee, Fee, InsufficientCapitalError
 from .metrics import (
     MaxDrawdown,
     AnnualReturn,
@@ -53,16 +55,13 @@ class BacktestRunException(Exception):
     def __init__(self, message):
         self.message = message
 
-
 class LongShortLiquidationError(Exception):
     def __init__(self, message):
         self.message = message
 
-
-class InsufficientCapitalError(Exception):
+class NegativeValueError(Exception):
     def __init__(self, message):
         self.message = message
-
 
 class StrategySequence:
     """A sequence of strategies than can be accessed by name or :class:`int` index.\
@@ -90,14 +89,18 @@ class StrategySequence:
 
     def __getitem__(self, index: Union[str, int]):
         if isinstance(index, int):
-            self.bt._get_bts()[index]
+            bt = self.bt._get_bts()[index]
+            bt._from_sequence = True
+            return bt
         elif isinstance(index, str):
             for i, bt in enumerate(self.bt._get_bts()):
                 if bt.name is not None:
                     if bt.name == index:
+                        bt._from_sequence = True
                         return bt
                 else:
                     if f"Backtest {i}" == index:
+                        bt._from_sequence = True
                         return bt
             raise IndexError
 
@@ -124,7 +127,7 @@ class Position:
         self.date = date
         self.event = event
         self.num_shares_int = num_shares
-        self.init_price = bt.price(symbol)
+        self.start_price = bt.price(symbol)
         self.bt = bt
         self.frozen = False
         self.df_cols = [
@@ -164,31 +167,31 @@ class Position:
     def value(self):
         if self.short:
             old_val = self.initial_value
-            cur_val = self.num_shares * self.bt.price(self.symbol)
+            cur_val = self.num_shares * self.price
             return old_val + (old_val - cur_val)
         if self.long:
-            return self.num_shares * self.bt.price(self.symbol)
+            return self.num_shares * self.price
 
     @property
     def price(self):
         if self.frozen:
-            return self.bt.prices[self.symbol, self.end_date, self.end_event]
+            return self.bt.prices[self.symbol, self.end_date][self.end_event]
         else:
             return self.bt.price(self.symbol)
 
     @property
     def value_pershare(self):
         if self.long:
-            return self.bt.price(self.symbol)
+            return self.price
         if self.short:
-            return self.init_price + (self.init_price - self.bt.price(self.symbol))
+            return self.start_price + (self.start_price - self.price)
 
     @property
     def initial_value(self):
         if self.short:
-            return self.num_shares * self.init_price
+            return self.num_shares * self.start_price
         if self.long:
-            return self.num_shares * self.init_price
+            return self.num_shares * self.start_price
 
     @property
     def profit_loss_pct(self):
@@ -221,6 +224,7 @@ class Position:
         self.frozen = True
         self.end_date = self.bt.current_date
         self.end_event = self.bt.event
+        self.df_cols += ['start_price', 'end_date', 'end_event']
 
 
 class Portfolio(MutableSequence):
@@ -257,12 +261,18 @@ class Portfolio(MutableSequence):
             if pos.short:
                 is_short = True
         if is_long and is_short:
+            self.bt._graceful_stop()
             raise LongShortLiquidationError(
                 "liquidating a mix of long and short positions is not possible"
             )
         for pos in copy.copy(self.positions):
             if num_shares == -1 or num_shares >= pos.num_shares:
                 self.bt._available_capital += pos.value
+                if self.bt._available_capital < 0:
+                    self.bt._graceful_stop()
+                    raise NegativeValueError(
+                        f'Tried to liquidate position resulting in negative capital {self.bt._available_capital}.'
+                    )
                 self.bt.portfolio._remove(pos)
 
                 pos._freeze()
@@ -355,6 +365,16 @@ class Portfolio(MutableSequence):
             if func(pos):
                 new_pos.append(pos)
         return Portfolio(self.bt, new_pos)
+
+    def attr(self, attribute):
+        result = [getattr(pos, attribute) for pos in self.positions]
+        if len(result) == 0:
+            return None
+        elif len(result) == 1:
+            return result[0]
+        else:
+            return result
+
 
 
 class BacktesterBuilder:
@@ -463,6 +483,11 @@ class BacktesterBuilder:
         self.bt._live_metrics_every = every
         return self
 
+    def no_live_metrics(self) -> "BacktesterBuilder":
+        scopy = copy.copy(self)
+        scopy.bt._live_metrics = False
+        return scopy
+
     def live_plot(
         self,
         every: int = 10,
@@ -483,10 +508,20 @@ class BacktesterBuilder:
         self.bt._live_plot_figsize = figsize
         return self
 
+    def no_live_plot(self) -> "BacktesterBuilder":
+        scopy = copy.copy(self)
+        scopy.bt._live_plot = False
+        return scopy
+
     def live_progress(self, every: int = 10) -> "BacktesterBuilder":
         self.bt._live_progress = True
         self.bt._live_progress_every = every
         return self
+
+    def no_live_progress(self) -> "BacktesterBuilder":
+        scopy = copy.copy(self)
+        scopy.bt._live_progress = False
+        return scopy
 
     def compare(
         self,
@@ -604,11 +639,16 @@ class Backtester:
         self._warn = []
 
         self._add_metrics = {}
+        self._add_metrics_lines = []
 
         self.datetimes = None
         self.add_metric_exists = False
 
         self._run_before = False
+
+        self._last_thread = None
+
+        self._from_sequence = False
 
     def _set_self(self, new_self=None):
         if new_self is not None:
@@ -681,6 +721,9 @@ class Backtester:
         self._add_metrics[key][0][self.i] = value
         self._add_metrics[key][1][self.i] = False
 
+    def add_line(self, **kwargs):
+        self._add_metrics_lines.append((self.timestamp, kwargs))
+
     @property
     def timestamp(self):
         return self._schedule.loc[self.current_date][f"market_{self.event}"]
@@ -736,7 +779,7 @@ class Backtester:
             print()
             print(self._show_live_progress())
 
-    def _show_live_plot(self, bts=None):
+    def _show_live_plot(self, bts=None, start_end=None):
         if not plt_exists:
             self._warn.append(
                 "matplotlib not installed, setting live plotting to false"
@@ -781,15 +824,21 @@ class Backtester:
             try:
                 interp_df = plot_add_df.interpolate(method="linear")
                 interp_df.plot(ax=axes[1], cmap="Accent")
+                for line in self._add_metrics_lines:
+                    plt.axvline(line[0], **line[1])
             except TypeError:
                 pass
 
         fig.autofmt_xdate()
-        plt.xlim([self.dates[0], self.dates[-1]])
-        display.clear_output(wait=True)
-        display.display(pl.gcf())
-        plt.close()
+        if start_end is not None:
+            plt.xlim([start_end[0], start_end[1]])
+        else:
+            plt.xlim([self.dates[0], self.dates[-1]])
 
+        display.clear_output(wait=True)
+        plt.draw()
+        plt.pause(0.001)
+        
     def _show_live_progress(self):
         _live_progress_pbar.n = self.i + 1
         return _live_progress_pbar
@@ -800,18 +849,26 @@ class Backtester:
                 metric(write=True)
         self._capital = self._available_capital + self.metric["Portfolio Value"][-1]
 
-    def _order(self, symbol, capital, as_percent=False):
+    def _graceful_stop(self):
+        if self._last_thread is not None:
+            self._last_thread.join()
+        self.plot(self._get_bts(), last=True)
+
+    def _order(self, symbol, capital, as_percent=False, as_percent_available=False, shares=None):
+        self._capital = self._available_capital + self.metric["Portfolio Value"]()
         if capital < 0:
             short = True
             capital = (-1) * capital
         else:
             short = False
-        if not as_percent:
+        if not as_percent and not as_percent_available:
             if capital > self._available_capital:
+                self._graceful_stop()
                 raise InsufficientCapitalError("not enough capital available")
-        else:
-            if capital * self._capital > self._available_capital:
+        elif as_percent:
+            if abs(capital * self._capital) > self._available_capital:
                 if not math.isclose(capital * self._capital, self._available_capital):
+                    self._graceful_stop()
                     raise InsufficientCapitalError(
                         f"""
                         not enough capital available:
@@ -819,10 +876,30 @@ class Backtester:
                         with only {self._available_capital} available
                         """
                     )
+        elif as_percent_available:
+            if abs(capital * self._available_capital) > self._available_capital:
+                if not math.isclose(capital * self._available_capital, self._available_capital):
+                    self._graceful_stop()
+                    raise InsufficientCapitalError(
+                        f"""
+                        not enough capital available:
+                        ordered {capital} * {self._available_capital}
+                        with only {self._available_capital} available
+                        """
+                    )
         current_price = self.price(symbol)
         if as_percent:
             capital = capital * self._capital
-        num_shares, total = self._trade_cost(current_price, capital)
+        if as_percent_available:
+            capital = capital * self._available_capital
+        try:
+            if shares is None:
+                num_shares, total = self._trade_cost(current_price, capital)
+            else:
+                num_shares, total = self._trade_cost(current_price, self._available_capital, num_shares=shares)
+        except Exception as e:
+            self._graceful_stop()
+            raise e
         if short:
             num_shares *= -1
         if num_shares != 0:
@@ -840,11 +917,31 @@ class Backtester:
                 """
             )
 
-    def order_pct(self, symbol, capital):
-        self._order(symbol, capital, as_percent=True)
+    #def order_pct(self, symbol, capital):
+    #    self._order(symbol, capital, as_percent=True)
 
-    def order_abs(self, symbol, capital):
-        self._order(symbol, capital, as_percent=False)
+    #def order_abs(self, symbol, capital):
+    #    self._order(symbol, capital, as_percent=False)
+
+    def long(self, symbol, **kwargs):
+        if 'percent' in kwargs:
+            self._order(symbol, kwargs['percent'], as_percent=True)
+        if 'absolute' in kwargs:
+            self._order(symbol, kwargs['absolute'])
+        if 'percent_available' in kwargs:
+            self._order(symbol, kwargs['percent_available'], as_percent_available=True)
+        if 'nshares' in kwargs:
+            self._order(symbol, 1, shares=kwargs['nshares'])
+
+    def short(self, symbol, **kwargs):
+        if 'percent' in kwargs:
+            self._order(symbol, -kwargs['percent'], as_percent=True)
+        if 'absolute' in kwargs:
+            self._order(symbol, -kwargs['absolute'])
+        if 'percent_available' in kwargs:
+            self._order(symbol, -kwargs['percent_available'], as_percent_available=True)
+        if 'nshares' in kwargs:
+            self._order(symbol, -1, shares=kwargs['nshares'])
 
     def price(self, symbol):
         try:
@@ -854,6 +951,7 @@ class Backtester:
                 self.prices.rem_cache(symbol)
                 price = self.prices[symbol, self.current_date][self.event]
             except KeyError:
+                self._graceful_stop()
                 raise PriceUnavailableError(
                     symbol,
                     self.current_date,
@@ -862,6 +960,7 @@ class Backtester:
                     """.strip(),
                 )
         if math.isnan(price) or price is None:
+            self._graceful_stop()
             raise PriceUnavailableError(
                 symbol,
                 self.current_date,
@@ -965,7 +1064,13 @@ class Backtester:
     def plot(self, bts, last=False):
         try:
             if self._live_plot and (self.i % self._live_plot_every == 0 or last):
-                self._show_live_plot(bts)
+                if self._last_thread is None or not self._last_thread.is_alive():
+                    thr = threading.Thread(target=self._show_live_plot, args=(bts,))
+                    thr.start()
+                    self._last_thread = thr
+                if last:
+                    self._last_thread.join()
+                    self._show_live_plot(bts)
             if self._live_metrics and (self.i % self._live_metrics_every == 0 or last):
                 self._show_live_metrics(bts)
             if not (self._live_metrics or self._live_plot) and (
@@ -975,6 +1080,15 @@ class Backtester:
                 print(self._show_live_progress())
         except:
             pass
+
+    def show(self, start=None, end=None):
+        bts = self._get_bts()
+        if self._from_sequence:
+            bts = [self]
+        if start is not None or end is not None:
+            self._show_live_plot(bts, [start, end])
+        else:
+            self._show_live_plot(bts)
 
     def run(self):
         self._init_iter()

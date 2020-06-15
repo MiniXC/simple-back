@@ -32,7 +32,7 @@ class PriceUnavailableError(Exception):
 
 class DataProvider(ABC):
     def __init__(self, debug=False):
-        self.current_datetime = pd.Timestamp(datetime.utcnow(), tzinfo=pytz.utc)
+        self.current_datetime = pd.Timestamp(datetime.datetime.utcnow(), tzinfo=pytz.utc)
         self.cache = dc.Cache(".simple-back")
         self.no_cache = debug
         self.debug = debug
@@ -216,6 +216,7 @@ class DailyDataProvider(ABC):
         self.current_date = date.today()
         self.current_event = self.columns[np.argmax(self.columns_order)]
         self.cache = dc.Cache(".simple-back")
+        self.mem_cache = {}
 
     def _remove_leaky_vals(self, df, cols, date):
         if isinstance(df, pd.DataFrame):
@@ -378,19 +379,34 @@ class DailyDataProvider(ABC):
     def columns_order(self) -> List[int]:
         pass
 
+    def make_key(self, key):
+        return str(key) + str(type(self))
+
     def get_cache(self, key):
-        return self.cache[str(key) + str(type(self))]
+        key = self.make_key(key)
+        if key not in self.mem_cache:
+            self.mem_cache[key] = self.cache[key]
+        return self.mem_cache[key]
 
     def in_cache(self, key):
-        return str(key) + str(type(self)) in self.cache
+        key = self.make_key(key)
+        in_memcache = key in self.mem_cache
+        in_diskcache = key in self.cache
+        return in_memcache or in_diskcache
 
     def set_cache(self, key, val):
-        self.cache.set(str(key) + str(type(self)), val)
+        key = self.make_key(key)
+        self.cache.set(key, val)
+        self.mem_cache[key] = val
+        
 
     def rem_cache(self, key):
-        del self.cache[str(key) + str(type(self))]
+        key = self.make_key(key)
+        del self.cache[key]
+        del self.mem_cache[key]
 
     def clear_cache(self):
+        self.mem_cache = {}
         self.cache.clear()
 
 
