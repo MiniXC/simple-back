@@ -48,10 +48,10 @@ There are many backtesters out there, but this is the first one built for rapid 
 ### Built for Jupyter Notebooks
 Get live feedback on your backtests (live plotting, progress and metrics) *in your notebook* to immediatly notice if something is off about your strategy.
 
-### Sensible Defaults
+### Sensible Defaults and Caching
 Many backtesters need a great deal of configuration and setup before they can be used. 
 Not so this one.  At it's core you only need one loop, as this backtester can be used like any iterator.
 A default provider for prices is included, and caches all its data on your disk to minimize the number of requests needed.
 
-### Extensibile
+### Extensible
 This is intended to be a lean framework where, e.g. adding crypto data is as easy as extending the ``DailyPriceProvider`` class.
