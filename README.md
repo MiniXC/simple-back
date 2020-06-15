@@ -22,6 +22,7 @@ bt = (
    .balance(10_000)
    .calendar('NYSE')
    .compare(['JNUG']) # strategies to compare with
+   .live_progress() # show a progress bar
    .live_plot() # we assume we are running this in a Jupyter Notebook
    .build()
 )
@@ -40,7 +41,7 @@ for day, event, b in bt['2019-1-1':'2020-1-1']:
                 b.portfolio['JNUG'].long.liquidate() # liquidate any/all long JNUG positions
                 b.order_pct('JNUG', -1) # short JNUG
 ````
-
+![](https://i.imgur.com/KhZ6f5I.png)
 
 ## Why another python backtester?
 There are many backtesters out there, but this is the first one built for rapid prototyping in Jupyter Notebooks.
