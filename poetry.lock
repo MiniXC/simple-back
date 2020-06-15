@@ -673,7 +673,7 @@ description = "More routines for operating on iterables, beyond itertools"
 name = "more-itertools"
 optional = false
 python-versions = ">=3.5"
-version = "8.3.0"
+version = "8.4.0"
 
 [[package]]
 category = "dev"
@@ -908,7 +908,7 @@ description = "library with cross-python path, ini-parsing, io, code, log facili
 name = "py"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "1.8.1"
+version = "1.8.2"
 
 [[package]]
 category = "dev"
@@ -1055,7 +1055,7 @@ marker = "sys_platform == \"win32\""
 name = "pywin32"
 optional = false
 python-versions = "*"
-version = "227"
+version = "228"
 
 [[package]]
 category = "dev"
@@ -1164,7 +1164,7 @@ description = "Python documentation generator"
 name = "sphinx"
 optional = false
 python-versions = ">=3.5"
-version = "3.1.0"
+version = "3.1.1"
 
 [package.dependencies]
 Jinja2 = ">=2.3"
@@ -1771,8 +1771,8 @@ mistune = [
     {file = "mistune-0.8.4.tar.gz", hash = "sha256:59a3429db53c50b5c6bcc8a07f8848cb00d7dc8bdb431a4ab41920d201d4756e"},
 ]
 more-itertools = [
-    {file = "more-itertools-8.3.0.tar.gz", hash = "sha256:558bb897a2232f5e4f8e2399089e35aecb746e1f9191b6584a151647e89267be"},
-    {file = "more_itertools-8.3.0-py3-none-any.whl", hash = "sha256:7818f596b1e87be009031c7653d01acc46ed422e6656b394b0f765ce66ed4982"},
+    {file = "more-itertools-8.4.0.tar.gz", hash = "sha256:68c70cc7167bdf5c7c9d8f6954a7837089c6a36bf565383919bb595efb8a17e5"},
+    {file = "more_itertools-8.4.0-py3-none-any.whl", hash = "sha256:b78134b2063dd214000685165d81c154522c3ee0a1c0d4d113c80361c234c5a2"},
 ]
 multidict = [
     {file = "multidict-4.7.6-cp35-cp35m-macosx_10_14_x86_64.whl", hash = "sha256:275ca32383bc5d1894b6975bb4ca6a7ff16ab76fa622967625baeebcf8079000"},
@@ -1896,8 +1896,8 @@ ptyprocess = [
     {file = "ptyprocess-0.6.0.tar.gz", hash = "sha256:923f299cc5ad920c68f2bc0bc98b75b9f838b93b599941a6b63ddbc2476394c0"},
 ]
 py = [
-    {file = "py-1.8.1-py2.py3-none-any.whl", hash = "sha256:c20fdd83a5dbc0af9efd622bee9a5564e278f6380fffcacc43ba6f43db2813b0"},
-    {file = "py-1.8.1.tar.gz", hash = "sha256:5e27081401262157467ad6e7f851b7aa402c5852dbcb3dae06768434de5752aa"},
+    {file = "py-1.8.2-py2.py3-none-any.whl", hash = "sha256:a673fa23d7000440cc885c17dbd34fafcb7d7a6e230b29f6766400de36a33c44"},
+    {file = "py-1.8.2.tar.gz", hash = "sha256:f3b3a4c36512a4c4f024041ab51866f11761cc169670204b235f6b20523d4e6b"},
 ]
 pycodestyle = [
     {file = "pycodestyle-2.6.0-py2.py3-none-any.whl", hash = "sha256:2295e7b2f6b5bd100585ebcb1f616591b652db8a741695b3d8f5d28bdc934367"},
@@ -1947,18 +1947,18 @@ pytz = [
     {file = "pytz-2020.1.tar.gz", hash = "sha256:c35965d010ce31b23eeb663ed3cc8c906275d6be1a34393a1d73a41febf4a048"},
 ]
 pywin32 = [
-    {file = "pywin32-227-cp27-cp27m-win32.whl", hash = "sha256:371fcc39416d736401f0274dd64c2302728c9e034808e37381b5e1b22be4a6b0"},
-    {file = "pywin32-227-cp27-cp27m-win_amd64.whl", hash = "sha256:4cdad3e84191194ea6d0dd1b1b9bdda574ff563177d2adf2b4efec2a244fa116"},
-    {file = "pywin32-227-cp35-cp35m-win32.whl", hash = "sha256:f4c5be1a293bae0076d93c88f37ee8da68136744588bc5e2be2f299a34ceb7aa"},
-    {file = "pywin32-227-cp35-cp35m-win_amd64.whl", hash = "sha256:a929a4af626e530383a579431b70e512e736e9588106715215bf685a3ea508d4"},
-    {file = "pywin32-227-cp36-cp36m-win32.whl", hash = "sha256:300a2db938e98c3e7e2093e4491439e62287d0d493fe07cce110db070b54c0be"},
-    {file = "pywin32-227-cp36-cp36m-win_amd64.whl", hash = "sha256:9b31e009564fb95db160f154e2aa195ed66bcc4c058ed72850d047141b36f3a2"},
-    {file = "pywin32-227-cp37-cp37m-win32.whl", hash = "sha256:47a3c7551376a865dd8d095a98deba954a98f326c6fe3c72d8726ca6e6b15507"},
-    {file = "pywin32-227-cp37-cp37m-win_amd64.whl", hash = "sha256:31f88a89139cb2adc40f8f0e65ee56a8c585f629974f9e07622ba80199057511"},
-    {file = "pywin32-227-cp38-cp38-win32.whl", hash = "sha256:7f18199fbf29ca99dff10e1f09451582ae9e372a892ff03a28528a24d55875bc"},
-    {file = "pywin32-227-cp38-cp38-win_amd64.whl", hash = "sha256:7c1ae32c489dc012930787f06244426f8356e129184a02c25aef163917ce158e"},
-    {file = "pywin32-227-cp39-cp39-win32.whl", hash = "sha256:c054c52ba46e7eb6b7d7dfae4dbd987a1bb48ee86debe3f245a2884ece46e295"},
-    {file = "pywin32-227-cp39-cp39-win_amd64.whl", hash = "sha256:f27cec5e7f588c3d1051651830ecc00294f90728d19c3bf6916e6dba93ea357c"},
+    {file = "pywin32-228-cp27-cp27m-win32.whl", hash = "sha256:37dc9935f6a383cc744315ae0c2882ba1768d9b06700a70f35dc1ce73cd4ba9c"},
+    {file = "pywin32-228-cp27-cp27m-win_amd64.whl", hash = "sha256:11cb6610efc2f078c9e6d8f5d0f957620c333f4b23466931a247fb945ed35e89"},
+    {file = "pywin32-228-cp35-cp35m-win32.whl", hash = "sha256:1f45db18af5d36195447b2cffacd182fe2d296849ba0aecdab24d3852fbf3f80"},
+    {file = "pywin32-228-cp35-cp35m-win_amd64.whl", hash = "sha256:6e38c44097a834a4707c1b63efa9c2435f5a42afabff634a17f563bc478dfcc8"},
+    {file = "pywin32-228-cp36-cp36m-win32.whl", hash = "sha256:ec16d44b49b5f34e99eb97cf270806fdc560dff6f84d281eb2fcb89a014a56a9"},
+    {file = "pywin32-228-cp36-cp36m-win_amd64.whl", hash = "sha256:a60d795c6590a5b6baeacd16c583d91cce8038f959bd80c53bd9a68f40130f2d"},
+    {file = "pywin32-228-cp37-cp37m-win32.whl", hash = "sha256:af40887b6fc200eafe4d7742c48417529a8702dcc1a60bf89eee152d1d11209f"},
+    {file = "pywin32-228-cp37-cp37m-win_amd64.whl", hash = "sha256:00eaf43dbd05ba6a9b0080c77e161e0b7a601f9a3f660727a952e40140537de7"},
+    {file = "pywin32-228-cp38-cp38-win32.whl", hash = "sha256:fa6ba028909cfc64ce9e24bcf22f588b14871980d9787f1e2002c99af8f1850c"},
+    {file = "pywin32-228-cp38-cp38-win_amd64.whl", hash = "sha256:9b3466083f8271e1a5eb0329f4e0d61925d46b40b195a33413e0905dccb285e8"},
+    {file = "pywin32-228-cp39-cp39-win32.whl", hash = "sha256:ed74b72d8059a6606f64842e7917aeee99159ebd6b8d6261c518d002837be298"},
+    {file = "pywin32-228-cp39-cp39-win_amd64.whl", hash = "sha256:8319bafdcd90b7202c50d6014efdfe4fde9311b3ff15fd6f893a45c0868de203"},
 ]
 regex = [
     {file = "regex-2020.6.8-cp27-cp27m-win32.whl", hash = "sha256:fbff901c54c22425a5b809b914a3bfaf4b9570eee0e5ce8186ac71eb2025191c"},
@@ -2033,8 +2033,8 @@ soupsieve = [
     {file = "soupsieve-1.9.6.tar.gz", hash = "sha256:7985bacc98c34923a439967c1a602dc4f1e15f923b6fcf02344184f86cc7efaa"},
 ]
 sphinx = [
-    {file = "Sphinx-3.1.0-py3-none-any.whl", hash = "sha256:7d3d5087e39ab5a031b75588e9859f011de70e213cd0080ccbc28079fb0786d1"},
-    {file = "Sphinx-3.1.0.tar.gz", hash = "sha256:1c445320a3310baa5ccb8d957267ef4a0fc930dc1234db5098b3d7af14fbb242"},
+    {file = "Sphinx-3.1.1-py3-none-any.whl", hash = "sha256:97c9e3bcce2f61d9f5edf131299ee9d1219630598d9f9a8791459a4d9e815be5"},
+    {file = "Sphinx-3.1.1.tar.gz", hash = "sha256:74fbead182a611ce1444f50218a1c5fc70b6cc547f64948f5182fb30a2a20258"},
 ]
 sphinx-autodoc-typehints = [
     {file = "sphinx-autodoc-typehints-1.10.3.tar.gz", hash = "sha256:a6b3180167479aca2c4d1ed3b5cb044a70a76cccd6b38662d39288ebd9f0dff0"},

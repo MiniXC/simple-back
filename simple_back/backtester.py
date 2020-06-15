@@ -55,13 +55,16 @@ class BacktestRunException(Exception):
     def __init__(self, message):
         self.message = message
 
+
 class LongShortLiquidationError(Exception):
     def __init__(self, message):
         self.message = message
 
+
 class NegativeValueError(Exception):
     def __init__(self, message):
         self.message = message
+
 
 class StrategySequence:
     """A sequence of strategies than can be accessed by name or :class:`int` index.\
@@ -224,7 +227,7 @@ class Position:
         self.frozen = True
         self.end_date = self.bt.current_date
         self.end_event = self.bt.event
-        self.df_cols += ['start_price', 'end_date', 'end_event']
+        self.df_cols += ["start_price", "end_date", "end_event"]
 
 
 class Portfolio(MutableSequence):
@@ -271,7 +274,7 @@ class Portfolio(MutableSequence):
                 if self.bt._available_capital < 0:
                     self.bt._graceful_stop()
                     raise NegativeValueError(
-                        f'Tried to liquidate position resulting in negative capital {self.bt._available_capital}.'
+                        f"Tried to liquidate position resulting in negative capital {self.bt._available_capital}."
                     )
                 self.bt.portfolio._remove(pos)
 
@@ -374,7 +377,6 @@ class Portfolio(MutableSequence):
             return result[0]
         else:
             return result
-
 
 
 class BacktesterBuilder:
@@ -838,7 +840,7 @@ class Backtester:
         display.clear_output(wait=True)
         plt.draw()
         plt.pause(0.001)
-        
+
     def _show_live_progress(self):
         _live_progress_pbar.n = self.i + 1
         return _live_progress_pbar
@@ -854,7 +856,9 @@ class Backtester:
             self._last_thread.join()
         self.plot(self._get_bts(), last=True)
 
-    def _order(self, symbol, capital, as_percent=False, as_percent_available=False, shares=None):
+    def _order(
+        self, symbol, capital, as_percent=False, as_percent_available=False, shares=None
+    ):
         self._capital = self._available_capital + self.metric["Portfolio Value"]()
         if capital < 0:
             short = True
@@ -878,7 +882,9 @@ class Backtester:
                     )
         elif as_percent_available:
             if abs(capital * self._available_capital) > self._available_capital:
-                if not math.isclose(capital * self._available_capital, self._available_capital):
+                if not math.isclose(
+                    capital * self._available_capital, self._available_capital
+                ):
                     self._graceful_stop()
                     raise InsufficientCapitalError(
                         f"""
@@ -896,7 +902,9 @@ class Backtester:
             if shares is None:
                 num_shares, total = self._trade_cost(current_price, capital)
             else:
-                num_shares, total = self._trade_cost(current_price, self._available_capital, num_shares=shares)
+                num_shares, total = self._trade_cost(
+                    current_price, self._available_capital, num_shares=shares
+                )
         except Exception as e:
             self._graceful_stop()
             raise e
@@ -917,31 +925,31 @@ class Backtester:
                 """
             )
 
-    #def order_pct(self, symbol, capital):
+    # def order_pct(self, symbol, capital):
     #    self._order(symbol, capital, as_percent=True)
 
-    #def order_abs(self, symbol, capital):
+    # def order_abs(self, symbol, capital):
     #    self._order(symbol, capital, as_percent=False)
 
     def long(self, symbol, **kwargs):
-        if 'percent' in kwargs:
-            self._order(symbol, kwargs['percent'], as_percent=True)
-        if 'absolute' in kwargs:
-            self._order(symbol, kwargs['absolute'])
-        if 'percent_available' in kwargs:
-            self._order(symbol, kwargs['percent_available'], as_percent_available=True)
-        if 'nshares' in kwargs:
-            self._order(symbol, 1, shares=kwargs['nshares'])
+        if "percent" in kwargs:
+            self._order(symbol, kwargs["percent"], as_percent=True)
+        if "absolute" in kwargs:
+            self._order(symbol, kwargs["absolute"])
+        if "percent_available" in kwargs:
+            self._order(symbol, kwargs["percent_available"], as_percent_available=True)
+        if "nshares" in kwargs:
+            self._order(symbol, 1, shares=kwargs["nshares"])
 
     def short(self, symbol, **kwargs):
-        if 'percent' in kwargs:
-            self._order(symbol, -kwargs['percent'], as_percent=True)
-        if 'absolute' in kwargs:
-            self._order(symbol, -kwargs['absolute'])
-        if 'percent_available' in kwargs:
-            self._order(symbol, -kwargs['percent_available'], as_percent_available=True)
-        if 'nshares' in kwargs:
-            self._order(symbol, -1, shares=kwargs['nshares'])
+        if "percent" in kwargs:
+            self._order(symbol, -kwargs["percent"], as_percent=True)
+        if "absolute" in kwargs:
+            self._order(symbol, -kwargs["absolute"])
+        if "percent_available" in kwargs:
+            self._order(symbol, -kwargs["percent_available"], as_percent_available=True)
+        if "nshares" in kwargs:
+            self._order(symbol, -1, shares=kwargs["nshares"])
 
     def price(self, symbol):
         try:

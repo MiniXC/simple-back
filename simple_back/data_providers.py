@@ -32,7 +32,9 @@ class PriceUnavailableError(Exception):
 
 class DataProvider(ABC):
     def __init__(self, debug=False):
-        self.current_datetime = pd.Timestamp(datetime.datetime.utcnow(), tzinfo=pytz.utc)
+        self.current_datetime = pd.Timestamp(
+            datetime.datetime.utcnow(), tzinfo=pytz.utc
+        )
         self.cache = dc.Cache(".simple-back")
         self.no_cache = debug
         self.debug = debug
@@ -398,7 +400,6 @@ class DailyDataProvider(ABC):
         key = self.make_key(key)
         self.cache.set(key, val)
         self.mem_cache[key] = val
-        
 
     def rem_cache(self, key):
         key = self.make_key(key)
