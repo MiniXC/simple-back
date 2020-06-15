@@ -11,7 +11,7 @@
 pip install simple_back
 ````
 ## Quickstart
-> The following is a simple crossover strategy. For a full tutorial on how to build strategy using **simple-back**, visit [the quickstart tutorial](https://simple-back.readthedocs.io/en/latest/intro/quickstart.html)
+> The following is a simple crossover strategy. For a full tutorial on how to build a strategy using **simple-back**, visit [the quickstart tutorial](https://simple-back.readthedocs.io/en/latest/intro/quickstart.html)
 
 ````python
 from simple_back.backtester import BacktesterBuilder
