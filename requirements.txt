@@ -1,6 +1,7 @@
 aiohttp==3.6.2
 alabaster==0.7.12
 appdirs==1.4.4
+astroid==2.4.2
 async-timeout==3.0.1
 attrs==19.3.0
 Babel==2.8.0
@@ -40,10 +41,12 @@ idna==2.9
 imagesize==1.2.0
 ipython==7.15.0
 ipython-genutils==0.2.0
+isort==4.3.21
 jedi==0.17.0
 Jinja2==2.11.2
 jsonschema==3.2.0
 jupyter-core==4.6.3
+lazy-object-proxy==1.4.3
 lxml==4.5.1
 m2r==0.2.1
 MarkupSafe==1.1.1
@@ -75,6 +78,7 @@ pycodestyle==2.6.0
 pyee==7.0.2
 pyflakes==2.2.0
 Pygments==2.6.1
+pylint==2.5.3
 pyparsing==2.4.7
 pyppeteer==0.2.2
 pyquery==1.4.1
@@ -113,6 +117,7 @@ w3lib==1.22.0
 wcwidth==0.2.4
 webencodings==0.5.1
 websockets==8.1
+wrapt==1.12.1
 yahoo-fin==0.8.5
 yarl==1.4.2
 yaspin==0.17.0
