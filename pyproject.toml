@@ -29,6 +29,7 @@ sphinx-rtd-theme = "^0.4.3"
 sphinx-copybutton = "^0.2.11"
 sphinx-autodoc-typehints = "^1.10.3"
 nbsphinx = "^0.7.0"
+pylint-badge = {git = "https://github.com/PouncySilverkitten/pylint-badge.git"}
 
 [tool.dephell.main]
 from = {format = "poetry", path = "pyproject.toml"}

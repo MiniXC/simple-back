@@ -486,7 +486,7 @@ class BacktesterBuilder:
         return self
 
     def no_live_metrics(self) -> "BacktesterBuilder":
-        scopy = copy.copy(self)
+        scopy = copy.deepcopy(self)
         scopy.bt._live_metrics = False
         return scopy
 
@@ -511,7 +511,7 @@ class BacktesterBuilder:
         return self
 
     def no_live_plot(self) -> "BacktesterBuilder":
-        scopy = copy.copy(self)
+        scopy = copy.deepcopy(self)
         scopy.bt._live_plot = False
         return scopy
 
@@ -521,7 +521,7 @@ class BacktesterBuilder:
         return self
 
     def no_live_progress(self) -> "BacktesterBuilder":
-        scopy = copy.copy(self)
+        scopy = copy.deepcopy(self)
         scopy.bt._live_progress = False
         return scopy
 

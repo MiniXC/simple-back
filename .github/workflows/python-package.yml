@@ -34,6 +34,8 @@ jobs:
         branch: ${{ github.head_ref }} 
     - name: Lint
       run: poetry run python -m flake8 . --count --exit-zero --max-complexity=10 --statistics
+    - name: pylint badge
+      run: poetry run pylint-badge simple_back
     - name: Test
       run: poetry run python -m pytest --cov=simple_back --cov-branch --cov-report=xml tests/
     - name: Codecov
