@@ -1,9 +1,6 @@
 from abc import ABC, abstractmethod
 
-
-class InsufficientCapitalError(Exception):
-    def __init__(self, message):
-        self.message = message
+from .exceptions import InsufficientCapitalError
 
 
 class Fee(ABC):

@@ -14,5 +14,6 @@ from . import strategy
 from . import fees
 from . import data_providers
 from . import metrics
+from . import exceptions
 
-__all__ = ["backtester", "strategy", "fees", "data_providers", "metrics"]
+__all__ = ["backtester", "strategy", "fees", "data_providers", "metrics", "exceptions"]

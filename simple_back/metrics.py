@@ -3,12 +3,7 @@ from typing import List, Optional
 import numpy as np
 import pandas as pd
 
-
-class MissingMetricsError(Exception):
-    def __init__(self, metrics, message):
-        self.metrics = metrics
-        self.message = message
-
+from .exceptions import MissingMetricsError
 
 class Metric(ABC):
     @property
@@ -26,7 +21,7 @@ class Metric(ABC):
         if self._single:
             return f"{self.value:.2f}"
         if self._series:
-            return f"{self.values[-1]:.2f}"
+            return f"{self[-1]:.2f}"
         else:
             return f"{self.name}"
 
@@ -138,18 +133,19 @@ class SeriesMetric(Metric):
     def get_value(self, bt):
         pass
 
-
 class MaxDrawdown(SingleMetric):
     @property
     def name(self):
-        return "Max Drawdown"
-
-    @property
-    def requires(self):
-        return ["Daily Profit/Loss"]
-
+        return "Max Drawdown (%)"
+    
     def get_value(self, bt):
-        return np.min(bt.metric["Daily Profit/Loss"].values)
+        highest_peaks = bt.metrics["Total Value"].cummax()
+        actual_value = bt.metrics["Total Value"]
+        # als positiver wert
+        # md = np.max((highest_peaks-actual_value).values)
+        # als negativer wert
+        md = np.min(((actual_value-highest_peaks)/highest_peaks).values)*100
+        return md
 
 
 class AnnualReturn(SingleMetric):
@@ -203,3 +199,15 @@ class TotalValue(SeriesMetric):
 
     def get_value(self, bt):
         return bt.metric["Portfolio Value"]() + bt._available_capital
+
+class TotalReturn(SeriesMetric):
+    @property
+    def name(self):
+        return "Total Return (%)"
+
+    @property
+    def requires(self):
+        return ["Total Value"]
+
+    def get_value(self, bt):
+        return ((bt.metric["Total Value"][-1]/bt.balance.start)-1)*100

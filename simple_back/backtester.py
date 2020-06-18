@@ -30,9 +30,11 @@ from .metrics import (
     PortfolioValue,
     DailyProfitLoss,
     TotalValue,
+    TotalReturn,
     Metric,
 )
 from .strategy import Strategy, BuyAndHold
+from .exceptions import BacktestRunError, LongShortLiquidationError, NegativeValueError
 
 try:
     from IPython import display
@@ -49,21 +51,6 @@ try:
     tqdm_exists = True
 except ImportError:
     tqdm_exists = False
-
-
-class BacktestRunException(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
-class LongShortLiquidationError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
-class NegativeValueError(Exception):
-    def __init__(self, message):
-        self.message = message
 
 
 class StrategySequence:
@@ -495,6 +482,7 @@ class BacktesterBuilder:
         every: int = 10,
         metric: str = "Total Value",
         figsize: Tuple[float, float] = None,
+        min_y: int = 0
     ) -> "BacktesterBuilder":
         if self.bt._live_metrics:
             self.bt._warn.append(
@@ -508,6 +496,7 @@ class BacktesterBuilder:
         self.bt._live_plot_every = every
         self.bt._live_plot_metric = metric
         self.bt._live_plot_figsize = figsize
+        self.bt._live_plot_min = min_y
         return self
 
     def no_live_plot(self) -> "BacktesterBuilder":
@@ -549,6 +538,10 @@ class BacktesterBuilder:
         self.bt._has_strategies = True
         return self
 
+    def slippage(self, slippage):
+        self.bt._slippage = slippage
+        return self
+
     def build(self) -> "Backtester":
         self.bt._builder = self
         return copy.deepcopy(self.bt)
@@ -557,7 +550,7 @@ class BacktesterBuilder:
 class Backtester:
     def __getitem__(self, date_range: slice) -> "Backtester":
         if self._run_before:
-            raise BacktestRunException(
+            raise BacktestRunError(
                 "Backtest has already run, build a new backtester to run again."
             )
         self._run_before = True
@@ -612,6 +605,7 @@ class Backtester:
             AnnualReturn(),
             PortfolioValue(),
             TotalValue(),
+            TotalReturn(),
             DailyProfitLoss(),
         ]
         self.metric = {}
@@ -651,6 +645,8 @@ class Backtester:
         self._last_thread = None
 
         self._from_sequence = False
+
+        self._slippage = None
 
     def _set_self(self, new_self=None):
         if new_self is not None:
@@ -820,7 +816,8 @@ class Backtester:
         if self._live_progress:
             axes[0].set_title(str(self._show_live_progress()))
         plot_df.plot(ax=axes[0])
-        axes[0].set_ylim(bottom=0)
+        if self._live_plot_min is not None:
+            axes[0].set_ylim(bottom=self._live_plot_min)
 
         if self.add_metric_exists:
             try:
@@ -894,6 +891,25 @@ class Backtester:
                         """
                     )
         current_price = self.price(symbol)
+        
+        """
+        if self._slippage is not None:
+            self.prices._leak_allowed = True
+
+            today_df = self.prices[symbol, self.current_date]
+
+            if self.event == 'open':
+                next_price = today_df['close']
+                high_low = [today_df['high'], today_df['low']]
+            elif self.event == 'close':
+                tom_df = self.prices[symbol, self.dates[self.i+1 // 2]]
+                next_price = tom_df['open']
+                high_low = [today_df['high'], today_df['low']]
+            current_price = self._slippage(current_price,next_price,high_low)
+
+            self.prices._leak_allowed = False
+        """
+
         if as_percent:
             capital = capital * self._capital
         if as_percent_available:

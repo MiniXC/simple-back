@@ -41,7 +41,7 @@ Getting Started
 Build and test a simple strategy using simple-back.
 
 :doc:`intro/debugging`
------------------------
+----------------------
 Visualize and improve your strategy.
 
 :doc:`intro/example`

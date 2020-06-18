@@ -15,20 +15,7 @@ from bs4 import BeautifulSoup
 from memoization import cached
 from json import JSONDecodeError
 
-
-class TimeLeakError(Exception):
-    def __init__(self, current_date, requested_date, message):
-        self.current_date = current_date
-        self.requested_date = requested_date
-        self.message = message
-
-
-class PriceUnavailableError(Exception):
-    def __init__(self, symbol, requested_date, message):
-        self.symbol = symbol
-        self.requested_date = requested_date
-        self.message = message
-
+from .exceptions import TimeLeakError, PriceUnavailableError
 
 class DataProvider(ABC):
     def __init__(self, debug=False):
@@ -219,6 +206,7 @@ class DailyDataProvider(ABC):
         self.current_event = self.columns[np.argmax(self.columns_order)]
         self.cache = dc.Cache(".simple-back")
         self.mem_cache = {}
+        self._leak_allowed = False
 
     def _remove_leaky_vals(self, df, cols, date):
         if isinstance(df, pd.DataFrame):
@@ -312,7 +300,7 @@ class DailyDataProvider(ABC):
         if len_t >= 2:
             date = symbol_date_event[1]
             if isinstance(date, datetime.date):
-                if date > self.current_date:
+                if date > self.current_date and not self._leak_allowed:
                     raise TimeLeakError(
                         self.current_date,
                         date,
@@ -350,6 +338,8 @@ class DailyDataProvider(ABC):
                         date.step,
                     )
         data = self._get_cached(symbol, date, event)
+        if self._leak_allowed:
+            return data
         return self._remove_leaky_vals(data, event, date)
 
     @cached(thread_safe=False, custom_key_maker=_get_arg_key)
@@ -457,9 +447,10 @@ class YahooFinanceProvider(DailyPriceProvider):
         else:
             df = self.get_cache(symbol)
         if df.isna().any().any():
-            raise PriceUnavailableError(
-                symbol, date, f"Price for {symbol} is nan for some dates."
-            )
+            #raise PriceUnavailableError(
+            #    symbol, date, f"Price for {symbol} is nan for some dates."
+            #)
+            df.dropna(inplace=True, axis=0)
         entry = df.loc[date].copy()
         adj = entry["adjclose"] / entry["close"]
         if self.adjust_prices:
