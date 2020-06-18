@@ -482,7 +482,7 @@ class BacktesterBuilder:
         every: int = 10,
         metric: str = "Total Value",
         figsize: Tuple[float, float] = None,
-        min_y: int = 0
+        min_y: int = 0,
     ) -> "BacktesterBuilder":
         if self.bt._live_metrics:
             self.bt._warn.append(
@@ -891,7 +891,7 @@ class Backtester:
                         """
                     )
         current_price = self.price(symbol)
-        
+
         """
         if self._slippage is not None:
             self.prices._leak_allowed = True

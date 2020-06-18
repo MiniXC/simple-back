@@ -25,6 +25,14 @@ simple\_back.data\_providers module
    :undoc-members:
    :show-inheritance:
 
+simple\_back.exceptions module
+------------------------------
+
+.. automodule:: simple_back.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 simple\_back.fees module
 ------------------------
 
