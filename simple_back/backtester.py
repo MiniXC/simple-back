@@ -10,7 +10,7 @@ import json
 from typing import Union, List, Tuple, Callable, overload
 from warnings import warn
 import os
-from IPython.display import clear_output, display, HTML
+from IPython.display import clear_output, display, HTML, display_html
 from dataclasses import dataclass
 import multiprocessing
 import threading
@@ -55,6 +55,17 @@ try:
 except ImportError:
     tqdm_exists = False
 
+# from https://stackoverflow.com/a/44923103, https://stackoverflow.com/a/50899244
+def display_side_by_side(bts):
+    html_str = ''
+    for bt in bts:
+        styler = (
+            bt.logs.style
+            .set_table_attributes("style='display:inline'")
+            .set_caption(bt.name)
+        )
+        html_str += styler._repr_html_()
+    display_html(html_str, raw=True)
 
 class StrategySequence:
     """A sequence of strategies than can be accessed by name or :class:`int` index.\
@@ -313,8 +324,9 @@ class Portfolio(MutableSequence):
         an attempt to liquidate all positions is made.
 
         Args:
-            num_shares: The number of shares to be liquidated.
-                        This should only be used when a ticker is selected using `['some_ticker']`.
+            num_shares:
+                The number of shares to be liquidated.
+                This should only be used when a ticker is selected using `['some_ticker']`.
 
         Examples:
             Select all `MSFT` positions and liquidate them::
@@ -430,8 +442,14 @@ class Portfolio(MutableSequence):
     def __bool__(self):
         return len(self) != 0
 
+    def insert(self, index: int, value: Position) -> None:
+        self.positions.insert(index, value)
+
     @property
-    def short(self):
+    def short(self) -> "Portfolio":
+        """Returns a view of the portfolio (which can be treated as its own :class:`.Portfolio`)
+        containing all *short* positions.
+        """
         new_pos = []
         for pos in self.positions:
             if pos.short:
@@ -439,24 +457,36 @@ class Portfolio(MutableSequence):
         return Portfolio(self.bt, new_pos)
 
     @property
-    def long(self):
+    def long(self) -> "Portfolio":
+        """Returns a view of the portfolio (which can be treated as its own :class:`.Portfolio`)
+        containing all *long* positions.
+        """
         new_pos = []
         for pos in self.positions:
             if pos.long:
                 new_pos.append(pos)
         return Portfolio(self.bt, new_pos)
 
-    def insert(self, index: int, value: Position) -> None:
-        self.positions.insert(index, value)
+    def filter(self, func: Callable[[Position], bool]) -> "Portfolio":
+        """Filters positions using any :class`.Callable`
 
-    def filter(self, func: Callable[[Position], bool]):
+        Args:
+            func: The function/callable to do the filtering.
+        """
         new_pos = []
         for pos in self.positions:
             if func(pos):
                 new_pos.append(pos)
         return Portfolio(self.bt, new_pos)
 
-    def attr(self, attribute):
+    def attr(self, attribute: str) -> List:
+        """Get a list of values for a certain value for all posititions
+
+        Args:
+            attribute:
+                String name of the attribute to get.
+                Can be any attribute of :clas:`.Position`.
+        """
         result = [getattr(pos, attribute) for pos in self.positions]
         if len(result) == 0:
             return None
@@ -538,12 +568,20 @@ class BacktesterBuilder:
     ) -> "BacktesterBuilder":
         """**Optional**, set a :class:`.Fee` to be applied when buying shares.
         When not set, :class:`.NoFee` is used.
+
+        Args:
+            trade_cost: one ore more :class:`.Fee` objects or callables.
         """
         self = copy.deepcopy(self)
         self.bt._trade_cost = trade_cost
         return self
 
     def metrics(self, metrics: Union[Metric, List[Metric]]) -> "BacktesterBuilder":
+        """**Optional**, set additional :class:`.Metric` objects to be used.
+
+        Args:
+            metrics: one or more :class:`.Metric` objects
+        """
         self = copy.deepcopy(self)
         if isinstance(metrics, list):
             for m in metrics:
@@ -556,6 +594,9 @@ class BacktesterBuilder:
         return self
 
     def clear_metrics(self) -> "BacktesterBuilder":
+        """**Optional**, remove all default metrics,
+        except :class:`.PortfolioValue`, which is needed internally.
+        """
         self = copy.deepcopy(self)
         metrics = [PortfolioValue()]
         self.bt.metric = {}
@@ -563,11 +604,27 @@ class BacktesterBuilder:
         return self
 
     def calendar(self, calendar: str) -> "BacktesterBuilder":
+        """**Optional**, set a `pandas market calendar`_ to be used.
+        If not called, "NYSE" is used.
+
+        Args:
+            calendar: the calendar identifier
+
+        .. _pandas market calendar:
+           https://pandas-market-calendars.readthedocs.io/en/latest/calendars.html
+        """
         self = copy.deepcopy(self)
         self.bt._calendar = calendar
         return self
 
     def live_metrics(self, every: int = 10) -> "BacktesterBuilder":
+        """**Optional**, shows all metrics live in output. This can be useful
+        when running simple-back from terminal.
+
+        Args:
+            every: how often metrics should be updated
+            (in events, e.g. 10 = 5 days)
+        """
         self = copy.deepcopy(self)
         if self.bt._live_plot:
             self.bt._warn.append(
@@ -582,6 +639,8 @@ class BacktesterBuilder:
         return self
 
     def no_live_metrics(self) -> "BacktesterBuilder":
+        """Disables showing live metrics.
+        """
         self = copy.deepcopy(self)
         self.bt._live_metrics = False
         return self
@@ -593,6 +652,19 @@ class BacktesterBuilder:
         figsize: Tuple[float, float] = None,
         min_y: int = 0,
     ) -> "BacktesterBuilder":
+        """**Optional**, shows the backtest results live using matplotlib.
+        Can only be used in notebooks.
+
+        Args:
+            every:
+                how often metrics should be updated
+                (in events, e.g. 10 = 5 days)
+            metric: which metric to plot
+            figsize: size of the plot
+            min_y:
+                minimum value on the y axis, set to `None`
+                for no lower limit
+        """
         self = copy.deepcopy(self)
         if self.bt._live_metrics:
             self.bt._warn.append(
@@ -610,17 +682,24 @@ class BacktesterBuilder:
         return self
 
     def no_live_plot(self) -> "BacktesterBuilder":
+        """Disables showing live plots.
+        """
         self = copy.deepcopy(self)
         self.bt._live_plot = False
         return self
 
     def live_progress(self, every: int = 10) -> "BacktesterBuilder":
+        """**Optional**, shows a live progress bar using :class:`.tqdm`, either
+        as port of a plot or as text output.
+        """
         self = copy.deepcopy(self)
         self.bt._live_progress = True
         self.bt._live_progress_every = every
         return self
 
     def no_live_progress(self) -> "BacktesterBuilder":
+        """Disables the live progress bar.
+        """
         self = copy.deepcopy(self)
         self.bt._live_progress = False
         return self
@@ -631,6 +710,14 @@ class BacktesterBuilder:
             Union[Callable[["datetime.date", str, "Backtester"], None], Strategy, str]
         ],
     ):
+        """**Optional**, alias for :meth:`.BacktesterBuilder.strategies`,
+        should be used when comparing to :class:`.BuyAndHold` of a ticker instead of other strategies.
+
+        Args:
+            strategies:
+                should be the string of the ticker to compare to,
+                but :class:`.Strategy` objects can be passed as well
+        """
         self = copy.deepcopy(self)
         return self.strategies(strategies)
 
@@ -640,6 +727,12 @@ class BacktesterBuilder:
             Union[Callable[["datetime.date", str, "Backtester"], None], Strategy, str]
         ],
     ) -> "BacktesterBuilder":
+        """**Optional**, sets :class:`.Strategy` objects to run.
+
+        Args:
+            strategies:
+                list of :class:`.Strategy` objects or tickers to :class:`.BuyAndHold`
+        """
         self = copy.deepcopy(self)
         strats = []
         for strat in strategies:
@@ -652,17 +745,52 @@ class BacktesterBuilder:
         return self
 
     def slippage(self, slippage: int = 0.0005):
+        """**Optional**, sets slippage which will create a (lower bound) strategy.
+        The orginial strategies will run without slippage.
+
+        Args:
+            slippage:
+                the slippage in percent of the base price,
+                default is equivalent to quantopian default for US Equities
+        """
         self = copy.deepcopy(self)
         self.bt._slippage = slippage
         return self
 
     def build(self) -> "Backtester":
+        """Build a :class:`.Backtester` given the previous configuration.
+        """
         self = copy.deepcopy(self)
         self.bt._builder = self
         return copy.deepcopy(self.bt)
 
 
 class Backtester:
+    """The :class:`.Backtester` object is yielded alongside
+    the current day and event (open or close)
+    when it is called with a date range,
+    which can be of the following forms.
+    The :class:`.Backtester` object stores information
+    about the backtest after it has completed.
+
+    Examples:
+
+        Initialize with dates as strings::
+
+            bt['2010-1-1','2020-1-1'].run()
+            # or
+            for day, event, b in bt['2010-1-1','2020-1-1']:
+                ...
+        
+        Initialize with dates as :class:`.datetime.date` objects::
+
+            bt[datetime.date(2010,1,1),datetime.date(2020,1,1)]
+
+        Initialize with dates as :class:`.int`::
+
+            bt[-100:] # backtest 100 days into the past
+    """
+
     def __getitem__(self, date_range: slice) -> "Backtester":
         if self._run_before:
             raise BacktestRunError(
@@ -701,10 +829,6 @@ class Backtester:
         if self._has_strategies:
             self._set_strategies(self._temp_strategies)
 
-        if self._slippage is not None:
-            self._init_slippage()
-            self._has_strategies = True
-
         return self
 
     def _init_slippage(self, bt=None):
@@ -716,9 +840,9 @@ class Backtester:
         lower_bound.name += " (lower bound)"
         lower_bound._has_strategies = False
         lower_bound._slippage_percent = (-1) * self._slippage
+        lower_bound._slippage = None
         self._init_iter(lower_bound)
         bt.lower_bound = lower_bound
-        bt.lower_bound._slippage = None
         self._strategies.append(lower_bound)
 
     def __init__(self):
@@ -818,6 +942,9 @@ class Backtester:
         if self._live_progress:
             _live_progress_pbar = tqdm(total=len(self))
             _cls()
+        if self._slippage is not None and not self.name is None:
+            self._init_slippage()
+            self._has_strategies = True
         return self
 
     def _next_iter(self, bt=None):
@@ -843,12 +970,18 @@ class Backtester:
                         for metric in strat.metric.values():
                             if metric._single:
                                 metric(write=True)
-                self.plot(self._get_bts(), last=True)
+                self._plot(self._get_bts(), last=True)
                 raise StopIteration
         bt._update()
         return bt.current_date, bt.event, bt
 
-    def add_metric(self, key, value):
+    def add_metric(self, key: str, value: float):
+        """Called inside the backtest, adds a metric that is visually tracked.
+
+        Args:
+            key: the metric name
+            value: the numerical value of the metric
+        """
         if key not in self._add_metrics:
             self._add_metrics[key] = (
                 np.repeat(np.nan, len(self)),
@@ -858,13 +991,24 @@ class Backtester:
         self._add_metrics[key][1][self.i] = False
 
     def add_line(self, **kwargs):
+        """Adds a vertical line on the plot on the current date + event.
+        """
         self._add_metrics_lines.append((self.timestamp, kwargs))
 
-    def log(self, text):
+    def log(self, text: str):
+        """Adds a log text on the current day and event that can be accessed using :obj:`.logs`
+        after the backtest has completed.
+
+        Args:
+            text: text to log
+        """
         self._log.append([self.current_date, self.event, text])
 
     @property
     def timestamp(self):
+        """Returns the current timestamp, which includes the correct open/close time,
+        depending on the calendar that was set using :meth:`.BacktesterBuilder.calendar`
+        """
         return self._schedule.loc[self.current_date][f"market_{self.event}"]
 
     def __iter__(self):
@@ -874,10 +1018,10 @@ class Backtester:
         if len(self._strategies) > 0:
             result = self._next_iter()
             self._run_once()
-            self.plot([self] + self._strategies)
+            self._plot([self] + self._strategies)
         else:
             result = self._next_iter()
-            self.plot([self])
+            self._plot([self])
         return result
 
     def __len__(self):
@@ -981,8 +1125,9 @@ class Backtester:
             try:
                 interp_df = plot_add_df.interpolate(method="linear")
                 interp_df.plot(ax=axes[1], cmap="Accent")
-                for line in self._add_metrics_lines:
-                    plt.axvline(line[0], **line[1])
+                for bt in bts:
+                    for line in bt._add_metrics_lines:
+                        plt.axvline(line[0], **line[1])
             except TypeError:
                 pass
 
@@ -997,17 +1142,20 @@ class Backtester:
         plt.draw()
         plt.pause(0.001)
 
-        display(
-            HTML(
-                tabulate.tabulate(
-                    self._log[-10:], tablefmt="html", headers=["date", "event", "log"]
-                )
-            )
-        )
-        if len(self._log) > 10:
-            display(
-                HTML("<i>... 10 logs displayed, all logs stored in Backtester.logs</i>")
-            )
+        captions = []
+
+        for bt in bts:
+            captions.append(bt.name)
+
+        has_logs = False
+
+        for bt in bts:
+            if len(bt._log) > 0:
+                has_logs = True
+
+        if has_logs:
+            display_side_by_side(bts)
+
         for w in self._warn:
             warn(w)
 
@@ -1046,7 +1194,7 @@ class Backtester:
     def _graceful_stop(self):
         if self._last_thread is not None:
             self._last_thread.join()
-        self.plot(self._get_bts(), last=True)
+        self._plot(self._get_bts(), last=True)
 
     def _order(
         self,
@@ -1144,7 +1292,18 @@ class Backtester:
                 """
             )
 
-    def long(self, symbol, **kwargs):
+    def long(self, symbol: str, **kwargs):
+        """Enter a long position of the given symbol.
+
+        Args:
+            symbol: the ticker to buy
+            kwargs:
+                one of either
+                "percent" as a percentage of total value (cash + positions),
+                "absolute" as an absolute value,
+                "percent_available" as a percentage of remaining funds (excluding positions)
+                "nshares" as a number of shares
+        """
         if "percent" in kwargs:
             self._order(symbol, kwargs["percent"], as_percent=True)
         if "absolute" in kwargs:
@@ -1154,7 +1313,18 @@ class Backtester:
         if "nshares" in kwargs:
             self._order(symbol, 1, shares=kwargs["nshares"])
 
-    def short(self, symbol, **kwargs):
+    def short(self, symbol: str, **kwargs):
+        """Enter a short position of the given symbol.
+
+        Args:
+            symbol: the ticker to short
+            kwargs:
+                one of either
+                "percent" as a percentage of total value (cash + positions),
+                "absolute" as an absolute value,
+                "percent_available" as a percentage of remaining funds (excluding positions)
+                "nshares" as a number of shares
+        """
         if "percent" in kwargs:
             self._order(symbol, -kwargs["percent"], as_percent=True)
         if "absolute" in kwargs:
@@ -1164,7 +1334,12 @@ class Backtester:
         if "nshares" in kwargs:
             self._order(symbol, -1, shares=kwargs["nshares"])
 
-    def price(self, symbol):
+    def price(self, symbol: str) -> float:
+        """Get the current price of a given symbol.
+
+        Args:
+            symbol: the ticker
+        """
         try:
             price = self.prices[symbol, self.current_date][self.event]
         except KeyError:
@@ -1187,7 +1362,19 @@ class Backtester:
         return price
 
     @property
-    def balance(self):
+    def balance(self) -> "Balance":
+        """Get the current or starting balance.
+
+        Examples:
+
+            Get the current balance::
+
+                bt.balance.current
+
+            Get the starting balance::
+
+                bt.balance.start
+        """
         @dataclass
         class Balance:
             start: float = self._start_capital
@@ -1205,7 +1392,9 @@ class Backtester:
         return bts
 
     @property
-    def metrics(self):
+    def metrics(self) -> pd.DataFrame:
+        """Get a dataframe of all metrics collected during the backtest(s).
+        """
         bts = self._get_bts()
         dfs = []
         for i, bt in enumerate(bts):
@@ -1230,7 +1419,11 @@ class Backtester:
             return pd.concat(dfs).set_index(["Date", "Event"])
 
     @property
-    def summary(self):
+    def summary(self) -> pd.DataFrame:
+        """Get a dataframe showing the last and overall values of all metrics
+        collected during the backtest.
+        This can be helpful for comparing backtests at a glance.
+        """
         bts = self._get_bts()
         dfs = []
         for i, bt in enumerate(bts):
@@ -1254,11 +1447,15 @@ class Backtester:
 
     @property
     def strategies(self):
+        """Provides access to sub-strategies, returning a :class:`.StrategySequence`.
+        """
         if self._has_strategies:
             return StrategySequence(self)
 
     @property
-    def pf(self):
+    def pf(self) -> Portfolio:
+        """Shorthand for `portfolio`, returns the backtesters portfolio.
+        """
         return self.portfolio
 
     def _set_strategies(
@@ -1287,7 +1484,7 @@ class Backtester:
         for i, bt in enumerate(no_slip_strats):
             self._strategies_call[i](*self._next_iter(bt))
 
-    def plot(self, bts, last=False):
+    def _plot(self, bts, last=False):
         try:
             if self._live_plot and (self.i % self._live_plot_every == 0 or last):
                 if self._last_thread is None or not self._last_thread.is_alive():
@@ -1314,12 +1511,20 @@ class Backtester:
             pass
 
     @property
-    def logs(self):
-        df = pd.DataFrame(self._logs, columns=["date", "event", "log"])
+    def logs(self) -> pd.DataFrame:
+        """Returns a :class:`.pd.DataFrame` for logs collected during the backtest.
+        """
+        df = pd.DataFrame(self._log, columns=["date", "event", "log"])
         df = df.set_index(["date", "event"])
         return df
 
     def show(self, start=None, end=None):
+        """Show the backtester as a plot.
+        
+        Args:
+            start: the start date
+            end: the end date
+        """
         bts = self._get_bts()
         if self._from_sequence:
             bts = [self]
@@ -1329,15 +1534,18 @@ class Backtester:
             self._show_live_plot(bts)
 
     def run(self):
+        """Run the backtesters strategies without using an iterator.
+        This is only possible if strategies have been set using :meth:`.BacktesterBuilder.strategies`.
+        """
         self._init_iter()
         self._no_iter = True
 
         for _ in range(len(self)):
             self._run_once()
             self.i = self._strategies[-1].i
-            self.plot(self._strategies)
+            self._plot(self._strategies)
 
-        self.plot(self._strategies, last=True)
+        self._plot(self._strategies, last=True)
 
         for strat in self._strategies:
             for metric in strat.metric.values():

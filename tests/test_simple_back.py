@@ -3,7 +3,7 @@ from simple_back.backtester import BacktesterBuilder
 
 
 def test_version():
-    assert __version__ == "0.5.6"
+    assert __version__ == "0.5.5"
 
 
 def test_compare_quantopian():
@@ -12,6 +12,7 @@ def test_compare_quantopian():
         .name("TSLA Strategy")
         .balance(10_000)
         .calendar("NYSE")
+        .live_metrics()
         .slippage(0.0005)
     )
     bt = builder.build()

@@ -55,6 +55,7 @@ Just copy example code and get started yourself.
 
    intro/quickstart
    intro/debugging
+   intro/slippage
    intro/example
 
 ..

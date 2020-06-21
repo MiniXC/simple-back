@@ -18,14 +18,65 @@ from json import JSONDecodeError
 from .exceptions import TimeLeakError, PriceUnavailableError
 
 
-class DataProvider(ABC):
+def _get_arg_key(self, *args):
+    return str(args)
+
+class CachedProvider(ABC):
+    def __init__(self, debug=False):
+        self.cache = dc.Cache(".simple-back")
+        self.mem_cache = {}
+        self.debug = debug
+
+    def get_key(self, key:str) -> str:
+        return str(key) + self.name
+
+    def get_cache(self, key):
+        nkey = self.get_key(key)
+        if self.in_cache(key):
+            return self.mem_cache[nkey]
+        else:
+            raise KeyError(f"{nkey} not in cache")
+
+    def in_cache(self, key) -> bool:
+        if not self.debug:
+            key = self.get_key(key)
+            if key in self.mem_cache:
+                return True
+            if key in self.cache:
+                self.mem_cache[key] = self.cache[key]
+                return True
+        return False
+
+    def set_cache(self, key, val, expire_days=None):
+        key = self.get_key(key)
+        self.mem_cache[key] = val
+        if expire_days is None:
+            self.cache.set(key, val)
+        else:
+            self.cache.set(key, val, expire=expire_days * 60 * 60 * 24)
+
+    def rem_cache(self, key):
+        key = self.get_key(key)
+        del self.mem_cache[key]
+        del self.cache[key]
+
+    def clear_cache(self):
+        for key in self.cache.iterkeys():
+            if key.endswith(self.name):
+                del self.cache[key]
+        self.mem_cache = {}
+
+    @property
+    @abstractmethod
+    def name(self):
+        pass
+
+class DataProvider(CachedProvider):
     def __init__(self, debug=False):
         self.current_datetime = pd.Timestamp(
             datetime.datetime.utcnow(), tzinfo=pytz.utc
         )
-        self.cache = dc.Cache(".simple-back")
-        self.no_cache = debug
-        self.debug = debug
+        super().__init__(debug=debug)
 
     def __getitem__(self, symbol_datetime=None) -> pd.DataFrame:
         try:
@@ -50,7 +101,7 @@ class DataProvider(ABC):
                 resulting in time leak
                 """,
             )
-        return self.get(date, symbol)
+        return self._get_cached(self.name, date, symbol)
 
     @property
     @abstractmethod
@@ -65,26 +116,9 @@ class DataProvider(ABC):
     def get(self, datetime: pd.Timestamp, symbol: str = None):
         pass
 
-    def get_cache(self, key):
-        return self.cache[str(key) + self.name]
-
-    def in_cache(self, key):
-        if not self.no_cache:
-            return str(key) + self.name in self.cache
-        else:
-            return False
-
-    def set_cache(self, key, val, expire_days=None):
-        if expire_days is None:
-            self.cache.set(str(key) + self.name, val)
-        else:
-            self.cache.set(str(key) + self.name, val, expire=expire_days * 60 * 60 * 24)
-
-    def rem_cache(self, key):
-        del self.cache[str(key) + self.name]
-
-    def clear_cache(self):
-        self.cache.clear()
+    @cached(thread_safe=False, custom_key_maker=_get_arg_key)
+    def _get_cached(self, *args) -> pd.DataFrame:
+        return self.get(args[1], args[2])
 
 
 class WikipediaProvider(DataProvider):
@@ -196,18 +230,12 @@ class SpProvider(WikipediaProvider):
     def name(self):
         return "S&P"
 
-
-def _get_arg_key(self, *args):
-    return str(args)
-
-
-class DailyDataProvider(ABC):
-    def __init__(self):
+class DailyDataProvider(CachedProvider):
+    def __init__(self, debug=False):
         self.current_date = date.today()
         self.current_event = self.columns[np.argmax(self.columns_order)]
-        self.cache = dc.Cache(".simple-back")
-        self.mem_cache = {}
         self._leak_allowed = False
+        super().__init__(debug=debug)
 
     def _remove_leaky_vals(self, df, cols, date):
         if isinstance(df, pd.DataFrame):
@@ -345,16 +373,7 @@ class DailyDataProvider(ABC):
 
     @cached(thread_safe=False, custom_key_maker=_get_arg_key)
     def _get_cached(self, *args) -> pd.DataFrame:
-        try:
-            key = _get_arg_key(self, *args)
-            if key in self.cache:
-                return self.cache.get(key)
-            else:
-                result = self.get(args[0], args[1], args[2])
-                self.cache.set(key, result)
-                return result
-        except JSONDecodeError:
-            return None
+        return self.get(args[0], args[1], args[2])
 
     @abstractmethod
     def get(
@@ -371,35 +390,6 @@ class DailyDataProvider(ABC):
     @abstractmethod
     def columns_order(self) -> List[int]:
         pass
-
-    def make_key(self, key):
-        return str(key) + str(type(self))
-
-    def get_cache(self, key):
-        key = self.make_key(key)
-        if key not in self.mem_cache:
-            self.mem_cache[key] = self.cache[key]
-        return self.mem_cache[key]
-
-    def in_cache(self, key):
-        key = self.make_key(key)
-        in_memcache = key in self.mem_cache
-        in_diskcache = key in self.cache
-        return in_memcache or in_diskcache
-
-    def set_cache(self, key, val):
-        key = self.make_key(key)
-        self.cache.set(key, val)
-        self.mem_cache[key] = val
-
-    def rem_cache(self, key):
-        key = self.make_key(key)
-        del self.cache[key]
-        del self.mem_cache[key]
-
-    def clear_cache(self):
-        self.mem_cache = {}
-        self.cache.clear()
 
 
 class DailyPriceProvider(DailyDataProvider):
@@ -434,6 +424,10 @@ class YahooFinanceProvider(DailyPriceProvider):
         self.highlow = highlow
         super().__init__()
 
+    @property
+    def name(self):
+        return "Yahoo Finance Prices"
+
     def get(
         self, symbol: str, date: Union[slice, date], event: Union[str, List[str]]
     ) -> pd.DataFrame:
@@ -448,9 +442,6 @@ class YahooFinanceProvider(DailyPriceProvider):
         else:
             df = self.get_cache(symbol)
         if df.isna().any().any():
-            # raise PriceUnavailableError(
-            #    symbol, date, f"Price for {symbol} is nan for some dates."
-            # )
             df.dropna(inplace=True, axis=0)
         entry = df.loc[date].copy()
         adj = entry["adjclose"] / entry["close"]
