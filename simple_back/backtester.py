@@ -10,11 +10,14 @@ import json
 from typing import Union, List, Tuple, Callable, overload
 from warnings import warn
 import os
-from IPython.display import clear_output
+from IPython.display import clear_output, display, HTML
 from dataclasses import dataclass
 import multiprocessing
 import threading
 from collections.abc import MutableSequence
+import uuid
+import time
+import tabulate
 
 from .data_providers import (
     DailyPriceProvider,
@@ -35,23 +38,20 @@ from .metrics import (
 )
 from .strategy import Strategy, BuyAndHold
 from .exceptions import BacktestRunError, LongShortLiquidationError, NegativeValueError
+from .utils import is_notebook
 
 try:
-    from IPython import display
     import pylab as pl
     import matplotlib.pyplot as plt
-
     plt_exists = True
 except ImportError:
     plt_exists = False
 
 try:
     from tqdm import tqdm
-
     tqdm_exists = True
 except ImportError:
     tqdm_exists = False
-
 
 class StrategySequence:
     """A sequence of strategies than can be accessed by name or :class:`int` index.\
@@ -110,14 +110,22 @@ def _cls():
     clear_output(wait=True)
     os.system("cls" if os.name == "nt" else "clear")
 
-
 class Position:
-    def __init__(self, bt, symbol, date, event, num_shares):
+    """Tracks a single position in a portfolio or trade history.
+    """
+
+    def __init__(self, bt: "Backtester", symbol: str, date: datetime.date, event: str, num_shares: int, uid: str, slippage: float=None):
         self.symbol = symbol
         self.date = date
         self.event = event
         self.num_shares_int = num_shares
         self.start_price = bt.price(symbol)
+        if slippage is not None:
+            if num_shares < 0:
+                self.start_price *= 1 + slippage
+            if num_shares > 0:
+                self.start_price *= 1 - slippage
+        self._slippage = slippage
         self.bt = bt
         self.frozen = False
         self.df_cols = [
@@ -129,8 +137,11 @@ class Position:
             "profit_loss_pct",
             "price",
         ]
+        self.end_date = None
+        self.end_event = None
+        self.uid = uid
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         t = self.order_type
         result = {
             "symbol": self.symbol,
@@ -146,15 +157,21 @@ class Position:
         return json.dumps(result, sort_keys=True, indent=2)
 
     @property
-    def short(self):
+    def short(self) -> bool:
+        """True if this is a short position.
+        """
         return self.num_shares_int < 0
 
     @property
-    def long(self):
+    def long(self) -> bool:
+        """True if this is a long position.
+        """
         return self.num_shares_int > 0
 
     @property
-    def value(self):
+    def value(self) -> float:
+        """Returns the current market value of the position.
+        """
         if self.short:
             old_val = self.initial_value
             cur_val = self.num_shares * self.price
@@ -163,40 +180,63 @@ class Position:
             return self.num_shares * self.price
 
     @property
-    def price(self):
+    def price(self) -> float:
+        """Returns the current price if the position is held in a portfolio.
+        Returns the last price if the position was liquidated and is part of a trade history.
+        """
         if self.frozen:
-            return self.bt.prices[self.symbol, self.end_date][self.end_event]
+            result = self.bt.prices[self.symbol, self.end_date][self.end_event]
         else:
-            return self.bt.price(self.symbol)
+            result = self.bt.price(self.symbol)
+        if self._slippage is not None:
+            if self.short:
+                result *= 1 - self._slippage
+            if self.long:
+                result *= 1 + self._slippage
+        return result
 
     @property
-    def value_pershare(self):
+    def value_pershare(self) -> float:
+        """Returns the value of the position per share.
+        """
         if self.long:
             return self.price
         if self.short:
             return self.start_price + (self.start_price - self.price)
 
     @property
-    def initial_value(self):
+    def initial_value(self) -> float:
+        """Returns the initial value of the position.
+        """
         if self.short:
             return self.num_shares * self.start_price
         if self.long:
             return self.num_shares * self.start_price
 
     @property
-    def profit_loss_pct(self):
+    def profit_loss_pct(self) -> float:
+        """Returns the profit/loss associated with the position (not including commission)
+        in relative terms.
+        """
         return self.value / self.initial_value - 1
 
     @property
-    def profit_loss_abs(self):
+    def profit_loss_abs(self) -> float:
+        """Returns the profit/loss associated with the position (not including commission)
+        in absolute terms.
+        """
         return self.value - self.initial_value
 
     @property
-    def num_shares(self):
+    def num_shares(self) -> int:
+        """Returns the number of shares in the position.
+        """
         return abs(self.num_shares_int)
 
     @property
-    def order_type(self):
+    def order_type(self) -> str:
+        """Returns "long" or "short" based on the position type.
+        """
         t = None
         if self.short:
             t = "short"
@@ -218,19 +258,25 @@ class Position:
 
 
 class Portfolio(MutableSequence):
+    """A portfolio is a collection of :class:`.Position` objects,
+    and can be used to :meth:`.liquidate` a subset of them.
+    """
+
     def __init__(self, bt, positions: List[Position] = []):
         self.positions = positions
         self.bt = bt
 
     @property
-    def value(self):
+    def value(self) -> float:
+        """Returns the total value of the portfolio.
+        """
         val = 0
         for pos in self.positions:
             val += pos.value
         return val
 
     @property
-    def df(self):
+    def df(self) -> pd.DataFrame:
         pos_dict = {}
         for pos in self.positions:
             for col in pos.df_cols:
@@ -239,10 +285,50 @@ class Portfolio(MutableSequence):
                 pos_dict[col].append(getattr(pos, col))
         return pd.DataFrame(pos_dict)
 
-    def __repr__(self):
-        return self.df.__repr__()
+    def _get_by_uid(self, uid) -> Position:
+        for pos in self.positions:
+            if pos.uid == uid:
+                return pos
 
-    def liquidate(self, num_shares=-1):
+    def __repr__(self) -> str:
+        return self.positions.__repr__()
+
+    def liquidate(self, num_shares:int=-1, _bt: "Backtester"=None):
+        """Liquidate all positions in the current "view" of the portfolio.
+        If no view is given using `['some_ticker']`, :meth:`.filter`,
+        :meth:`.Portfolio.long` or :meth:`.Portfolio.short`,
+        an attempt to liquidate all positions is made.
+
+        Args:
+            num_shares: The number of shares to be liquidated.
+                        This should only be used when a ticker is selected using `['some_ticker']`.
+
+        Examples:
+            Select all `MSFT` positions and liquidate them::
+
+                bt.portfolio['MSFT'].liquidate()
+
+            Liquidate 10 `MSFT` shares::
+
+                bt.portfolio['MSFT'].liquidate(num_shares=10)
+
+            Liquidate all long positions::
+
+                bt.portfolio.long.liquidate()
+
+            Liquidate all positions that have lost more than 5% in value.
+            We can either use :meth:`.filter` or the dataframe as indexer
+            (in this case in combination with the pf shorthand)::
+
+                bt.pf[bt.pf.df['profit_loss_pct'] < -0.05].liquidate()
+                # or
+                bt.pf.filter(lambda x: x.profit_loss_pct < -0.05)
+        """
+        bt = _bt
+        if bt is None:
+            bt = self.bt
+            if bt._slippage is not None:
+                self.liquidate(num_shares, bt.lower_bound)
         is_long = False
         is_short = False
         for pos in self.positions:
@@ -251,27 +337,28 @@ class Portfolio(MutableSequence):
             if pos.short:
                 is_short = True
         if is_long and is_short:
-            self.bt._graceful_stop()
+            bt._graceful_stop()
             raise LongShortLiquidationError(
                 "liquidating a mix of long and short positions is not possible"
             )
         for pos in copy.copy(self.positions):
+            pos = bt.pf._get_by_uid(pos.uid)
             if num_shares == -1 or num_shares >= pos.num_shares:
-                self.bt._available_capital += pos.value
-                if self.bt._available_capital < 0:
-                    self.bt._graceful_stop()
+                bt._available_capital += pos.value
+                if bt._available_capital < 0:
+                    bt._graceful_stop()
                     raise NegativeValueError(
-                        f"Tried to liquidate position resulting in negative capital {self.bt._available_capital}."
+                        f"Tried to liquidate position resulting in negative capital {bt._available_capital}."
                     )
-                self.bt.portfolio._remove(pos)
+                bt.portfolio._remove(pos)
 
                 pos._freeze()
-                self.bt.trades._add(copy.copy(pos))
+                bt.trades._add(copy.copy(pos))
 
                 if num_shares != -1:
                     num_shares -= pos.num_shares
             elif num_shares > 0 and num_shares < pos.num_shares:
-                self.bt._available_capital += pos.value_pershare * num_shares
+                bt._available_capital += pos.value_pershare * num_shares
                 pos._remove_shares(num_shares)
 
                 hist = copy.copy(pos)
@@ -280,7 +367,7 @@ class Portfolio(MutableSequence):
                     hist.num_shares_int = (-1) * num_shares
                 if hist.long:
                     hist.num_shares_int = num_shares
-                self.bt.trades._add(hist)
+                bt.trades._add(hist)
 
                 break
 
@@ -288,7 +375,7 @@ class Portfolio(MutableSequence):
         self.positions.append(position)
 
     def _remove(self, position):
-        self.positions.remove(position)
+        self.positions = [pos for pos in self.positions if pos.uid != position.uid]
 
     @overload
     def __getitem__(self, index: Union[int, slice]):
@@ -392,6 +479,7 @@ class BacktesterBuilder:
         Args:
             name: The strategy name.
         """
+        self = copy.deepcopy(self)
         self.bt.name = name
         return self
 
@@ -402,6 +490,7 @@ class BacktesterBuilder:
         Args:
             amount: The starting balance.
         """
+        self = copy.deepcopy(self)
         self.bt._capital = amount
         self.bt._available_capital = amount
         self.bt._start_capital = amount
@@ -415,6 +504,7 @@ class BacktesterBuilder:
         Args:
             prices: The price provider.
         """
+        self = copy.deepcopy(self)
         self.bt.prices = prices
         self.bt.prices.bt = self.bt
         return self
@@ -425,6 +515,7 @@ class BacktesterBuilder:
         Args:
             data: The data provider.
         """
+        self = copy.deepcopy(self)
         self.bt.data[data.name] = data
         data.bt = self.bt
         return self
@@ -435,10 +526,12 @@ class BacktesterBuilder:
         """**Optional**, set a :class:`.Fee` to be applied when buying shares.
         When not set, :class:`.NoFee` is used.
         """
+        self = copy.deepcopy(self)
         self.bt._trade_cost = trade_cost
         return self
 
     def metrics(self, metrics: Union[Metric, List[Metric]]) -> "BacktesterBuilder":
+        self = copy.deepcopy(self)
         if isinstance(metrics, list):
             for m in metrics:
                 for m in metrics:
@@ -450,16 +543,19 @@ class BacktesterBuilder:
         return self
 
     def clear_metrics(self) -> "BacktesterBuilder":
+        self = copy.deepcopy(self)
         metrics = [PortfolioValue()]
         self.bt.metric = {}
         self.bt.metric(metrics)
         return self
 
     def calendar(self, calendar: str) -> "BacktesterBuilder":
+        self = copy.deepcopy(self)
         self.bt._calendar = calendar
         return self
 
     def live_metrics(self, every: int = 10) -> "BacktesterBuilder":
+        self = copy.deepcopy(self)
         if self.bt._live_plot:
             self.bt._warn.append(
                 """
@@ -473,9 +569,9 @@ class BacktesterBuilder:
         return self
 
     def no_live_metrics(self) -> "BacktesterBuilder":
-        scopy = copy.deepcopy(self)
-        scopy.bt._live_metrics = False
-        return scopy
+        self = copy.deepcopy(self)
+        self.bt._live_metrics = False
+        return self
 
     def live_plot(
         self,
@@ -484,6 +580,7 @@ class BacktesterBuilder:
         figsize: Tuple[float, float] = None,
         min_y: int = 0
     ) -> "BacktesterBuilder":
+        self = copy.deepcopy(self)
         if self.bt._live_metrics:
             self.bt._warn.append(
                 """
@@ -500,19 +597,20 @@ class BacktesterBuilder:
         return self
 
     def no_live_plot(self) -> "BacktesterBuilder":
-        scopy = copy.deepcopy(self)
-        scopy.bt._live_plot = False
-        return scopy
+        self = copy.deepcopy(self)
+        self.bt._live_plot = False
+        return self
 
     def live_progress(self, every: int = 10) -> "BacktesterBuilder":
+        self = copy.deepcopy(self)
         self.bt._live_progress = True
         self.bt._live_progress_every = every
         return self
 
     def no_live_progress(self) -> "BacktesterBuilder":
-        scopy = copy.deepcopy(self)
-        scopy.bt._live_progress = False
-        return scopy
+        self = copy.deepcopy(self)
+        self.bt._live_progress = False
+        return self
 
     def compare(
         self,
@@ -520,6 +618,7 @@ class BacktesterBuilder:
             Union[Callable[["datetime.date", str, "Backtester"], None], Strategy, str]
         ],
     ):
+        self = copy.deepcopy(self)
         return self.strategies(strategies)
 
     def strategies(
@@ -528,6 +627,7 @@ class BacktesterBuilder:
             Union[Callable[["datetime.date", str, "Backtester"], None], Strategy, str]
         ],
     ) -> "BacktesterBuilder":
+        self = copy.deepcopy(self)
         strats = []
         for strat in strategies:
             if isinstance(strat, str):
@@ -538,11 +638,13 @@ class BacktesterBuilder:
         self.bt._has_strategies = True
         return self
 
-    def slippage(self, slippage):
+    def slippage(self, slippage: int=0.0005):
+        self = copy.deepcopy(self)
         self.bt._slippage = slippage
         return self
 
     def build(self) -> "Backtester":
+        self = copy.deepcopy(self)
         self.bt._builder = self
         return copy.deepcopy(self.bt)
 
@@ -586,7 +688,25 @@ class Backtester:
         if self._has_strategies:
             self._set_strategies(self._temp_strategies)
 
+        if self._slippage is not None:
+            self._init_slippage()
+            self._has_strategies = True
+
         return self
+
+    def _init_slippage(self, bt=None):
+        if bt is None:
+            bt = self
+        lower_bound = copy.deepcopy(bt)
+        lower_bound._strategies = []
+        lower_bound._set_self()
+        lower_bound.name += " (lower bound)"
+        lower_bound._has_strategies = False
+        lower_bound._slippage_percent = (-1) * self._slippage
+        self._init_iter(lower_bound)
+        bt.lower_bound = lower_bound
+        bt.lower_bound._slippage = None
+        self._strategies.append(lower_bound)
 
     def __init__(self):
         self.dates = []
@@ -621,6 +741,9 @@ class Backtester:
 
         self._live_plot = False
         self._live_plot_figsize = None
+        self._live_plot_metric = 'Total Value'
+        self._live_plot_figsize = None
+        self._live_plot_min = None
         self._live_metrics = False
         self._live_progress = False
 
@@ -633,6 +756,7 @@ class Backtester:
 
         self._schedule = None
         self._warn = []
+        self._log = []
 
         self._add_metrics = {}
         self._add_metrics_lines = []
@@ -647,6 +771,9 @@ class Backtester:
         self._from_sequence = False
 
         self._slippage = None
+        self._slippage_percent = None
+
+        self._live_plot_axes = None
 
     def _set_self(self, new_self=None):
         if new_self is not None:
@@ -704,8 +831,6 @@ class Backtester:
                             if metric._single:
                                 metric(write=True)
                 self.plot(self._get_bts(), last=True)
-                for w in self._warn:
-                    warn(w)
                 raise StopIteration
         bt._update()
         return bt.current_date, bt.event, bt
@@ -721,6 +846,9 @@ class Backtester:
 
     def add_line(self, **kwargs):
         self._add_metrics_lines.append((self.timestamp, kwargs))
+
+    def log(self, text):
+        self._log.append([self.current_date, self.event, text])
 
     @property
     def timestamp(self):
@@ -789,11 +917,17 @@ class Backtester:
         plot_df = plot_df.set_index("Date")
         plot_add_df = plot_df.copy()
         add_metric_exists = False
+        main_col = []
+        bound_col = []
         for i, bt in enumerate(bts):
             metric = bt.metric[self._live_plot_metric].values
             name = f"Backtest {i}"
             if bt.name is not None:
                 name = bt.name
+            if bt._slippage_percent is not None:
+                bound_col.append(name)
+            else:
+                main_col.append(name)
             plot_df[name] = metric
             for mkey in bt._add_metrics.keys():
                 add_metric = bt._add_metrics[mkey]
@@ -815,7 +949,9 @@ class Backtester:
 
         if self._live_progress:
             axes[0].set_title(str(self._show_live_progress()))
-        plot_df.plot(ax=axes[0])
+        plot_df[main_col].plot(ax=axes[0])
+        for col in main_col:
+            axes[0].fill_between(plot_df.index, plot_df[f'{col} (lower bound)'], plot_df[f'{col}'], alpha=.1)
         if self._live_plot_min is not None:
             axes[0].set_ylim(bottom=self._live_plot_min)
 
@@ -834,9 +970,16 @@ class Backtester:
         else:
             plt.xlim([self.dates[0], self.dates[-1]])
 
-        display.clear_output(wait=True)
+        clear_output(wait=True)
+        
         plt.draw()
         plt.pause(0.001)
+
+        display(HTML(tabulate.tabulate(self._log[-10:], tablefmt='html', headers=['date','event','log'])))
+        if len(self._log) > 10:
+            display(HTML('<i>... 10 logs displayed, all logs stored in Backtester.logs</i>'))
+        for w in self._warn:
+            warn(w)
 
     def _show_live_progress(self):
         _live_progress_pbar.n = self.i + 1
@@ -845,7 +988,27 @@ class Backtester:
     def _update(self):
         for metric in self.metric.values():
             if metric._series:
-                metric(write=True)
+                try:
+                    metric(write=True)
+                except PriceUnavailableError as e:
+                    if self.event == 'close':
+                        self.i -= 2
+                    if self.event == 'open':
+                        self.i -= 1
+
+                    self._warn.append(f"{e.symbol} discontinued on {self.current_date}, liquidating at previous day's {self.event} price")
+
+                    self.current_date = self.dates[(self.i // 2)]
+
+                    self.portfolio[e.symbol].liquidate()
+                    metric(write=True)
+                
+                    if self.event == 'close':
+                        self.i += 2
+                    if self.event == 'open':
+                        self.i += 1
+                    self.current_date = self.dates[(self.i // 2)]
+                    
         self._capital = self._available_capital + self.metric["Portfolio Value"][-1]
 
     def _graceful_stop(self):
@@ -854,8 +1017,13 @@ class Backtester:
         self.plot(self._get_bts(), last=True)
 
     def _order(
-        self, symbol, capital, as_percent=False, as_percent_available=False, shares=None
+        self, symbol, capital, as_percent=False, as_percent_available=False, shares=None, uid=None
     ):
+        if uid is None:
+            uid = uuid.uuid4()
+        if self._slippage is not None:
+            self.lower_bound._order(symbol, capital, as_percent, as_percent_available, shares, uid)
+
         self._capital = self._available_capital + self.metric["Portfolio Value"]()
         if capital < 0:
             short = True
@@ -891,24 +1059,12 @@ class Backtester:
                         """
                     )
         current_price = self.price(symbol)
-        
-        """
-        if self._slippage is not None:
-            self.prices._leak_allowed = True
 
-            today_df = self.prices[symbol, self.current_date]
-
-            if self.event == 'open':
-                next_price = today_df['close']
-                high_low = [today_df['high'], today_df['low']]
-            elif self.event == 'close':
-                tom_df = self.prices[symbol, self.dates[self.i+1 // 2]]
-                next_price = tom_df['open']
-                high_low = [today_df['high'], today_df['low']]
-            current_price = self._slippage(current_price,next_price,high_low)
-
-            self.prices._leak_allowed = False
-        """
+        if self._slippage_percent is not None:
+            if short:
+                current_price *= 1 + self._slippage_percent
+            else:
+                current_price *= 1 - self._slippage_percent
 
         if as_percent:
             capital = capital * self._capital
@@ -928,9 +1084,8 @@ class Backtester:
             num_shares *= -1
         if num_shares != 0:
             self._available_capital -= total
-            self.portfolio._add(
-                Position(self, symbol, self.current_date, self.event, num_shares)
-            )
+            pos = Position(self, symbol, self.current_date, self.event, num_shares, uid, self._slippage_percent)
+            self.portfolio._add(pos)
         else:
             _cls()
             raise Exception(
@@ -940,12 +1095,6 @@ class Backtester:
                 with {symbol} price at {current_price}
                 """
             )
-
-    # def order_pct(self, symbol, capital):
-    #    self._order(symbol, capital, as_percent=True)
-
-    # def order_abs(self, symbol, capital):
-    #    self._order(symbol, capital, as_percent=False)
 
     def long(self, symbol, **kwargs):
         if "percent" in kwargs:
@@ -971,18 +1120,13 @@ class Backtester:
         try:
             price = self.prices[symbol, self.current_date][self.event]
         except KeyError:
-            try:
-                self.prices.rem_cache(symbol)
-                price = self.prices[symbol, self.current_date][self.event]
-            except KeyError:
-                self._graceful_stop()
-                raise PriceUnavailableError(
-                    symbol,
-                    self.current_date,
-                    f"""
-                    Price for {symbol} on {self.current_date} could not be found.
-                    """.strip(),
-                )
+            raise PriceUnavailableError(
+                symbol,
+                self.current_date,
+                f"""
+                Price for {symbol} on {self.current_date} could not be found.
+                """.strip(),
+            )
         if math.isnan(price) or price is None:
             self._graceful_stop()
             raise PriceUnavailableError(
@@ -1078,11 +1222,17 @@ class Backtester:
             new_bt._set_self()
             new_bt.name = strat.name
             new_bt._has_strategies = False
+            if self._slippage is not None:
+                self._init_slippage(new_bt)
             self._init_iter(new_bt)
             self._strategies.append(new_bt)
 
     def _run_once(self):
-        for i, bt in enumerate(self._strategies):
+        no_slip_strats = [strat for strat in self._strategies if strat._slippage_percent is None]
+        slip_strats = [strat for strat in self._strategies if strat._slippage_percent is not None]
+        for bt in slip_strats:
+            self._next_iter(bt)
+        for i, bt in enumerate(no_slip_strats):
             self._strategies_call[i](*self._next_iter(bt))
 
     def plot(self, bts, last=False):
@@ -1102,8 +1252,20 @@ class Backtester:
             ):
                 _cls()
                 print(self._show_live_progress())
+                for l in self._log[-20:]:
+                    print(l)
+                if len(self._log) > 20:
+                    print('... more logs stored in Backtester.logs')
+                for w in self._warn:
+                    warn(w)
         except:
             pass
+
+    @property
+    def logs(self):
+        df = pd.DataFrame(self._logs, columns=['date','event','log'])
+        df = df.set_index(['date', 'event'])
+        return df
 
     def show(self, start=None, end=None):
         bts = self._get_bts()

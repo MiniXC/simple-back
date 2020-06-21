@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "simple-back"
-version = "0.5.1"
+version = "0.5.2"
 description = "A backtester with minimal setup and sensible defaults."
 authors = ["Christoph Minixhofer <christoph.minixhofer@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6.9"
 yahoo_fin = "^0.8.5"
 requests_html = "^0.10.0"
 pandas = "^1.0.3"
@@ -16,6 +16,7 @@ pytz = "^2020.1"
 beautifulsoup4 = "^4.9.1"
 memoization = "^0.3.1"
 pandoc = "^1.0.2"
+tabulate = "^0.8.7"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
