@@ -143,7 +143,7 @@ class MaxDrawdown(SingleMetric):
     def get_value(self, bt):
         highest_peaks = bt.metrics["Total Value"].cummax()
         actual_value = bt.metrics["Total Value"]
-        md = np.min(((actual_value-highest_peaks)/highest_peaks).values)*100
+        md = np.min(((actual_value - highest_peaks) / highest_peaks).values) * 100
         return md
 
 
