@@ -57,3 +57,11 @@ simple\_back.strategy module
    :undoc-members:
    :show-inheritance:
 
+simple\_back.utils module
+-------------------------
+
+.. automodule:: simple_back.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

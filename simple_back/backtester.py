@@ -43,15 +43,18 @@ from .utils import is_notebook
 try:
     import pylab as pl
     import matplotlib.pyplot as plt
+
     plt_exists = True
 except ImportError:
     plt_exists = False
 
 try:
     from tqdm import tqdm
+
     tqdm_exists = True
 except ImportError:
     tqdm_exists = False
+
 
 class StrategySequence:
     """A sequence of strategies than can be accessed by name or :class:`int` index.\
@@ -110,11 +113,21 @@ def _cls():
     clear_output(wait=True)
     os.system("cls" if os.name == "nt" else "clear")
 
+
 class Position:
     """Tracks a single position in a portfolio or trade history.
     """
 
-    def __init__(self, bt: "Backtester", symbol: str, date: datetime.date, event: str, num_shares: int, uid: str, slippage: float=None):
+    def __init__(
+        self,
+        bt: "Backtester",
+        symbol: str,
+        date: datetime.date,
+        event: str,
+        num_shares: int,
+        uid: str,
+        slippage: float = None,
+    ):
         self.symbol = symbol
         self.date = date
         self.event = event
@@ -293,7 +306,7 @@ class Portfolio(MutableSequence):
     def __repr__(self) -> str:
         return self.positions.__repr__()
 
-    def liquidate(self, num_shares:int=-1, _bt: "Backtester"=None):
+    def liquidate(self, num_shares: int = -1, _bt: "Backtester" = None):
         """Liquidate all positions in the current "view" of the portfolio.
         If no view is given using `['some_ticker']`, :meth:`.filter`,
         :meth:`.Portfolio.long` or :meth:`.Portfolio.short`,
@@ -638,7 +651,7 @@ class BacktesterBuilder:
         self.bt._has_strategies = True
         return self
 
-    def slippage(self, slippage: int=0.0005):
+    def slippage(self, slippage: int = 0.0005):
         self = copy.deepcopy(self)
         self.bt._slippage = slippage
         return self
@@ -741,7 +754,7 @@ class Backtester:
 
         self._live_plot = False
         self._live_plot_figsize = None
-        self._live_plot_metric = 'Total Value'
+        self._live_plot_metric = "Total Value"
         self._live_plot_figsize = None
         self._live_plot_min = None
         self._live_metrics = False
@@ -952,7 +965,12 @@ class Backtester:
         plot_df[main_col].plot(ax=axes[0])
         if self._slippage is not None:
             for col in main_col:
-                axes[0].fill_between(plot_df.index, plot_df[f'{col} (lower bound)'], plot_df[f'{col}'], alpha=.1)
+                axes[0].fill_between(
+                    plot_df.index,
+                    plot_df[f"{col} (lower bound)"],
+                    plot_df[f"{col}"],
+                    alpha=0.1,
+                )
         if self._live_plot_min is not None:
             axes[0].set_ylim(bottom=self._live_plot_min)
 
@@ -972,13 +990,21 @@ class Backtester:
             plt.xlim([self.dates[0], self.dates[-1]])
 
         clear_output(wait=True)
-        
+
         plt.draw()
         plt.pause(0.001)
 
-        display(HTML(tabulate.tabulate(self._log[-10:], tablefmt='html', headers=['date','event','log'])))
+        display(
+            HTML(
+                tabulate.tabulate(
+                    self._log[-10:], tablefmt="html", headers=["date", "event", "log"]
+                )
+            )
+        )
         if len(self._log) > 10:
-            display(HTML('<i>... 10 logs displayed, all logs stored in Backtester.logs</i>'))
+            display(
+                HTML("<i>... 10 logs displayed, all logs stored in Backtester.logs</i>")
+            )
         for w in self._warn:
             warn(w)
 
@@ -992,24 +1018,26 @@ class Backtester:
                 try:
                     metric(write=True)
                 except PriceUnavailableError as e:
-                    if self.event == 'close':
+                    if self.event == "close":
                         self.i -= 2
-                    if self.event == 'open':
+                    if self.event == "open":
                         self.i -= 1
 
-                    self._warn.append(f"{e.symbol} discontinued on {self.current_date}, liquidating at previous day's {self.event} price")
+                    self._warn.append(
+                        f"{e.symbol} discontinued on {self.current_date}, liquidating at previous day's {self.event} price"
+                    )
 
                     self.current_date = self.dates[(self.i // 2)]
 
                     self.portfolio[e.symbol].liquidate()
                     metric(write=True)
-                
-                    if self.event == 'close':
+
+                    if self.event == "close":
                         self.i += 2
-                    if self.event == 'open':
+                    if self.event == "open":
                         self.i += 1
                     self.current_date = self.dates[(self.i // 2)]
-                    
+
         self._capital = self._available_capital + self.metric["Portfolio Value"][-1]
 
     def _graceful_stop(self):
@@ -1018,12 +1046,20 @@ class Backtester:
         self.plot(self._get_bts(), last=True)
 
     def _order(
-        self, symbol, capital, as_percent=False, as_percent_available=False, shares=None, uid=None
+        self,
+        symbol,
+        capital,
+        as_percent=False,
+        as_percent_available=False,
+        shares=None,
+        uid=None,
     ):
         if uid is None:
             uid = uuid.uuid4()
         if self._slippage is not None:
-            self.lower_bound._order(symbol, capital, as_percent, as_percent_available, shares, uid)
+            self.lower_bound._order(
+                symbol, capital, as_percent, as_percent_available, shares, uid
+            )
 
         self._capital = self._available_capital + self.metric["Portfolio Value"]()
         if capital < 0:
@@ -1085,7 +1121,15 @@ class Backtester:
             num_shares *= -1
         if num_shares != 0:
             self._available_capital -= total
-            pos = Position(self, symbol, self.current_date, self.event, num_shares, uid, self._slippage_percent)
+            pos = Position(
+                self,
+                symbol,
+                self.current_date,
+                self.event,
+                num_shares,
+                uid,
+                self._slippage_percent,
+            )
             self.portfolio._add(pos)
         else:
             _cls()
@@ -1229,8 +1273,12 @@ class Backtester:
             self._strategies.append(new_bt)
 
     def _run_once(self):
-        no_slip_strats = [strat for strat in self._strategies if strat._slippage_percent is None]
-        slip_strats = [strat for strat in self._strategies if strat._slippage_percent is not None]
+        no_slip_strats = [
+            strat for strat in self._strategies if strat._slippage_percent is None
+        ]
+        slip_strats = [
+            strat for strat in self._strategies if strat._slippage_percent is not None
+        ]
         for bt in slip_strats:
             self._next_iter(bt)
         for i, bt in enumerate(no_slip_strats):
@@ -1256,7 +1304,7 @@ class Backtester:
                 for l in self._log[-20:]:
                     print(l)
                 if len(self._log) > 20:
-                    print('... more logs stored in Backtester.logs')
+                    print("... more logs stored in Backtester.logs")
                 for w in self._warn:
                     warn(w)
         except:
@@ -1264,8 +1312,8 @@ class Backtester:
 
     @property
     def logs(self):
-        df = pd.DataFrame(self._logs, columns=['date','event','log'])
-        df = df.set_index(['date', 'event'])
+        df = pd.DataFrame(self._logs, columns=["date", "event", "log"])
+        df = df.set_index(["date", "event"])
         return df
 
     def show(self, start=None, end=None):
