@@ -15,7 +15,7 @@ readme = ''
 setup(
     long_description=readme,
     name='simple-back',
-    version='0.5.2',
+    version='0.5.3',
     description='A backtester with minimal setup and sensible defaults.',
     python_requires='==3.*,>=3.6.9',
     author='Christoph Minixhofer',
