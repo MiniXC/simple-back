@@ -5,6 +5,7 @@ import pandas as pd
 
 from .exceptions import MissingMetricsError
 
+
 class Metric(ABC):
     @property
     def requires(self) -> Optional[List[type]]:
@@ -133,11 +134,12 @@ class SeriesMetric(Metric):
     def get_value(self, bt):
         pass
 
+
 class MaxDrawdown(SingleMetric):
     @property
     def name(self):
         return "Max Drawdown (%)"
-    
+
     def get_value(self, bt):
         highest_peaks = bt.metrics["Total Value"].cummax()
         actual_value = bt.metrics["Total Value"]
@@ -197,6 +199,7 @@ class TotalValue(SeriesMetric):
     def get_value(self, bt):
         return bt.metric["Portfolio Value"]() + bt._available_capital
 
+
 class TotalReturn(SeriesMetric):
     @property
     def name(self):
@@ -207,4 +210,4 @@ class TotalReturn(SeriesMetric):
         return ["Total Value"]
 
     def get_value(self, bt):
-        return ((bt.metric["Total Value"][-1]/bt.balance.start)-1)*100
+        return ((bt.metric["Total Value"][-1] / bt.balance.start) - 1) * 100

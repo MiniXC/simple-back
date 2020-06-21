@@ -578,7 +578,7 @@ class BacktesterBuilder:
         every: int = 10,
         metric: str = "Total Value",
         figsize: Tuple[float, float] = None,
-        min_y: int = 0
+        min_y: int = 0,
     ) -> "BacktesterBuilder":
         self = copy.deepcopy(self)
         if self.bt._live_metrics:

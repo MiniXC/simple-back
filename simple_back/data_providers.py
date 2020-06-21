@@ -17,6 +17,7 @@ from json import JSONDecodeError
 
 from .exceptions import TimeLeakError, PriceUnavailableError
 
+
 class DataProvider(ABC):
     def __init__(self, debug=False):
         self.current_datetime = pd.Timestamp(
@@ -447,9 +448,9 @@ class YahooFinanceProvider(DailyPriceProvider):
         else:
             df = self.get_cache(symbol)
         if df.isna().any().any():
-            #raise PriceUnavailableError(
+            # raise PriceUnavailableError(
             #    symbol, date, f"Price for {symbol} is nan for some dates."
-            #)
+            # )
             df.dropna(inplace=True, axis=0)
         entry = df.loc[date].copy()
         adj = entry["adjclose"] / entry["close"]
