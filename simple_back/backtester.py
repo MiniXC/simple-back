@@ -964,14 +964,14 @@ class Backtester:
             axes[0].set_title(str(self._show_live_progress()))
         plot_df[main_col].plot(ax=axes[0])
         try:
-        if self._slippage is not None:
-            for col in main_col:
-                axes[0].fill_between(
-                    plot_df.index,
-                    plot_df[f"{col} (lower bound)"],
-                    plot_df[f"{col}"],
-                    alpha=0.1,
-                )
+            if self._slippage is not None:
+                for col in main_col:
+                    axes[0].fill_between(
+                        plot_df.index,
+                        plot_df[f"{col} (lower bound)"],
+                        plot_df[f"{col}"],
+                        alpha=0.1,
+                    )
         except KeyError:
             pass
         if self._live_plot_min is not None:
