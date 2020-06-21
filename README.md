@@ -24,7 +24,7 @@ builder = (
    .calendar('NYSE')
    .compare(['JNUG']) # strategies to compare with
    .live_progress() # show a progress bar
-   .live_plot() # we assume we are running this in a Jupyter Notebook
+   .live_plot(metric='Total Return (%)', min_y=None)  # we assume we are running this in a Jupyter Notebook
 )
 
 bt = builder.build() # build the backtest
