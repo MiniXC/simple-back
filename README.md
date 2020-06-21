@@ -17,7 +17,7 @@ pip install simple_back
 ````python
 from simple_back.backtester import BacktesterBuilder
 
-bt = (
+builder = (
    BacktesterBuilder()
    .name('JNUG 20-Day Crossover')
    .balance(10_000)
@@ -25,24 +25,27 @@ bt = (
    .compare(['JNUG']) # strategies to compare with
    .live_progress() # show a progress bar
    .live_plot() # we assume we are running this in a Jupyter Notebook
-   .build()
 )
+
+bt = builder.build() # build the backtest
 
 for day, event, b in bt['2019-1-1':'2020-1-1']:
     if event == 'open':
         jnug_ma = b.prices['JNUG',-20:]['close'].mean()
+        b.add_metric('Price', b.price('JNUG'))
+        b.add_metric('MA (20 Days)', jnug_ma)
 
         if b.price('JNUG') > jnug_ma:
             if not b.portfolio['JNUG'].long: # check if we already are long JNUG
                 b.portfolio['JNUG'].short.liquidate() # liquidate any/all short JNUG positions
-                b.order_pct('JNUG', 1) # long JNUG
+                b.long('JNUG', percent=1) # long JNUG
 
         if b.price('JNUG') < jnug_ma:
             if not b.portfolio['JNUG'].short: # check if we already are short JNUG
                 b.portfolio['JNUG'].long.liquidate() # liquidate any/all long JNUG positions
-                b.order_pct('JNUG', -1) # short JNUG
+                b.short('JNUG', percent=1) # short JNUG
 ````
-![](https://i.imgur.com/KhZ6f5I.png)
+![](https://i.imgur.com/8wFQ4Gq.png)
 
 ## Why another python backtester?
 There are many backtesters out there, but this is the first one built for rapid prototyping in Jupyter Notebooks.
