@@ -21,13 +21,14 @@ from .exceptions import TimeLeakError, PriceUnavailableError
 def _get_arg_key(self, *args):
     return str(args)
 
+
 class CachedProvider(ABC):
     def __init__(self, debug=False):
         self.cache = dc.Cache(".simple-back")
         self.mem_cache = {}
         self.debug = debug
 
-    def get_key(self, key:str) -> str:
+    def get_key(self, key: str) -> str:
         return str(key) + self.name
 
     def get_cache(self, key):
@@ -70,6 +71,7 @@ class CachedProvider(ABC):
     @abstractmethod
     def name(self):
         pass
+
 
 class DataProvider(CachedProvider):
     def __init__(self, debug=False):
@@ -229,6 +231,7 @@ class SpProvider(WikipediaProvider):
     @property
     def name(self):
         return "S&P"
+
 
 class DailyDataProvider(CachedProvider):
     def __init__(self, debug=False):
