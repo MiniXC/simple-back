@@ -101,7 +101,23 @@ class DataProvider(CachedProvider):
                 resulting in time leak
                 """,
             )
-        return self._get_cached(self.name, date, symbol)
+        if not self.debug:
+            return self._get_cached(self.name, date, symbol)
+        else:
+            return self.get(date, symbol)
+
+    def __call__(self, datetime=None):
+        try:
+            if datetime is None:
+                self.current_datetime = self.bt.timestamp
+            else:
+                self.current_datetime = datetime
+        except AttributeError:
+            pass
+        if not self.debug:
+            return self._get_cached(self.name, self.current_datetime, None)
+        else:
+            return self.get(self.current_datetime, None)
 
     @property
     @abstractmethod
@@ -290,6 +306,10 @@ class DailyDataProvider(CachedProvider):
             max_order = self._get_order(self.current_event)
         return max_order
 
+    def set_date_event(self, date, event):
+        self.current_date = date
+        self.current_event = event
+
     def __getitem__(
         self,
         symbol_date_event: Union[
@@ -359,6 +379,8 @@ class DailyDataProvider(CachedProvider):
                     )
                 if isinstance(date.start, int) and date.start <= 0:
                     stop_date = date.stop
+                    if isinstance(stop_date, slice):
+                        stop_date = stop_date.stop
                     if isinstance(stop_date, str):
                         stop_date = pd.to_datetime(stop_date)
                     date = slice(
@@ -366,14 +388,17 @@ class DailyDataProvider(CachedProvider):
                         date.stop,
                         date.step,
                     )
-        data = self._get_cached(symbol, date, event)
+        if not self.debug:
+            data = self._get_cached(self.name, symbol, date, event)
+        else:
+            data = self.get(symbol, date, event)
         if self._leak_allowed:
             return data
         return self._remove_leaky_vals(data, event, date)
 
     @cached(thread_safe=False, custom_key_maker=_get_arg_key)
     def _get_cached(self, *args) -> pd.DataFrame:
-        return self.get(args[0], args[1], args[2])
+        return self.get(args[1], args[2], args[3])
 
     @abstractmethod
     def get(
@@ -393,9 +418,9 @@ class DailyDataProvider(CachedProvider):
 
 
 class DailyPriceProvider(DailyDataProvider):
-    def __init__(self, highlow=True):
+    def __init__(self, highlow=True, debug=False):
         self.highlow = highlow
-        super().__init__()
+        super().__init__(debug=debug)
 
     @property
     def columns(self):
@@ -419,10 +444,10 @@ class DailyPriceProvider(DailyDataProvider):
 
 
 class YahooFinanceProvider(DailyPriceProvider):
-    def __init__(self, highlow=False, adjust_prices=True):
+    def __init__(self, highlow=False, adjust_prices=True, debug=False):
         self.adjust_prices = adjust_prices
         self.highlow = highlow
-        super().__init__()
+        super().__init__(debug=debug)
 
     @property
     def name(self):

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Kaggle: Your Home for Data Science</title>
+    <meta charset="utf-8" />
+    <meta name="robots" content="index, follow" />
+    <meta name="description" content="Kaggle is the world&#x2019;s largest data science community with powerful tools and resources to help you achieve your data science goals." />
+    <meta name="turbolinks-cache-control" content="no-cache" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0">
+    <meta name="theme-color" content="#008ABC" />
+    <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" type="text/javascript">
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations()
+                .then(function(registrations) {
+                    for (let registration of registrations) {
+                        registration.unregister();
+                    }
+                })
+                .catch(function(err) {
+                    console.error("Service worker unregister failed: ", err);
+                });
+        }
+    </script>
+    <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" type="text/javascript">
+        window["pageRequestStartTime"] = 1592751478530;
+        window["pageRequestEndTime"] = 1592751478533;
+        window["initialPageLoadStartTime"] = new Date().getTime();
+    </script>
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin="anonymous" /><link rel="preconnect" href="https://stats.g.doubleclick.net" /><link rel="preconnect" href="https://js.intercomcdn.com" /><link rel="preconnect" href="https://storage.googleapis.com" /><link rel="preconnect" href="https://apis.google.com" /><link rel="preload" href="/static/assets/fontawesome-webfont.woff2" as="font" crossorigin="anonymous" />
+    <link href="/static/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link rel="manifest" href="/static/json/manifest.json" crossorigin="use-credentials">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic" rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/icon?family=Google+Material+Icons" rel="stylesheet" type='text/css' />
+        <link rel="stylesheet" type="text/css" href="/static/assets/vendor.css?v=11a68b8f662293f66555" />
+        <link rel="stylesheet" type="text/css" href="/static/assets/app.css?v=0d47ab4de16db6d151f0" />
+    
+    
+ 
+    
+    <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==">
+        try{(function(a,s,y,n,c,h,i,d,e){d=s.createElement("style");
+        d.appendChild(s.createTextNode(""));s.head.appendChild(d);d=d.sheet;
+        y=y.map(x => d.insertRule(x + "{ opacity: 0 !important }"));
+        h.start=1*new Date;h.end=i=function(){y.forEach(x => x<d.cssRules.length ? d.deleteRule(x) : {})};
+        (a[n]=a[n]||[]).hide=h;setTimeout(function(){i();h.end=null},c);h.timeout=c;
+        })(window,document,['.site-header-react__nav'],'dataLayer',2000,{'GTM-52LNT9S':true});}catch(ex){}
+    </script>
+    <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==">
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-12629138-1', {
+            'optimize_id': 'GTM-52LNT9S',
+            'displayFeaturesTask': null,
+            'send_page_view': false,
+            'content_group1': 'Account'
+        });
+    </script>
+    <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" async src="https://www.googletagmanager.com/gtag/js?id=UA-12629138-1"></script>
+
+    
+    
+
+    
+    
+
+    
+    
+    
+<script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" type="text/javascript">
+    var Kaggle = window.Kaggle || {};
+
+    Kaggle.Current = {
+        antiForgeryToken: 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL8zV8Z_Hv0OjTrQTlvnwp3-nVqFubK0om4vnVUMVPE0wuV1IvNFY4xbwKQoAtdvk0Wfxu7LsIEknsTMIl6oVWsNY7gQ3D3eN9eVLzjxaJ07O_tFSGHZ6CiCTzabtpscu50',
+        isAnonymous: true,
+        analyticsToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTI3NTIzNzgsIlVzZXJJZCI6MH0.vB-LTzaOwMluRxwSqm6cXBnjXvBtT4AH6JnjpFAjasg',
+        analyticsTokenExpiry: 15,
+        
+        
+        
+        
+        
+        
+        mdeImageUploader: true,
+        
+        enableRapidash: true, 
+    }
+        Kaggle.Current.log = function(){};
+        Kaggle.Current.warn = function(){};
+
+    var decodeUserDisplayName = function () {
+        var escapedUserDisplayName = Kaggle.Current.userDisplayNameEscaped || "";
+        try {
+            var textVersion = new DOMParser().parseFromString(escapedUserDisplayName, "text/html").documentElement.textContent;
+            if (textVersion) {
+                return textVersion;
+            }
+        } catch(ex) {}
+        return escapedUserDisplayName;
+    }
+    Kaggle.Current.userDisplayName = decodeUserDisplayName();
+</script>
+
+    
+
+<script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" type="text/javascript">
+    var Kaggle = window.Kaggle || {};
+    Kaggle.PageMessages = [];
+</script>
+
+        <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" type="text/javascript">
+/* <![CDATA[ */
+goog_snippet_vars = function() {
+    var w = window;
+    w.google_conversion_id = 955616553;
+    w.google_conversion_label = "QSjvCKDksHMQqZrWxwM";
+    w.google_conversion_value = 0.00;
+    w.google_conversion_currency = "USD";
+    w.google_remarketing_only = false;
+    w.google_conversion_language = "en";
+    w.google_conversion_format = "3";
+    w.google_conversion_color = "ffffff";
+}
+// DO NOT CHANGE THE CODE BELOW.
+goog_report_conversion = function(url) {
+    goog_snippet_vars();
+    window.google_conversion_format = "3";
+    var opt = new Object();
+    opt.onload_callback = function() {
+        if (typeof(url) != 'undefined') {
+            window.location = url;
+        }
+    }
+    var conv_handler = window['google_trackConversion'];
+    if (typeof(conv_handler) == 'function') {
+        conv_handler(opt);
+    }
+}
+/* ]]> */
+    </script>
+    <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" type="text/javascript"
+            src="//www.googleadservices.com/pagead/conversion_async.js">
+    </script>
+
+
+
+        <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==">window['useKaggleAnalytics'] = true;</script>
+
+    <script id="gapi-target" nonce="EvDrUsOG4Vh6f3H19TfA8Q==" src="https://apis.google.com/js/api.js" defer async></script>
+    <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" src="/static/assets/runtime.js?v=dada8271295533bd78cf" data-turbolinks-track="reload"></script>
+    <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" src="/static/assets/vendor.js?v=c128d38af727350a8b5b" data-turbolinks-track="reload"></script>
+    <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" src="/static/assets/app.js?v=4f09196a1e2f131fc53e" data-turbolinks-track="reload"></script>
+        <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" defer src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@0.7.0/dist/stackdriver-errors-concat.min.js"></script>
+        <script nonce="EvDrUsOG4Vh6f3H19TfA8Q==" type="text/javascript">
+            function shouldFilterStackdriverError(message) {
+                if (message &&
+                    /\[ResponseMiddlewares.enforceOk\] response was not ok \| (429|404)/.test(message)) {
+                    return true;
+                }
+                if (!window.navigator || !window.navigator.userAgent ||
+                    window.navigator.userAgent.toLowerCase().indexOf("bot") > -1) {
+                    return true;
+                }
+                return false;
+            }
+
+            window.addEventListener('DOMContentLoaded', function () {
+                var errorHandler = new StackdriverErrorReporter();
+                errorHandler.start({
+                    key: 'AIzaSyDANGXFHtSIVc51MIdGwg4mQFgm3oNrKoo',
+                    projectId: 'kaggle-161607',
+                    service: 'web-fe',
+                    version: 'ci',
+                    context: {
+                        user: '0',
+                    },
+                });
+                let sdErrorHandler = window.onerror;
+                window.onerror = function(message, source, lineno, colno, error) {
+                    if (error && shouldFilterStackdriverError(error.message)) {
+                        return true;
+                    }
+                    return sdErrorHandler(message, source, lineno, colno, error);
+                };
+                let sdUnhandledRejectionHandler = window.onunhandledrejection;
+                window.onunhandledrejection = function(e) {
+                    e.preventDefault();
+                    if (shouldFilterStackdriverError(e.reason)) {
+                        return true;
+                    }
+                    return sdUnhandledRejectionHandler(e);
+                };
+            });
+        </script>
+</head>
+<body data-turbolinks="false">
+    <main>
+        
+
+
+
+
+
+
+<div id="site-container"></div>
+
+<div id="site-body" class="hide">
+    
+
+<div data-component-name="LoginRegisterPage" style="display: flex; flex-direction: column; flex: 1 0 auto;"></div><script class="kaggle-component" nonce="EvDrUsOG4Vh6f3H19TfA8Q==">var Kaggle=window.Kaggle||{};Kaggle.State=Kaggle.State||[];Kaggle.State.push({});performance && performance.mark && performance.mark("LoginRegisterPage.componentCouldBootstrap");</script>
+
+</div>
+
+
+
+
+    </main>
+</body>
+</html>

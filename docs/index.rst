@@ -44,6 +44,10 @@ Build and test a simple strategy using simple-back.
 ----------------------
 Visualize and improve your strategy.
 
+:doc:`intro/slippage`
+---------------------
+Move from stateless iterators to stateful strategy objects and configure slippage.
+
 :doc:`intro/example`
 --------------------
 Just copy example code and get started yourself.
