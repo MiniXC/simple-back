@@ -57,15 +57,14 @@ except ImportError:
 
 # from https://stackoverflow.com/a/44923103, https://stackoverflow.com/a/50899244
 def display_side_by_side(bts):
-    html_str = ''
+    html_str = ""
     for bt in bts:
-        styler = (
-            bt.logs.style
-            .set_table_attributes("style='display:inline'")
-            .set_caption(bt.name)
-        )
+        styler = bt.logs.style.set_table_attributes(
+            "style='display:inline'"
+        ).set_caption(bt.name)
         html_str += styler._repr_html_()
     display_html(html_str, raw=True)
+
 
 class StrategySequence:
     """A sequence of strategies than can be accessed by name or :class:`int` index.\
@@ -1375,6 +1374,7 @@ class Backtester:
 
                 bt.balance.start
         """
+
         @dataclass
         class Balance:
             start: float = self._start_capital
