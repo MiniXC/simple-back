@@ -6,6 +6,7 @@
 ![pylint](simple_back.svg)
 [![Documentation Status](https://readthedocs.org/projects/simple-back/badge/?version=latest)](https://minixc.github.io/simple-back)
 
+## [Documentation](https://minixc.github.io/simple-back)
 
 ## Installation
 ````
