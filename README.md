@@ -48,7 +48,7 @@ for day, event, b in bt['2019-1-1':'2020-1-1']:
 ````
 ![](https://i.imgur.com/8wFQ4Gq.png)
 
-## Why another python backtester?
+## Why another Python backtester?
 There are many backtesters out there, but this is the first one built for rapid prototyping in Jupyter Notebooks.
 
 ### Built for Jupyter Notebooks
