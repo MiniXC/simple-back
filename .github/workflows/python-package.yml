@@ -30,7 +30,7 @@ jobs:
     - name: install pandoc
       run: sudo apt-get install -y pandoc
     - name: generate sphinx doc
-      run: cd docs && mkdir -p docs/_build/html && touch docs/_build/html/.nojekyll && poetry run make html
+      run: cd docs && mkdir -p _build/html && touch _build/html/.nojekyll && poetry run make html
     - name: Deploy to GitHub Pages
       uses: crazy-max/ghaction-github-pages@v2
       with:
