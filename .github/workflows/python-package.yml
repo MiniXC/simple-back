@@ -27,8 +27,8 @@ jobs:
       run: poetry run python -m dephell convert
     - name: generate api doc
       run: sphinx-apidoc -M -T -f -o docs/api simple_back
-    - name: install pandoc
-      run: sudo apt-get install -y pandoc
+    - name: install pandoc & python3-sphinx
+      run: sudo apt-get install -y pandoc && sudo apt-get install -y python3-sphinx
     - name: generate sphinx doc
       run: cd docs && mkdir -p _build/html && touch _build/html/.nojekyll && poetry run make html
     - name: Deploy to GitHub Pages
