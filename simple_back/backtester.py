@@ -840,7 +840,7 @@ class Backtester:
         lower_bound._has_strategies = False
         lower_bound._slippage_percent = (-1) * self._slippage
         lower_bound._slippage = None
-        self._init_iter(lower_bound)
+        lower_bound._init_iter(lower_bound)
         bt.lower_bound = lower_bound
         self._strategies.append(lower_bound)
 
@@ -886,7 +886,7 @@ class Backtester:
         self._strategies = []
         self._temp_strategies = []
         self._has_strategies = False
-        self.name = None
+        self.name = "Backtest"
 
         self._no_iter = False
 
@@ -941,8 +941,8 @@ class Backtester:
         if self._live_progress:
             _live_progress_pbar = tqdm(total=len(self))
             _cls()
-        if self._slippage is not None and not self.name is None:
-            self._init_slippage()
+        if self._slippage is not None and not self._no_iter:
+            self._init_slippage(self)
             self._has_strategies = True
         return self
 
@@ -1469,7 +1469,13 @@ class Backtester:
             new_bt._has_strategies = False
             if self._slippage is not None:
                 self._init_slippage(new_bt)
+                
+            # this is bad but not bad enough to
+            # do anything other than this hotfix
+            self._no_iter = True
             self._init_iter(new_bt)
+            self._no_iter = False
+
             self._strategies.append(new_bt)
 
     def _run_once(self):
@@ -1496,7 +1502,7 @@ class Backtester:
                     self._show_live_plot(bts)
             if self._live_metrics and (self.i % self._live_metrics_every == 0 or last):
                 self._show_live_metrics(bts)
-            if not (self._live_metrics or self._live_plot) and (
+            if not (self._live_metrics or self._live_plot) and self._live_progress and (
                 self.i % self._live_progress_every == 0 or last
             ):
                 _cls()
@@ -1537,8 +1543,8 @@ class Backtester:
         """Run the backtesters strategies without using an iterator.
         This is only possible if strategies have been set using :meth:`.BacktesterBuilder.strategies`.
         """
-        self._init_iter()
         self._no_iter = True
+        self._init_iter()
 
         for _ in range(len(self)):
             self._run_once()

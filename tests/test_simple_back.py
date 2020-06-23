@@ -3,7 +3,7 @@ from simple_back.backtester import BacktesterBuilder
 
 
 def test_version():
-    assert __version__ == "0.5.5"
+    assert __version__ == "0.6.0"
 
 
 def test_compare_quantopian():

@@ -6,6 +6,7 @@ class Strategy(ABC):
         self.run(day, event, bt)
 
     @property
+    @abstractmethod
     def name(self):
         return None
 
