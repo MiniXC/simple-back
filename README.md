@@ -4,7 +4,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![codecov](https://codecov.io/gh/MiniXC/simple-back/branch/master/graph/badge.svg)](https://codecov.io/gh/MiniXC/simple-back)
 ![pylint](simple_back.svg)
-[![Documentation Status](https://readthedocs.org/projects/simple-back/badge/?version=latest)](https://simple-back.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/simple-back/badge/?version=latest)](https://minixc.github.io/simple-back)
 
 
 ## Installation
@@ -12,7 +12,7 @@
 pip install simple_back
 ````
 ## Quickstart
-> The following is a simple crossover strategy. For a full tutorial on how to build a strategy using **simple-back**, visit [the quickstart tutorial](https://simple-back.readthedocs.io/en/latest/intro/quickstart.html)
+> The following is a simple crossover strategy. For a full tutorial on how to build a strategy using **simple-back**, visit [the quickstart tutorial](https://minixc.github.io/simple-back/intro/quickstart.html)
 
 ````python
 from simple_back.backtester import BacktesterBuilder
