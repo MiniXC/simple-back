@@ -1469,7 +1469,7 @@ class Backtester:
             new_bt._has_strategies = False
             if self._slippage is not None:
                 self._init_slippage(new_bt)
-                
+
             # this is bad but not bad enough to
             # do anything other than this hotfix
             self._no_iter = True
@@ -1502,8 +1502,10 @@ class Backtester:
                     self._show_live_plot(bts)
             if self._live_metrics and (self.i % self._live_metrics_every == 0 or last):
                 self._show_live_metrics(bts)
-            if not (self._live_metrics or self._live_plot) and self._live_progress and (
-                self.i % self._live_progress_every == 0 or last
+            if (
+                not (self._live_metrics or self._live_plot)
+                and self._live_progress
+                and (self.i % self._live_progress_every == 0 or last)
             ):
                 _cls()
                 print(self._show_live_progress())
