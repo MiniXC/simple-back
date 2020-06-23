@@ -62,6 +62,13 @@ Just copy example code and get started yourself.
    intro/slippage
    intro/example
 
+.. toctree::
+   :maxdepth: 5
+   :caption: Advanced
+   :hidden:
+
+   adv/data_sources
+
 ..
    intro/strategies
    intro/data
