@@ -27,6 +27,15 @@ jobs:
       run: poetry run python -m dephell convert
     - name: generate api doc
       run: sphinx-apidoc -M -T -f -o docs/api simple_back
+    - name: generate sphinx doc
+      run: cd docs && poetry run make html
+    - name: Deploy to GitHub Pages
+      uses: crazy-max/ghaction-github-pages@v2
+      with:
+        target_branch: gh-pages
+        build_dir: docs/_build
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Git Auto Commit
       uses: stefanzweifel/git-auto-commit-action@v4.3.0
       with:
