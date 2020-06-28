@@ -36,6 +36,10 @@ while your backtests are being run.
 Getting Started
 ===============
 
+.. note::
+    **simple-back** uses [matplotlib](https://matplotlib.org/) for live plotting.
+    Make sure to install matplotlib using `pip install matplotlib` if you want to use live plotting.
+
 :doc:`intro/quickstart`
 -----------------------
 Build and test a simple strategy using simple-back.
@@ -51,6 +55,15 @@ Move from stateless iterators to stateful strategy objects and configure slippag
 :doc:`intro/example`
 --------------------
 Just copy example code and get started yourself.
+
+Advanced
+========
+
+:doc:`adv/data_sources`
+-----------------------
+Use text data and machine learning to predict stock prices.
+The api used for this tutorial will change in version **0.7**.
+
 
 .. toctree::
    :maxdepth: 5
