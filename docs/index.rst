@@ -37,8 +37,11 @@ Getting Started
 ===============
 
 .. note::
-    **simple-back** uses [matplotlib](https://matplotlib.org/) for live plotting.
+    **simple-back** uses `matplotlib`_ for live plotting.
     Make sure to install matplotlib using `pip install matplotlib` if you want to use live plotting.
+    
+.. _matplotlib:
+   https://matplotlib.org/
 
 :doc:`intro/quickstart`
 -----------------------
