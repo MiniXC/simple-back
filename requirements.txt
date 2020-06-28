@@ -37,9 +37,9 @@ docutils==0.16
 entrypoints==0.3
 fake-useragent==0.1.11
 flake8==3.8.3
-idna==2.9
+idna==2.10
 imagesize==1.2.0
-ipython==7.15.0
+ipython==7.16.1
 ipython-genutils==0.2.0
 isort==4.3.21
 jedi==0.17.1
