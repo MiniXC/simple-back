@@ -46,8 +46,6 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib
     plt_exists = True
-    if not is_notebook():
-        matplotlib.use('Qt4Agg', warn=False, force=True)
 except ImportError:
     plt_exists = False
 
