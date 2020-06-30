@@ -134,19 +134,19 @@ class Position:
         symbol: str,
         date: datetime.date,
         event: str,
-        num_shares: int,
+        nshares: int,
         uid: str,
         slippage: float = None,
     ):
         self.symbol = symbol
         self.date = date
         self.event = event
-        self.num_shares_int = num_shares
+        self.nshares_int = nshares
         self.start_price = bt.price(symbol)
         if slippage is not None:
-            if num_shares < 0:
+            if nshares < 0:
                 self.start_price *= 1 + slippage
-            if num_shares > 0:
+            if nshares > 0:
                 self.start_price *= 1 - slippage
         self._slippage = slippage
         self.bt = bt
@@ -170,7 +170,7 @@ class Position:
             "symbol": self.symbol,
             "date & event": str(self.date) + " " + self.event,
             "type": t,
-            "shares": self.num_shares,
+            "shares": self.nshares,
             "profit/loss (abs)": f"{self.profit_loss_abs:.2f}",
             "profit/loss (%)": f"{self.profit_loss_pct:.2f}",
             "price": f"{self.price:.2f}",
@@ -183,13 +183,13 @@ class Position:
     def short(self) -> bool:
         """True if this is a short position.
         """
-        return self.num_shares_int < 0
+        return self.nshares_int < 0
 
     @property
     def long(self) -> bool:
         """True if this is a long position.
         """
-        return self.num_shares_int > 0
+        return self.nshares_int > 0
 
     @property
     def value(self) -> float:
@@ -197,10 +197,10 @@ class Position:
         """
         if self.short:
             old_val = self.initial_value
-            cur_val = self.num_shares * self.price
+            cur_val = self.nshares * self.price
             return old_val + (old_val - cur_val)
         if self.long:
-            return self.num_shares * self.price
+            return self.nshares * self.price
 
     @property
     def price(self) -> float:
@@ -232,9 +232,9 @@ class Position:
         """Returns the initial value of the position.
         """
         if self.short:
-            return self.num_shares * self.start_price
+            return self.nshares * self.start_price
         if self.long:
-            return self.num_shares * self.start_price
+            return self.nshares * self.start_price
 
     @property
     def profit_loss_pct(self) -> float:
@@ -251,10 +251,10 @@ class Position:
         return self.value - self.initial_value
 
     @property
-    def num_shares(self) -> int:
+    def nshares(self) -> int:
         """Returns the number of shares in the position.
         """
-        return abs(self.num_shares_int)
+        return abs(self.nshares_int)
 
     @property
     def order_type(self) -> str:
@@ -269,9 +269,9 @@ class Position:
 
     def _remove_shares(self, n):
         if self.short:
-            self.num_shares_int += n
+            self.nshares_int += n
         if self.long:
-            self.num_shares_int -= n
+            self.nshares_int -= n
 
     def _freeze(self):
         self.frozen = True
@@ -316,14 +316,14 @@ class Portfolio(MutableSequence):
     def __repr__(self) -> str:
         return self.positions.__repr__()
 
-    def liquidate(self, num_shares: int = -1, _bt: "Backtester" = None):
+    def liquidate(self, nshares: int = -1, _bt: "Backtester" = None):
         """Liquidate all positions in the current "view" of the portfolio.
         If no view is given using `['some_ticker']`, :meth:`.filter`,
         :meth:`.Portfolio.long` or :meth:`.Portfolio.short`,
         an attempt to liquidate all positions is made.
 
         Args:
-            num_shares:
+            nshares:
                 The number of shares to be liquidated.
                 This should only be used when a ticker is selected using `['some_ticker']`.
 
@@ -334,7 +334,7 @@ class Portfolio(MutableSequence):
 
             Liquidate 10 `MSFT` shares::
 
-                bt.portfolio['MSFT'].liquidate(num_shares=10)
+                bt.portfolio['MSFT'].liquidate(nshares=10)
 
             Liquidate all long positions::
 
@@ -352,7 +352,7 @@ class Portfolio(MutableSequence):
         if bt is None:
             bt = self.bt
             if bt._slippage is not None:
-                self.liquidate(num_shares, bt.lower_bound)
+                self.liquidate(nshares, bt.lower_bound)
         is_long = False
         is_short = False
         for pos in self.positions:
@@ -367,7 +367,7 @@ class Portfolio(MutableSequence):
             )
         for pos in copy.copy(self.positions):
             pos = bt.pf._get_by_uid(pos.uid)
-            if num_shares == -1 or num_shares >= pos.num_shares:
+            if nshares == -1 or nshares >= pos.nshares:
                 bt._available_capital += pos.value
                 if bt._available_capital < 0:
                     bt._graceful_stop()
@@ -379,18 +379,18 @@ class Portfolio(MutableSequence):
                 pos._freeze()
                 bt.trades._add(copy.copy(pos))
 
-                if num_shares != -1:
-                    num_shares -= pos.num_shares
-            elif num_shares > 0 and num_shares < pos.num_shares:
-                bt._available_capital += pos.value_pershare * num_shares
-                pos._remove_shares(num_shares)
+                if nshares != -1:
+                    nshares -= pos.nshares
+            elif nshares > 0 and nshares < pos.nshares:
+                bt._available_capital += pos.value_pershare * nshares
+                pos._remove_shares(nshares)
 
                 hist = copy.copy(pos)
                 hist._freeze()
                 if hist.short:
-                    hist.num_shares_int = (-1) * num_shares
+                    hist.nshares_int = (-1) * nshares
                 if hist.long:
-                    hist.num_shares_int = num_shares
+                    hist.nshares_int = nshares
                 bt.trades._add(hist)
 
                 break
@@ -1259,24 +1259,24 @@ class Backtester:
             capital = capital * self._available_capital
         try:
             if shares is None:
-                num_shares, total = self._trade_cost(current_price, capital)
+                nshares, total = self._trade_cost(current_price, capital)
             else:
-                num_shares, total = self._trade_cost(
-                    current_price, self._available_capital, num_shares=shares
+                nshares, total = self._trade_cost(
+                    current_price, self._available_capital, nshares=shares
                 )
         except Exception as e:
             self._graceful_stop()
             raise e
         if short:
-            num_shares *= -1
-        if num_shares != 0:
+            nshares *= -1
+        if nshares != 0:
             self._available_capital -= total
             pos = Position(
                 self,
                 symbol,
                 self.current_date,
                 self.event,
-                num_shares,
+                nshares,
                 uid,
                 self._slippage_percent,
             )
