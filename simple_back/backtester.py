@@ -136,7 +136,7 @@ class Position:
         self.symbol = symbol
         self.date = date
         self.event = event
-        self.nshares_int = nshares
+        self._nshares_int = nshares
         self.start_price = bt.price(symbol)
         if slippage is not None:
             if nshares < 0:
@@ -144,57 +144,44 @@ class Position:
             if nshares > 0:
                 self.start_price *= 1 - slippage
         self._slippage = slippage
-        self.bt = bt
-        self.frozen = False
-        self.df_cols = [
-            "symbol",
-            "date",
-            "event",
-            "order_type",
-            "profit_loss_abs",
-            "profit_loss_pct",
-            "price",
-        ]
-        self.end_date = None
-        self.end_event = None
-        self.uid = uid
+        self._bt = bt
+        self._frozen = False
+        self._uid = uid
+
+    def _attr(self):
+        return [attr for attr in dir(self) if not attr.startswith('_')]
 
     def __repr__(self) -> str:
-        t = self.order_type
-        result = {
-            "symbol": self.symbol,
-            "date & event": str(self.date) + " " + self.event,
-            "type": t,
-            "shares": self.nshares,
-            "profit/loss (abs)": f"{self.profit_loss_abs:.2f}",
-            "profit/loss (%)": f"{self.profit_loss_pct:.2f}",
-            "price": f"{self.price:.2f}",
-        }
-        if self.frozen:
-            result["end date & event"] = str(self.end_date) + " " + self.end_event
+        result = {}
+        for attr in self._attr():
+            val = getattr(self, attr)
+            if isinstance(val, float):
+                result[attr] = f"{val:.2f}"
+            else:
+                result[attr] = str(val)
         return json.dumps(result, sort_keys=True, indent=2)
 
     @property
-    def short(self) -> bool:
+    def _short(self) -> bool:
         """True if this is a short position.
         """
-        return self.nshares_int < 0
+        return self._nshares_int < 0
 
     @property
-    def long(self) -> bool:
+    def _long(self) -> bool:
         """True if this is a long position.
         """
-        return self.nshares_int > 0
+        return self._nshares_int > 0
 
     @property
     def value(self) -> float:
         """Returns the current market value of the position.
         """
-        if self.short:
+        if self._short:
             old_val = self.initial_value
             cur_val = self.nshares * self.price
             return old_val + (old_val - cur_val)
-        if self.long:
+        if self._long:
             return self.nshares * self.price
 
     @property
@@ -202,14 +189,14 @@ class Position:
         """Returns the current price if the position is held in a portfolio.
         Returns the last price if the position was liquidated and is part of a trade history.
         """
-        if self.frozen:
-            result = self.bt.prices[self.symbol, self.end_date][self.end_event]
+        if self._frozen:
+            result = self._bt.prices[self.symbol, self.end_date][self.end_event]
         else:
-            result = self.bt.price(self.symbol)
+            result = self._bt.price(self.symbol)
         if self._slippage is not None:
-            if self.short:
+            if self._short:
                 result *= 1 - self._slippage
-            if self.long:
+            if self._long:
                 result *= 1 + self._slippage
         return result
 
@@ -217,18 +204,18 @@ class Position:
     def value_pershare(self) -> float:
         """Returns the value of the position per share.
         """
-        if self.long:
+        if self._long:
             return self.price
-        if self.short:
+        if self._short:
             return self.start_price + (self.start_price - self.price)
 
     @property
     def initial_value(self) -> float:
         """Returns the initial value of the position.
         """
-        if self.short:
+        if self._short:
             return self.nshares * self.start_price
-        if self.long:
+        if self._long:
             return self.nshares * self.start_price
 
     @property
@@ -249,30 +236,29 @@ class Position:
     def nshares(self) -> int:
         """Returns the number of shares in the position.
         """
-        return abs(self.nshares_int)
+        return abs(self._nshares_int)
 
     @property
     def order_type(self) -> str:
         """Returns "long" or "short" based on the position type.
         """
         t = None
-        if self.short:
+        if self._short:
             t = "short"
-        if self.long:
+        if self._long:
             t = "long"
         return t
 
     def _remove_shares(self, n):
-        if self.short:
-            self.nshares_int += n
-        if self.long:
-            self.nshares_int -= n
+        if self._short:
+            self._nshares_int += n
+        if self._long:
+            self._nshares_int -= n
 
     def _freeze(self):
-        self.frozen = True
-        self.end_date = self.bt.current_date
-        self.end_event = self.bt.event
-        self.df_cols += ["start_price", "end_date", "end_event"]
+        self._frozen = True
+        self.end_date = self._bt.current_date
+        self.end_event = self._bt.event
 
 
 class Portfolio(MutableSequence):
@@ -285,7 +271,7 @@ class Portfolio(MutableSequence):
         self.bt = bt
 
     @property
-    def value(self) -> float:
+    def total_value(self) -> float:
         """Returns the total value of the portfolio.
         """
         val = 0
@@ -297,7 +283,7 @@ class Portfolio(MutableSequence):
     def df(self) -> pd.DataFrame:
         pos_dict = {}
         for pos in self.positions:
-            for col in pos.df_cols:
+            for col in pos._attr():
                 if col not in pos_dict:
                     pos_dict[col] = []
                 pos_dict[col].append(getattr(pos, col))
@@ -305,7 +291,7 @@ class Portfolio(MutableSequence):
 
     def _get_by_uid(self, uid) -> Position:
         for pos in self.positions:
-            if pos.uid == uid:
+            if pos._uid == uid:
                 return pos
 
     def __repr__(self) -> str:
@@ -351,9 +337,9 @@ class Portfolio(MutableSequence):
         is_long = False
         is_short = False
         for pos in self.positions:
-            if pos.long:
+            if pos._long:
                 is_long = True
-            if pos.short:
+            if pos._short:
                 is_short = True
         if is_long and is_short:
             bt._graceful_stop()
@@ -361,7 +347,7 @@ class Portfolio(MutableSequence):
                 "liquidating a mix of long and short positions is not possible"
             )
         for pos in copy.copy(self.positions):
-            pos = bt.pf._get_by_uid(pos.uid)
+            pos = bt.pf._get_by_uid(pos._uid)
             if nshares == -1 or nshares >= pos.nshares:
                 bt._available_capital += pos.value
                 if bt._available_capital < 0:
@@ -382,10 +368,10 @@ class Portfolio(MutableSequence):
 
                 hist = copy.copy(pos)
                 hist._freeze()
-                if hist.short:
-                    hist.nshares_int = (-1) * nshares
-                if hist.long:
-                    hist.nshares_int = nshares
+                if hist._short:
+                    hist._nshares_int = (-1) * nshares
+                if hist._long:
+                    hist._nshares_int = nshares
                 bt.trades._add(hist)
 
                 break
@@ -394,7 +380,7 @@ class Portfolio(MutableSequence):
         self.positions.append(position)
 
     def _remove(self, position):
-        self.positions = [pos for pos in self.positions if pos.uid != position.uid]
+        self.positions = [pos for pos in self.positions if pos._uid != position._uid]
 
     @overload
     def __getitem__(self, index: Union[int, slice]):
@@ -446,7 +432,7 @@ class Portfolio(MutableSequence):
         """
         new_pos = []
         for pos in self.positions:
-            if pos.short:
+            if pos._short:
                 new_pos.append(pos)
         return Portfolio(self.bt, new_pos)
 
@@ -457,7 +443,7 @@ class Portfolio(MutableSequence):
         """
         new_pos = []
         for pos in self.positions:
-            if pos.long:
+            if pos._long:
                 new_pos.append(pos)
         return Portfolio(self.bt, new_pos)
 
@@ -479,8 +465,13 @@ class Portfolio(MutableSequence):
         Args:
             attribute:
                 String name of the attribute to get.
-                Can be any attribute of :clas:`.Position`.
+                Can be any attribute of :class:`.Position`.
         """
+        self.bt._warn.append(f"""
+        .attr will be removed in 0.7
+        you can use b.portfolio.df[{attribute}]
+        instead of b.portfolio.attr('{attribute}')
+        """)
         result = [getattr(pos, attribute) for pos in self.positions]
         if len(result) == 0:
             return None
@@ -488,7 +479,6 @@ class Portfolio(MutableSequence):
             return result[0]
         else:
             return result
-
 
 class BacktesterBuilder:
     """

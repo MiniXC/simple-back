@@ -168,7 +168,7 @@ class PortfolioValue(SeriesMetric):
         return "Portfolio Value"
 
     def get_value(self, bt):
-        return bt.portfolio.value
+        return bt.portfolio.total_value
 
 
 class DailyProfitLoss(SeriesMetric):
