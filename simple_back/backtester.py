@@ -45,6 +45,7 @@ try:
     import pylab as pl
     import matplotlib.pyplot as plt
     import matplotlib
+
     plt_exists = True
 except ImportError:
     plt_exists = False
@@ -52,6 +53,7 @@ except ImportError:
 # tqdm is not a strict requirement
 try:
     from tqdm import tqdm
+
     tqdm_exists = True
 except ImportError:
     tqdm_exists = False
@@ -118,6 +120,7 @@ class StrategySequence:
 
     def __len__(self):
         return len(self.bt._get_bts())
+
 
 class Position:
     """Tracks a single position in a portfolio or trade history.
@@ -1112,9 +1115,13 @@ class Backtester:
                 self._live_plot_figsize = (10, 6.5)
 
         if self.add_metric_exists:
-            fig, axes = plt.subplots(2, 1, sharex=True, figsize=self._live_plot_figsize, num=0)
+            fig, axes = plt.subplots(
+                2, 1, sharex=True, figsize=self._live_plot_figsize, num=0
+            )
         else:
-            fig, axes = plt.subplots(1, 1, sharex=True, figsize=self._live_plot_figsize, num=0)
+            fig, axes = plt.subplots(
+                1, 1, sharex=True, figsize=self._live_plot_figsize, num=0
+            )
             axes = [axes]
 
         if self._live_progress:
@@ -1156,7 +1163,7 @@ class Backtester:
         plt.draw()
         plt.pause(0.001)
         if self._live_plot_blocking:
-            plt.clf() # needed to prevent overlapping tick labels
+            plt.clf()  # needed to prevent overlapping tick labels
 
         captions = []
 
