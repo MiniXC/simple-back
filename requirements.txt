@@ -110,7 +110,7 @@ tabulate==0.8.7
 testpath==0.4.4
 toml==0.10.1
 tomlkit==0.6.0
-tqdm==4.46.1
+tqdm==4.47.0
 traitlets==4.3.3
 typed-ast==1.4.1
 urllib3==1.25.9
