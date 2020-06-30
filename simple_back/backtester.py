@@ -38,19 +38,22 @@ from .metrics import (
 )
 from .strategy import Strategy, BuyAndHold
 from .exceptions import BacktestRunError, LongShortLiquidationError, NegativeValueError
-from .utils import is_notebook
+from .utils import is_notebook, _cls
 
+# matplotlib is not a strict requirement, only needed for live_plot
 try:
     import pylab as pl
     import matplotlib.pyplot as plt
-
+    import matplotlib
     plt_exists = True
+    if not is_notebook():
+        matplotlib.use('Qt4Agg', warn=False, force=True)
 except ImportError:
     plt_exists = False
 
+# tqdm is not a strict requirement
 try:
     from tqdm import tqdm
-
     tqdm_exists = True
 except ImportError:
     tqdm_exists = False
@@ -117,12 +120,6 @@ class StrategySequence:
 
     def __len__(self):
         return len(self.bt._get_bts())
-
-
-def _cls():
-    clear_output(wait=True)
-    os.system("cls" if os.name == "nt" else "clear")
-
 
 class Position:
     """Tracks a single position in a portfolio or trade history.
@@ -626,7 +623,7 @@ class BacktesterBuilder:
         """
         self = copy.deepcopy(self)
         if self.bt._live_plot:
-            self.bt._warn.append(
+            warn(
                 """
                 live plotting and metrics cannot be used together,
                  setting live plotting to false
@@ -646,10 +643,11 @@ class BacktesterBuilder:
 
     def live_plot(
         self,
-        every: int = 10,
+        every: int = None,
         metric: str = "Total Value",
         figsize: Tuple[float, float] = None,
         min_y: int = 0,
+        blocking: bool = False,
     ) -> "BacktesterBuilder":
         """**Optional**, shows the backtest results live using matplotlib.
         Can only be used in notebooks.
@@ -658,26 +656,54 @@ class BacktesterBuilder:
             every:
                 how often metrics should be updated
                 (in events, e.g. 10 = 5 days)
+                the regular default is 10,
+                blocking default is 100
             metric: which metric to plot
             figsize: size of the plot
             min_y:
                 minimum value on the y axis, set to `None`
                 for no lower limit
+            blocking:
+                will disable threading for plots and
+                allow live plotting in terminal,
+                this will slow down the backtester
+                significantly
         """
         self = copy.deepcopy(self)
         if self.bt._live_metrics:
-            self.bt._warn.append(
+            warn(
                 """
                 live metrics and plotting cannot be used together,
                  setting live metrics to false
                 """
             )
             self.bt._live_metrics = False
+        if is_notebook():
+            if every is None:
+                every = 10
+        elif not blocking:
+            warn(
+                """
+                live plots use threading which is not supported
+                with matplotlib outside notebooks. to disable
+                threading for live plots, you can call
+                live_plot with ``blocking = True``.
+
+                live_plot set to false.
+                """
+            )
+            return self
+        elif blocking:
+            self.bt._live_plot_blocking = True
+            if every is None:
+                every = 100
+
         self.bt._live_plot = True
         self.bt._live_plot_every = every
         self.bt._live_plot_metric = metric
         self.bt._live_plot_figsize = figsize
         self.bt._live_plot_min = min_y
+
         return self
 
     def no_live_plot(self) -> "BacktesterBuilder":
@@ -880,6 +906,8 @@ class Backtester:
         self._live_plot_metric = "Total Value"
         self._live_plot_figsize = None
         self._live_plot_min = None
+        self._live_plot_axes = None
+        self._live_plot_blocking = False
         self._live_metrics = False
         self._live_progress = False
 
@@ -908,8 +936,6 @@ class Backtester:
 
         self._slippage = None
         self._slippage_percent = None
-
-        self._live_plot_axes = None
 
     def _set_self(self, new_self=None):
         if new_self is not None:
@@ -1098,9 +1124,9 @@ class Backtester:
                 self._live_plot_figsize = (10, 6.5)
 
         if self.add_metric_exists:
-            fig, axes = plt.subplots(2, 1, sharex=True, figsize=self._live_plot_figsize)
+            fig, axes = plt.subplots(2, 1, sharex=True, figsize=self._live_plot_figsize, num=0)
         else:
-            fig, axes = plt.subplots(1, 1, sharex=True, figsize=self._live_plot_figsize)
+            fig, axes = plt.subplots(1, 1, sharex=True, figsize=self._live_plot_figsize, num=0)
             axes = [axes]
 
         if self._live_progress:
@@ -1119,6 +1145,7 @@ class Backtester:
             pass
         if self._live_plot_min is not None:
             axes[0].set_ylim(bottom=self._live_plot_min)
+        plt.tight_layout()
 
         if self.add_metric_exists:
             try:
@@ -1140,6 +1167,8 @@ class Backtester:
 
         plt.draw()
         plt.pause(0.001)
+        if self._live_plot_blocking:
+            plt.clf() # needed to prevent overlapping tick labels
 
         captions = []
 
@@ -1193,6 +1222,7 @@ class Backtester:
     def _graceful_stop(self):
         if self._last_thread is not None:
             self._last_thread.join()
+            del self._last_thread
         self._plot(self._get_bts(), last=True)
 
     def _order(
@@ -1493,12 +1523,15 @@ class Backtester:
     def _plot(self, bts, last=False):
         try:
             if self._live_plot and (self.i % self._live_plot_every == 0 or last):
-                if self._last_thread is None or not self._last_thread.is_alive():
-                    thr = threading.Thread(target=self._show_live_plot, args=(bts,))
-                    thr.start()
-                    self._last_thread = thr
-                if last:
-                    self._last_thread.join()
+                if not self._live_plot_blocking:
+                    if self._last_thread is None or not self._last_thread.is_alive():
+                        thr = threading.Thread(target=self._show_live_plot, args=(bts,))
+                        thr.start()
+                        self._last_thread = thr
+                    if last:
+                        self._last_thread.join()
+                        self._show_live_plot(bts)
+                else:
                     self._show_live_plot(bts)
             if self._live_metrics and (self.i % self._live_metrics_every == 0 or last):
                 self._show_live_metrics(bts)
@@ -1540,6 +1573,8 @@ class Backtester:
             self._show_live_plot(bts, [start, end])
         else:
             self._show_live_plot(bts)
+        if not is_notebook():
+            plt.show()
 
     def run(self):
         """Run the backtesters strategies without using an iterator.

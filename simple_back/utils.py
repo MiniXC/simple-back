@@ -1,6 +1,7 @@
 from io import StringIO
 import sys
-
+import os
+from IPython.display import clear_output
 
 def is_notebook():
     try:
@@ -13,3 +14,7 @@ def is_notebook():
             return False  # Other type (?)
     except NameError:
         return False  # Probably standard Python interpreter
+
+def _cls():
+    clear_output(wait=True)
+    os.system("cls" if os.name == "nt" else "clear")
