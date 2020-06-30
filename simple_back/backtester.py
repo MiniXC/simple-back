@@ -152,7 +152,7 @@ class Position:
         self._uid = uid
 
     def _attr(self):
-        return [attr for attr in dir(self) if not attr.startswith('_')]
+        return [attr for attr in dir(self) if not attr.startswith("_")]
 
     def __repr__(self) -> str:
         result = {}
@@ -470,11 +470,13 @@ class Portfolio(MutableSequence):
                 String name of the attribute to get.
                 Can be any attribute of :class:`.Position`.
         """
-        self.bt._warn.append(f"""
+        self.bt._warn.append(
+            f"""
         .attr will be removed in 0.7
         you can use b.portfolio.df[{attribute}]
         instead of b.portfolio.attr('{attribute}')
-        """)
+        """
+        )
         result = [getattr(pos, attribute) for pos in self.positions]
         if len(result) == 0:
             return None
@@ -482,6 +484,7 @@ class Portfolio(MutableSequence):
             return result[0]
         else:
             return result
+
 
 class BacktesterBuilder:
     """
