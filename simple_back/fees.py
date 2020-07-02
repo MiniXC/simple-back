@@ -16,11 +16,16 @@ class Fee(ABC):
         else:
             shares = nshares
         cost = self.cost(price, shares)
+        fee = cost - (price * shares)
         if cost > capital:
             raise InsufficientCapitalError(
                 f"Tried to buy {shares} shares at {price} with only {capital}."
             )
-        return shares, cost
+        return {
+            'nshares': shares, 
+            'total': cost,
+            'fee': fee,
+        }
 
     @abstractmethod
     def nshares(self, price, capital):

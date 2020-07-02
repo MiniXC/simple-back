@@ -55,6 +55,10 @@ Visualize and improve your strategy.
 ---------------------
 Move from stateless iterators to stateful strategy objects and configure slippage.
 
+:doc:`intro/fees`
+-----------------
+Test if your strategies hold up against potential broker fees.
+
 :doc:`intro/example`
 --------------------
 Just copy example code and get started yourself.
@@ -76,6 +80,7 @@ The api used for this tutorial will change in version **0.7**.
    intro/quickstart
    intro/debugging
    intro/slippage
+   intro/fees
    intro/example
 
 .. toctree::

@@ -134,6 +134,7 @@ class Position:
         event: str,
         nshares: int,
         uid: str,
+        fee: float,
         slippage: float = None,
     ):
         self.symbol = symbol
@@ -150,6 +151,7 @@ class Position:
         self._bt = bt
         self._frozen = False
         self._uid = uid
+        self.fee = fee
 
     def _attr(self):
         return [attr for attr in dir(self) if not attr.startswith('_')]
@@ -214,12 +216,12 @@ class Position:
 
     @property
     def initial_value(self) -> float:
-        """Returns the initial value of the position.
+        """Returns the initial value of the position, including fees.
         """
         if self._short:
-            return self.nshares * self.start_price
+            return self.nshares * self.start_price + self.fee
         if self._long:
-            return self.nshares * self.start_price
+            return self.nshares * self.start_price + self.fee
 
     @property
     def profit_loss_pct(self) -> float:
@@ -1284,11 +1286,13 @@ class Backtester:
             capital = capital * self._available_capital
         try:
             if shares is None:
-                nshares, total = self._trade_cost(current_price, capital)
+                 fee_dict = self._trade_cost(current_price, capital)
+                 nshares, total, fee = fee_dict['nshares'], fee_dict['total'], fee_dict['fee']
             else:
-                nshares, total = self._trade_cost(
+                fee_dict = self._trade_cost(
                     current_price, self._available_capital, nshares=shares
                 )
+                nshares, total, fee = fee_dict['nshares'], fee_dict['total'], fee_dict['fee']
         except Exception as e:
             self._graceful_stop()
             raise e
@@ -1303,6 +1307,7 @@ class Backtester:
                 self.event,
                 nshares,
                 uid,
+                fee,
                 self._slippage_percent,
             )
             self.portfolio._add(pos)
