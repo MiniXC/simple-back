@@ -1289,13 +1289,21 @@ class Backtester:
             capital = capital * self._available_capital
         try:
             if shares is None:
-                 fee_dict = self._trade_cost(current_price, capital)
-                 nshares, total, fee = fee_dict['nshares'], fee_dict['total'], fee_dict['fee']
+                fee_dict = self._trade_cost(current_price, capital)
+                nshares, total, fee = (
+                    fee_dict["nshares"],
+                    fee_dict["total"],
+                    fee_dict["fee"],
+                )
             else:
                 fee_dict = self._trade_cost(
                     current_price, self._available_capital, nshares=shares
                 )
-                nshares, total, fee = fee_dict['nshares'], fee_dict['total'], fee_dict['fee']
+                nshares, total, fee = (
+                    fee_dict["nshares"],
+                    fee_dict["total"],
+                    fee_dict["fee"],
+                )
         except Exception as e:
             self._graceful_stop()
             raise e

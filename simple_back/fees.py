@@ -22,9 +22,9 @@ class Fee(ABC):
                 f"Tried to buy {shares} shares at {price} with only {capital}."
             )
         return {
-            'nshares': shares, 
-            'total': cost,
-            'fee': fee,
+            "nshares": shares,
+            "total": cost,
+            "fee": fee,
         }
 
     @abstractmethod
