@@ -1,0 +1,41 @@
+name: build
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-python@v2
+    - uses: dschep/install-poetry-action@v1.3
+    - name: Poetry Lock
+      run: poetry lock
+    - name: Poetry Install
+      run: poetry install
+    - name: requirements.txt
+      run: poetry run pip freeze | awk '/==/' > requirements.txt
+    - name: requirements-docs.txt
+      run: poetry run pip freeze | awk '/sphinx|Sphinx|ipython/' > docs/requirements.txt
+    - name: Black
+      run: poetry run python -m black .
+    - name: Dephell Convert
+      run: poetry run python -m dephell convert
+    - name: install package locally
+      run: pip install -e .
+    - name: generate api doc
+      run: sphinx-apidoc -M -T -f -o docs/api simple_back
+    - name: install pandoc & python3-sphinx
+      run: sudo apt-get install -y pandoc python3-sphinx python3-nbsphinx python3-pypandoc
+    - name: generate sphinx doc
+      run: cd docs && mkdir -p _build/html && touch _build/html/.nojekyll && poetry run make html
+    - name: Lint
+      run: poetry run python -m flake8 . --count --exit-zero --max-complexity=10 --statistics
+    - name: pylint badge
+      run: poetry run pylint-badge simple_back
+    - name: Test
+      run: poetry run python -m pytest --cov=simple_back --cov-branch --cov-report=xml tests/
+    - name: Codecov
+      uses: codecov/codecov-action@v1.0.7
