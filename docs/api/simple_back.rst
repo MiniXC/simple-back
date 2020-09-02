@@ -64,4 +64,3 @@ simple\_back.utils module
    :members:
    :undoc-members:
    :show-inheritance:
-
