@@ -251,7 +251,7 @@ class SpProvider(WikipediaProvider):
 
 class DailyDataProvider(CachedProvider):
     def __init__(self, debug=False):
-        self.current_date = date.today()
+        self.current_date = date.today().isoformat()
         self.current_event = self.columns[np.argmax(self.columns_order)]
         self._leak_allowed = False
         super().__init__(debug=debug)

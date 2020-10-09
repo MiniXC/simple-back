@@ -7,7 +7,7 @@ code, while avoiding time leaks.
 """
 
 
-__version__ = "0.6.0"
+__version__ = "0.6.2"
 
 from . import backtester
 from . import strategy

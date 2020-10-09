@@ -3,7 +3,7 @@ from simple_back.backtester import BacktesterBuilder
 
 
 def test_version():
-    assert __version__ == "0.6.0"
+    assert __version__ == "0.6.2"
 
 
 def test_compare_quantopian():
@@ -12,13 +12,15 @@ def test_compare_quantopian():
         .name("TSLA Strategy")
         .balance(10_000)
         .calendar("NYSE")
-        .live_metrics()
+        #.live_metrics()
         .slippage(0.0005)
     )
     bt = builder.build()
+    bt.prices.clear_cache()
     for _, _, b in bt["2017-1-1":"2020-1-1"]:
         if not b.pf or True:
             b.pf.liquidate()
+            print(b._schedule.index)
             b.long("TSLA", percent=1)
     quant_no_slippage = 105.97  # https://www.quantopian.com/posts/test-without-slippage-to-compare-with-simple-back
     quant_slippage = (

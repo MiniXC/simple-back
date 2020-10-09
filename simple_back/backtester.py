@@ -843,8 +843,8 @@ class Backtester:
         self.dates = [d.date() for d in self.dates]
         for date in self.dates:
             self.datetimes += [
-                sched.loc[date]["market_open"],
-                sched.loc[date]["market_close"],
+                sched.loc[date.isoformat()]["market_open"],
+                sched.loc[date.isoformat()]["market_close"],
             ]
 
         if self._has_strategies:
@@ -979,7 +979,7 @@ class Backtester:
         elif bt.event == "close":
             try:
                 bt.i += 1
-                bt.current_date = bt.dates[bt.i // 2]
+                bt.current_date = bt.dates[bt.i // 2].isoformat()
                 bt.event = "open"
             except IndexError:
                 bt.i -= 1
@@ -1206,7 +1206,7 @@ class Backtester:
                         f"{e.symbol} discontinued on {self.current_date}, liquidating at previous day's {self.event} price"
                     )
 
-                    self.current_date = self.dates[(self.i // 2)]
+                    self.current_date = self.dates[(self.i // 2)].isoformat()
 
                     self.portfolio[e.symbol].liquidate()
                     metric(write=True)
@@ -1215,7 +1215,7 @@ class Backtester:
                         self.i += 2
                     if self.event == "open":
                         self.i += 1
-                    self.current_date = self.dates[(self.i // 2)]
+                    self.current_date = self.dates[(self.i // 2)].isoformat()
 
         self._capital = self._available_capital + self.metric["Portfolio Value"][-1]
 
