@@ -24,7 +24,7 @@ jobs:
     - name: Dephell Convert
       run: poetry run python -m dephell convert
     - name: install package locally
-      run: pip install -e .
+      run: pip install .
     - name: generate api doc
       run: sphinx-apidoc -M -T -f -o docs/api simple_back
     - name: install pandoc & python3-sphinx
