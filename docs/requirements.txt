@@ -1,13 +1,13 @@
-ipython==7.16.1
-ipython-genutils==0.2.0
-nbsphinx==0.7.1
-Sphinx==3.2.1
-sphinx-autodoc-typehints==1.11.0
-sphinx-copybutton==0.2.12
-sphinx-rtd-theme==0.4.3
-sphinxcontrib-applehelp==1.0.2
-sphinxcontrib-devhelp==1.0.2
-sphinxcontrib-htmlhelp==1.0.3
-sphinxcontrib-jsmath==1.0.1
-sphinxcontrib-qthelp==1.0.3
-sphinxcontrib-serializinghtml==1.1.4
+ipython @ file:///home/runner/.cache/pypoetry/artifacts/ee/15/e4/46c9aac48c17943cf2b157b42f91ea38a776eb75555dda9b3ce97460be/ipython-7.16.1-py3-none-any.whl
+ipython-genutils @ file:///home/runner/.cache/pypoetry/artifacts/e6/8e/a3/8f37e14310c0072b3fcc4240490bcb42630aa695d069aee89953ebd9f8/ipython_genutils-0.2.0-py2.py3-none-any.whl
+nbsphinx @ file:///home/runner/.cache/pypoetry/artifacts/6b/b4/13/282d9564751afef6b1c9a13e42a693b402a54802c6c5cfbd8534e61c5a/nbsphinx-0.7.1-py3-none-any.whl
+Sphinx @ file:///home/runner/.cache/pypoetry/artifacts/21/a7/4e/3db5d6366e72acf4efa55cfb7503f0e535cbd78f2527cb472d0b46c288/Sphinx-3.2.1-py3-none-any.whl
+sphinx-autodoc-typehints @ file:///home/runner/.cache/pypoetry/artifacts/2b/53/1a/7950b77871ff4bf2997f2f5ec71f5c4c9d06d851f8cfec5d69c2238358/sphinx_autodoc_typehints-1.11.0-py3-none-any.whl
+sphinx-copybutton @ file:///home/runner/.cache/pypoetry/artifacts/09/e9/6c/652ce259ef677c4cfe166c956bd558c7c4d2096f81a9b0f4c7f7b6b627/sphinx_copybutton-0.2.12-py3-none-any.whl
+sphinx-rtd-theme @ file:///home/runner/.cache/pypoetry/artifacts/b0/e3/22/ca80e3cab5744c3720393aea19f4bc0c68b26b7d7c6564ab0d17ea180f/sphinx_rtd_theme-0.4.3-py2.py3-none-any.whl
+sphinxcontrib-applehelp @ file:///home/runner/.cache/pypoetry/artifacts/06/55/7c/cf28d2c944f7fc7cba94678d0ca98b77947cae69b6c801ffd04601cc8c/sphinxcontrib_applehelp-1.0.2-py2.py3-none-any.whl
+sphinxcontrib-devhelp @ file:///home/runner/.cache/pypoetry/artifacts/95/e9/af/55ffd1a6f2b03f2bc460172ec6a9ee4a9353404fc6b9026b0fd4776f84/sphinxcontrib_devhelp-1.0.2-py2.py3-none-any.whl
+sphinxcontrib-htmlhelp @ file:///home/runner/.cache/pypoetry/artifacts/a0/ad/8e/a970be3040e06e0264ff5263c1c64053370852e5711ebce0169f50d4c0/sphinxcontrib_htmlhelp-1.0.3-py2.py3-none-any.whl
+sphinxcontrib-jsmath @ file:///home/runner/.cache/pypoetry/artifacts/5f/c9/8c/2bf04b76e3b07f85857acb15a02dec77db17eb7069ef7e3e8200580fa0/sphinxcontrib_jsmath-1.0.1-py2.py3-none-any.whl
+sphinxcontrib-qthelp @ file:///home/runner/.cache/pypoetry/artifacts/bd/a5/cb/8f6c168f27ca463b2c09d5dfbaabea32b6bb9ebff80556a11bc2b1152f/sphinxcontrib_qthelp-1.0.3-py2.py3-none-any.whl
+sphinxcontrib-serializinghtml @ file:///home/runner/.cache/pypoetry/artifacts/83/d2/78/3f17c9e1fa5ed17cb815a8d897bf2003c1197b16a36d4e9c6ffa0e8592/sphinxcontrib_serializinghtml-1.1.4-py2.py3-none-any.whl

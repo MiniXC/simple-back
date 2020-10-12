@@ -12,7 +12,7 @@ def test_compare_quantopian():
         .name("TSLA Strategy")
         .balance(10_000)
         .calendar("NYSE")
-        #.live_metrics()
+        # .live_metrics()
         .slippage(0.0005)
     )
     bt = builder.build()
