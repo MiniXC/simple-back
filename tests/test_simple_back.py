@@ -1,9 +1,9 @@
 from simple_back import __version__
 from simple_back.backtester import BacktesterBuilder
-
+from datetime import date
 
 def test_version():
-    assert __version__ == "0.6.2"
+    assert __version__ == "0.6.3"
 
 
 def test_compare_quantopian():
@@ -17,7 +17,7 @@ def test_compare_quantopian():
     )
     bt = builder.build()
     bt.prices.clear_cache()
-    for _, _, b in bt["2017-1-1":"2020-1-1"]:
+    for _, _, b in bt[date.fromisoformat("2017-1-1"):date.fromisoformat("2020-1-1")]:
         if not b.pf or True:
             b.pf.liquidate()
             print(b._schedule.index)
