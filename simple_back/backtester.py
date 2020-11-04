@@ -62,10 +62,10 @@ except ImportError:
 def display_side_by_side(bts):
     html_str = ""
     for bt in bts:
-        #styler = bt.logs.style.set_table_attributes(
+        # styler = bt.logs.style.set_table_attributes(
         #    "style='display:inline'"
-        #).set_caption(bt.name)
-        #html_str += styler._repr_html_()
+        # ).set_caption(bt.name)
+        # html_str += styler._repr_html_()
         pass
     display_html(bt.logs._repr_html_(), raw=True)
 
