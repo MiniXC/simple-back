@@ -5,6 +5,7 @@ import pandas as pd
 from dateutil.relativedelta import relativedelta
 from datetime import date, datetime
 import datetime
+import datetime
 import numpy as np
 import diskcache as dc
 import pytz
@@ -251,12 +252,14 @@ class SpProvider(WikipediaProvider):
 
 class DailyDataProvider(CachedProvider):
     def __init__(self, debug=False):
-        self.current_date = date.today().isoformat()
+        self.current_date = date.today()
         self.current_event = self.columns[np.argmax(self.columns_order)]
         self._leak_allowed = False
         super().__init__(debug=debug)
 
     def _remove_leaky_vals(self, df, cols, date):
+        if isinstance(self.current_date, str):
+            self.current_date = datetime.date.fromisoformat(self.current_date)
         if isinstance(df, pd.DataFrame):
             if isinstance(date, str):
                 date = pd.to_datetime(date)
@@ -469,7 +472,7 @@ class YahooFinanceProvider(DailyPriceProvider):
             self.set_cache(symbol, df)
         else:
             df = self.get_cache(symbol)
-        if df.isna().any().any():
+        if df.isna().any().any() == 0:
             df.dropna(inplace=True, axis=0)
         entry = df.loc[date].copy()
         adj = entry["adjclose"] / entry["close"]
