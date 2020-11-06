@@ -1,0 +1,282 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simple_back.fees &mdash; simple-back  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> simple-back
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/quickstart.html">Creating a Simple Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/debugging.html">Debugging a Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/slippage.html">Strategy Objects &amp; Slippage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/fees.html">Fees &amp; Trade Costs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/example.html">Example Code</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../adv/data_sources.html">Using External Data &amp; Machine Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/simple_back.html">simple_back package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">simple-back</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>simple_back.fees</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for simple_back.fees</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">InsufficientCapitalError</span>
+
+
+<div class="viewcode-block" id="Fee"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.Fee">[docs]</a><span class="k">class</span> <span class="nc">Fee</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract ``Callable`` that calculates the total cost and number of shares</span>
+<span class="sd">    given an asset price and the capital to be allocated to it.</span>
+<span class="sd">    It returns the total cost and the number of shares aquired for that cost.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">capital</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nshares</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">nshares</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">shares</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nshares</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">capital</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shares</span> <span class="o">=</span> <span class="n">nshares</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">shares</span><span class="p">)</span>
+        <span class="n">fee</span> <span class="o">=</span> <span class="n">cost</span> <span class="o">-</span> <span class="p">(</span><span class="n">price</span> <span class="o">*</span> <span class="n">shares</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cost</span> <span class="o">&gt;</span> <span class="n">capital</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InsufficientCapitalError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Tried to buy </span><span class="si">{</span><span class="n">shares</span><span class="si">}</span><span class="s2"> shares at </span><span class="si">{</span><span class="n">price</span><span class="si">}</span><span class="s2"> with only </span><span class="si">{</span><span class="n">capital</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;nshares&quot;</span><span class="p">:</span> <span class="n">shares</span><span class="p">,</span>
+            <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="n">cost</span><span class="p">,</span>
+            <span class="s2">&quot;fee&quot;</span><span class="p">:</span> <span class="n">fee</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="Fee.nshares"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.Fee.nshares">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">nshares</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">capital</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Fee.cost"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.Fee.cost">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">nshares</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="FlatPerTrade"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.FlatPerTrade">[docs]</a><span class="k">class</span> <span class="nc">FlatPerTrade</span><span class="p">(</span><span class="n">Fee</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fee</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fee</span> <span class="o">=</span> <span class="n">fee</span>
+
+<div class="viewcode-block" id="FlatPerTrade.nshares"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.FlatPerTrade.nshares">[docs]</a>    <span class="k">def</span> <span class="nf">nshares</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">capital</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">capital</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fee</span><span class="p">)</span> <span class="o">//</span> <span class="n">price</span></div>
+
+<div class="viewcode-block" id="FlatPerTrade.cost"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.FlatPerTrade.cost">[docs]</a>    <span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">nshares</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">price</span> <span class="o">*</span> <span class="n">nshares</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fee</span></div></div>
+
+
+<div class="viewcode-block" id="FlatPerShare"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.FlatPerShare">[docs]</a><span class="k">class</span> <span class="nc">FlatPerShare</span><span class="p">(</span><span class="n">Fee</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fee</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fee</span> <span class="o">=</span> <span class="n">fee</span>
+
+<div class="viewcode-block" id="FlatPerShare.nshares"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.FlatPerShare.nshares">[docs]</a>    <span class="k">def</span> <span class="nf">nshares</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">capital</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">capital</span> <span class="o">//</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fee</span> <span class="o">+</span> <span class="n">price</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FlatPerShare.cost"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.FlatPerShare.cost">[docs]</a>    <span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">nshares</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">price</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fee</span><span class="p">)</span> <span class="o">*</span> <span class="n">nshares</span></div></div>
+
+
+<div class="viewcode-block" id="NoFee"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.NoFee">[docs]</a><span class="k">class</span> <span class="nc">NoFee</span><span class="p">(</span><span class="n">Fee</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the number of shares possible to buy with given capital,</span>
+<span class="sd">    and calculates to total cost of buying said shares.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        How many shares of an asset costing 10 can be bought using 415,</span>
+<span class="sd">        and what is the total cost::</span>
+
+<span class="sd">            &gt;&gt;&gt; NoFee(10, 415)</span>
+<span class="sd">            41, 410</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="NoFee.nshares"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.NoFee.nshares">[docs]</a>    <span class="k">def</span> <span class="nf">nshares</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">capital</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">capital</span> <span class="o">//</span> <span class="n">price</span></div>
+
+<div class="viewcode-block" id="NoFee.cost"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.fees.NoFee.cost">[docs]</a>    <span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">nshares</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">price</span> <span class="o">*</span> <span class="n">nshares</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Christoph Minixhofer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

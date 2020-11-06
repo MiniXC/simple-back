@@ -1,0 +1,908 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Debugging a Strategy &mdash; simple-back  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Strategy Objects &amp; Slippage" href="slippage.html" />
+    <link rel="prev" title="Creating a Simple Strategy" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> simple-back
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Creating a Simple Strategy</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Debugging a Strategy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Plotting-Additional-Metrics">Plotting Additional Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Plotting-Lines">Plotting Lines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Negative-Portfolio">Negative Portfolio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Zooming-in">Zooming in</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Accessing-Metrics">Accessing Metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="slippage.html">Strategy Objects &amp; Slippage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fees.html">Fees &amp; Trade Costs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Example Code</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../adv/data_sources.html">Using External Data &amp; Machine Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/simple_back.html">simple_back package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">simple-back</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Debugging a Strategy</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/intro/debugging.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Debugging-a-Strategy">
+<h1>Debugging a Strategy<a class="headerlink" href="#Debugging-a-Strategy" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://colab.research.google.com/github/MiniXC/simple-back/blob/master/docs/intro/debugging.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p>Our <a class="reference external" href="https://simple-back.readthedocs.io/en/latest/intro/quickstart.html">crossover strategy from before</a> does not seem to work. To improve upon your strategies, it can be helpful to visualize them.</p>
+<p>First, we create our <code class="docutils literal notranslate"><span class="pre">builder</span></code> object again.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">simple_back.backtester</span> <span class="kn">import</span> <span class="n">BacktesterBuilder</span>
+
+<span class="n">builder</span> <span class="o">=</span> <span class="p">(</span>
+   <span class="n">BacktesterBuilder</span><span class="p">()</span>
+   <span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="s1">&#39;JNUG 20-Day Crossover&#39;</span><span class="p">)</span>
+   <span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="mi">10_000</span><span class="p">)</span>
+   <span class="o">.</span><span class="n">calendar</span><span class="p">(</span><span class="s1">&#39;NYSE&#39;</span><span class="p">)</span>
+   <span class="o">.</span><span class="n">compare</span><span class="p">([</span><span class="s1">&#39;JNUG&#39;</span><span class="p">])</span> <span class="c1"># strategies to compare with</span>
+   <span class="o">.</span><span class="n">live_progress</span><span class="p">()</span> <span class="c1"># show a progress bar using tqdm</span>
+   <span class="o">.</span><span class="n">live_plot</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s1">&#39;Total Return (%)&#39;</span><span class="p">,</span> <span class="n">min_y</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="c1"># we assume we are running this in a Jupyter Notebook</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Plotting-Additional-Metrics">
+<h2>Plotting Additional Metrics<a class="headerlink" href="#Plotting-Additional-Metrics" title="Permalink to this headline">¶</a></h2>
+<p>Now, we can start by logging the moving average and price of <strong>JNUG</strong> with <code class="docutils literal notranslate"><span class="pre">.Backtester.add_metric</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2019-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s1">&#39;open&#39;</span><span class="p">:</span>
+        <span class="n">jnug_ma</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span><span class="o">-</span><span class="mi">20</span><span class="p">:][</span><span class="s1">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">))</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="s1">&#39;MA (20 Days)&#39;</span><span class="p">,</span> <span class="n">jnug_ma</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="p">:</span> <span class="c1"># check if we already are long JNUG</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all short JNUG positions</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># long JNUG</span>
+
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="p">:</span> <span class="c1"># check if we already are short JNUG</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all long JNUG positions</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">short</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># short JNUG</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_debugging_6_0.png" src="../_images/intro_debugging_6_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Plotting-Lines">
+<h2>Plotting Lines<a class="headerlink" href="#Plotting-Lines" title="Permalink to this headline">¶</a></h2>
+<p>We can see that the moving average crosses the price many times, causing buy and sell signals just because of noise. We will try to calculate the average of 60 instead of 20 days instead, in the hope of crossover events being fewer and more meaningful. We will also use <code class="docutils literal notranslate"><span class="pre">.Backtester.add_line</span></code> to draw a <em>green line</em> when we go long and a <em>red line</em> when we short.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2019-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s1">&#39;open&#39;</span><span class="p">:</span>
+        <span class="n">jnug_ma</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">:][</span><span class="s1">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">))</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="s1">&#39;MA (100 Days)&#39;</span><span class="p">,</span> <span class="n">jnug_ma</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="p">:</span> <span class="c1"># check if we already are long JNUG</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all short JNUG positions</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># long JNUG</span>
+
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="p">:</span> <span class="c1"># check if we already are short JNUG</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all long JNUG positions</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">short</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># short JNUG</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_debugging_8_0.png" src="../_images/intro_debugging_8_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span><span class="o">.</span><span class="n">summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Max Drawdown</th>
+      <th>Annual Return</th>
+      <th>Portfolio Value (Last Value)</th>
+      <th>Total Value (Last Value)</th>
+      <th>Daily Profit/Loss (Last Value)</th>
+    </tr>
+    <tr>
+      <th>Backtest</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>JNUG 20-Day Crossover</th>
+      <td>-3932.812380</td>
+      <td>2.481914</td>
+      <td>24133.862305</td>
+      <td>24680.546328</td>
+      <td>-106.979980</td>
+    </tr>
+    <tr>
+      <th>JNUG (Buy &amp; Hold)</th>
+      <td>-3441.210832</td>
+      <td>1.799052</td>
+      <td>17476.245117</td>
+      <td>17925.556025</td>
+      <td>-77.468262</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>The strategy does now slightly outperform just buying and holding <strong>JNUG</strong>. But thanks to <code class="docutils literal notranslate"><span class="pre">add_line</span></code>, we see that it is very likely for many signals to be triggered in a row. Let’s try to implement a “cooldown” after a signal is triggered. Whenever we long/short due to a signal, we will wait 60 days before considering other signals.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2019-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s1">&#39;open&#39;</span><span class="p">:</span>
+        <span class="n">jnug_ma</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">:][</span><span class="s1">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">))</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="s1">&#39;MA (100 Days)&#39;</span><span class="p">,</span> <span class="n">jnug_ma</span><span class="p">)</span>
+
+        <span class="n">last_pos_date</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">last_pos_date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">date_diff</span> <span class="o">=</span> <span class="mi">60</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">date_diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">day</span> <span class="o">-</span> <span class="n">last_pos_date</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+
+        <span class="k">if</span> <span class="n">date_diff</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="p">:</span> <span class="c1"># check if we already are long JNUG</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all short JNUG positions</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># long JNUG</span>
+
+            <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="p">:</span> <span class="c1"># check if we already are short JNUG</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all long JNUG positions</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">short</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># short JNUG</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_debugging_11_0.png" src="../_images/intro_debugging_11_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span><span class="o">.</span><span class="n">summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Max Drawdown</th>
+      <th>Annual Return</th>
+      <th>Portfolio Value (Last Value)</th>
+      <th>Total Value (Last Value)</th>
+      <th>Daily Profit/Loss (Last Value)</th>
+    </tr>
+    <tr>
+      <th>Backtest</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>JNUG 20-Day Crossover</th>
+      <td>-4916.015475</td>
+      <td>2.987039</td>
+      <td>29127.075195</td>
+      <td>29669.710315</td>
+      <td>-129.113770</td>
+    </tr>
+    <tr>
+      <th>JNUG (Buy &amp; Hold)</th>
+      <td>-3441.210832</td>
+      <td>1.799052</td>
+      <td>17476.245117</td>
+      <td>17925.556025</td>
+      <td>-77.468262</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="Negative-Portfolio">
+<h2>Negative Portfolio<a class="headerlink" href="#Negative-Portfolio" title="Permalink to this headline">¶</a></h2>
+<p>Now the strategy is even more profitable! Of course we are overfitting to our time period here, so let’s backtest all the way back to 2015 and forward to 2020 to include the market crash due to coronavirus.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2015-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-5-1&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s1">&#39;open&#39;</span><span class="p">:</span>
+        <span class="n">jnug_ma</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">:][</span><span class="s1">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">))</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="s1">&#39;MA (100 Days)&#39;</span><span class="p">,</span> <span class="n">jnug_ma</span><span class="p">)</span>
+
+        <span class="n">last_pos_date</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">last_pos_date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">date_diff</span> <span class="o">=</span> <span class="mi">60</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">date_diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">day</span> <span class="o">-</span> <span class="n">last_pos_date</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+
+        <span class="k">if</span> <span class="n">date_diff</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="p">:</span> <span class="c1"># check if we already are long JNUG</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all short JNUG positions</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># long JNUG</span>
+
+            <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="p">:</span> <span class="c1"># check if we already are short JNUG</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all long JNUG positions</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">short</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># short JNUG</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_debugging_14_0.png" src="../_images/intro_debugging_14_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">NegativeValueError</span><span class="ansi-red-fg">:</span> Tried to liquidate position resulting in negative capital -2483.530529785243.
+
+</pre></div></div>
+</div>
+<p>Seems like our portfolio dips into the negative mid-2016. We can awoid this error by not liquidating when our short position is negative.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2015-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-5-1&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s1">&#39;open&#39;</span><span class="p">:</span>
+        <span class="n">jnug_ma</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">:][</span><span class="s1">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">))</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="s1">&#39;MA (60 Days)&#39;</span><span class="p">,</span> <span class="n">jnug_ma</span><span class="p">)</span>
+
+        <span class="n">last_pos_date</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">last_pos_date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">date_diff</span> <span class="o">=</span> <span class="mi">60</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">date_diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">day</span> <span class="o">-</span> <span class="n">last_pos_date</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+
+        <span class="k">if</span> <span class="n">date_diff</span> <span class="o">&gt;=</span> <span class="mi">60</span> <span class="ow">and</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="o">.</span><span class="n">total_value</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="p">:</span> <span class="c1"># check if we already are long JNUG</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all short JNUG positions</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># long JNUG</span>
+
+            <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="p">:</span> <span class="c1"># check if we already are short JNUG</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all long JNUG positions</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">short</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># short JNUG</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_debugging_16_0.png" src="../_images/intro_debugging_16_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Zooming-in">
+<h2>Zooming in<a class="headerlink" href="#Zooming-in" title="Permalink to this headline">¶</a></h2>
+<p>The strategy does not fail anymore, but the drawdown seems significant. We can have a look at the period the plot is negative using <code class="docutils literal notranslate"><span class="pre">.Backtester.show</span></code></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s1">&#39;2016-1-1&#39;</span><span class="p">,</span><span class="s1">&#39;2017-1-1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_debugging_18_0.png" src="../_images/intro_debugging_18_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Accessing-Metrics">
+<h2>Accessing Metrics<a class="headerlink" href="#Accessing-Metrics" title="Permalink to this headline">¶</a></h2>
+<p>We can also check the minimum value of the backtest. There are two main ways of accessing an individual Backtests’ metrics, either by using <code class="docutils literal notranslate"><span class="pre">.StrategySequence</span></code> or by selecting its index in the full <code class="docutils literal notranslate"><span class="pre">.Backtester.metrics</span></code> dataframe.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;JNUG 20-Day Crossover&#39;</span><span class="p">][</span><span class="s1">&#39;Total Value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+-33452.41876081888
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span><span class="o">.</span><span class="n">strategies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;Total Value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+-33452.41876081888
+</pre></div></div>
+</div>
+<p>The strategy might seem profitable, but holding a short position with a value so negative would not be possible.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="slippage.html" class="btn btn-neutral float-right" title="Strategy Objects &amp; Slippage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Creating a Simple Strategy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Christoph Minixhofer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

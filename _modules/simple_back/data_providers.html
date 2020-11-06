@@ -1,0 +1,688 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simple_back.data_providers &mdash; simple-back  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> simple-back
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/quickstart.html">Creating a Simple Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/debugging.html">Debugging a Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/slippage.html">Strategy Objects &amp; Slippage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/fees.html">Fees &amp; Trade Costs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/example.html">Example Code</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../adv/data_sources.html">Using External Data &amp; Machine Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/simple_back.html">simple_back package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">simple-back</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>simple_back.data_providers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for simple_back.data_providers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">yahoo_fin.stock_info</span> <span class="kn">import</span> <span class="n">get_data</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">dateutil.relativedelta</span> <span class="kn">import</span> <span class="n">relativedelta</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">diskcache</span> <span class="k">as</span> <span class="nn">dc</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">memoization</span> <span class="kn">import</span> <span class="n">cached</span>
+<span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">JSONDecodeError</span>
+
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">TimeLeakError</span><span class="p">,</span> <span class="n">PriceUnavailableError</span>
+
+
+<span class="k">def</span> <span class="nf">_get_arg_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CachedProvider"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.CachedProvider">[docs]</a><span class="k">class</span> <span class="nc">CachedProvider</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">Cache</span><span class="p">(</span><span class="s2">&quot;.simple-back&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mem_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+
+<div class="viewcode-block" id="CachedProvider.get_key"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.CachedProvider.get_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="CachedProvider.get_cache"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.CachedProvider.get_cache">[docs]</a>    <span class="k">def</span> <span class="nf">get_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">nkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_cache</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mem_cache</span><span class="p">[</span><span class="n">nkey</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nkey</span><span class="si">}</span><span class="s2"> not in cache&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CachedProvider.in_cache"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.CachedProvider.in_cache">[docs]</a>    <span class="k">def</span> <span class="nf">in_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mem_cache</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mem_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="CachedProvider.set_cache"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.CachedProvider.set_cache">[docs]</a>    <span class="k">def</span> <span class="nf">set_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">expire_days</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mem_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">if</span> <span class="n">expire_days</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">expire</span><span class="o">=</span><span class="n">expire_days</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">24</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CachedProvider.rem_cache"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.CachedProvider.rem_cache">[docs]</a>    <span class="k">def</span> <span class="nf">rem_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">mem_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CachedProvider.clear_cache"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.CachedProvider.clear_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mem_cache</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DataProvider"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.DataProvider">[docs]</a><span class="k">class</span> <span class="nc">DataProvider</span><span class="p">(</span><span class="n">CachedProvider</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">pytz</span><span class="o">.</span><span class="n">utc</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_datetime</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bt</span><span class="o">.</span><span class="n">timestamp</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">symbol_datetime</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol_datetime</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">symbol_datetime</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">symbol_datetime</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol_datetime</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">symbol_datetime</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">)</span> <span class="ow">or</span> <span class="n">symbol_datetime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TimeLeakError</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span><span class="p">,</span>
+                <span class="n">date</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                </span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2"> is more recent than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">                resulting in time leak</span>
+<span class="s2">                &quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_cached</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datetime</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">datetime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bt</span><span class="o">.</span><span class="n">timestamp</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span> <span class="o">=</span> <span class="n">datetime</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_cached</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="DataProvider.dates"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.DataProvider.dates">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">dates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="DataProvider.get"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.DataProvider.get">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datetime</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+    <span class="nd">@cached</span><span class="p">(</span><span class="n">thread_safe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">custom_key_maker</span><span class="o">=</span><span class="n">_get_arg_key</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_get_cached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="WikipediaProvider"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.WikipediaProvider">[docs]</a><span class="k">class</span> <span class="nc">WikipediaProvider</span><span class="p">(</span><span class="n">DataProvider</span><span class="p">):</span>
+<div class="viewcode-block" id="WikipediaProvider.get_revisions"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.WikipediaProvider.get_revisions">[docs]</a>    <span class="k">def</span> <span class="nf">get_revisions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;https://en.wikipedia.org/w/api.php?action=query&amp;format=xml&amp;prop=revisions&amp;rvlimit=500&amp;&quot;</span>
+            <span class="o">+</span> <span class="n">title</span>
+        <span class="p">)</span>
+        <span class="n">revisions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">next_params</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_cache</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">next_params</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">revisions</span> <span class="o">+=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;&lt;rev [^&gt;]*&gt;&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+                <span class="n">cont</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;&lt;continue rvcontinue=&quot;([^&quot;]+)&quot;&#39;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">cont</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">next_params</span> <span class="o">=</span> <span class="s2">&quot;&amp;rvcontinue=&quot;</span> <span class="o">+</span> <span class="n">cont</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;timestamp=&quot;([^&quot;]+)&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;id=&quot;([^&quot;]+)&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">revisions</span>
+            <span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_cache</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Wikipedia Provider&quot;</span>
+
+<div class="viewcode-block" id="WikipediaProvider.get"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.WikipediaProvider.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datetime</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">new_symbol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_symbol</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_symbol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_symbol</span> <span class="o">=</span> <span class="n">symbol</span>
+        <span class="n">titles</span> <span class="o">=</span> <span class="n">urlencode</span><span class="p">({</span><span class="s2">&quot;titles&quot;</span><span class="p">:</span> <span class="n">new_symbol</span><span class="p">})</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">urlencode</span><span class="p">({</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">new_symbol</span><span class="p">})</span>
+        <span class="n">rev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_revisions</span><span class="p">(</span><span class="n">titles</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rev</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">datetime</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_cache</span><span class="p">(</span><span class="n">title</span> <span class="o">+</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache</span><span class="p">(</span><span class="n">title</span> <span class="o">+</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://en.wikipedia.org/w/index.php?</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&amp;oldid=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                    <span class="n">html</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">set_cache</span><span class="p">(</span><span class="n">title</span> <span class="o">+</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">html</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_html</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WikipediaProvider.dates"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.WikipediaProvider.dates">[docs]</a>    <span class="k">def</span> <span class="nf">dates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+        <span class="n">new_symbol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_symbol</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_symbol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_symbol</span> <span class="o">=</span> <span class="n">symbol</span>
+        <span class="n">titles</span> <span class="o">=</span> <span class="n">urlencode</span><span class="p">({</span><span class="s2">&quot;titles&quot;</span><span class="p">:</span> <span class="n">new_symbol</span><span class="p">})</span>
+        <span class="n">rev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_revisions</span><span class="p">(</span><span class="n">titles</span><span class="p">)</span>
+        <span class="n">revs</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rev</span><span class="p">]</span>
+        <span class="n">revs</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">revs</span></div>
+
+<div class="viewcode-block" id="WikipediaProvider.transform_symbol"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.WikipediaProvider.transform_symbol">[docs]</a>    <span class="k">def</span> <span class="nf">transform_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">symbol</span></div>
+
+<div class="viewcode-block" id="WikipediaProvider.process_html"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.WikipediaProvider.process_html">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">process_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="SpProvider"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.SpProvider">[docs]</a><span class="k">class</span> <span class="nc">SpProvider</span><span class="p">(</span><span class="n">WikipediaProvider</span><span class="p">):</span>
+<div class="viewcode-block" id="SpProvider.transform_symbol"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.SpProvider.transform_symbol">[docs]</a>    <span class="k">def</span> <span class="nf">transform_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">symbol</span> <span class="o">==</span> <span class="s2">&quot;S&amp;P_500&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;List_of_S&amp;P_500_companies&quot;</span>
+        <span class="k">return</span> <span class="n">symbol</span></div>
+
+<div class="viewcode-block" id="SpProvider.process_html"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.SpProvider.process_html">[docs]</a>    <span class="k">def</span> <span class="nf">process_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+        <span class="n">bs_object</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">symbol</span> <span class="o">==</span> <span class="s2">&quot;S&amp;P_100&quot;</span><span class="p">:</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="n">bs_object</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;wikitable sortable&quot;</span><span class="p">})</span>
+            <span class="n">td_i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">symbol</span> <span class="o">==</span> <span class="s2">&quot;S&amp;P_500&quot;</span><span class="p">:</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="n">bs_object</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;constituents&quot;</span><span class="p">})</span>
+            <span class="n">td_i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">table</span> <span class="o">=</span> <span class="n">bs_object</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;wikitable sortable&quot;</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">table</span> <span class="o">=</span> <span class="n">bs_object</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;wikitable&quot;</span><span class="p">})</span>
+                <span class="n">td_i</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">tickers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s2">&quot;tr&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">ticker</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s2">&quot;td&quot;</span><span class="p">)[</span><span class="n">td_i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">tickers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">tickers</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;S&amp;P&quot;</span></div>
+
+
+<div class="viewcode-block" id="DailyDataProvider"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.DailyDataProvider">[docs]</a><span class="k">class</span> <span class="nc">DailyDataProvider</span><span class="p">(</span><span class="n">CachedProvider</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_order</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_leak_allowed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_remove_leaky_vals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+            <span class="n">istoday</span> <span class="o">=</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="nb">slice</span><span class="p">))</span> <span class="ow">and</span> <span class="n">date</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span>
+            <span class="k">if</span> <span class="n">istoday</span> <span class="ow">or</span> <span class="p">(</span><span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+                <span class="n">cur_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_event</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cols</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_order</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">cur_order</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">istoday</span><span class="p">:</span>
+                            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                <span class="n">sum_recent</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">date</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">sum_recent</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">TimeLeakError</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">,</span>
+                        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">date</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                        </span><span class="si">{</span><span class="n">sum_recent</span><span class="si">}</span><span class="s2"> dates in index</span>
+<span class="s2">                        more recent than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">                        &quot;&quot;&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">date</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">TimeLeakError</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">,</span>
+                        <span class="n">date</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                        </span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2"> is more recent than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">                        resulting in time leak</span>
+<span class="s2">                        &quot;&quot;&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">_get_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_order</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">event</span><span class="p">)]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_max_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">max_order</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_order</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_event</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_event</span><span class="p">:</span>
+                <span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_order</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="n">max_order</span><span class="p">:</span>
+                    <span class="n">max_order</span> <span class="o">=</span> <span class="n">order</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_event</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">max_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_order</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_event</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">max_order</span>
+
+<div class="viewcode-block" id="DailyDataProvider.set_date_event"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.DailyDataProvider.set_date_event">[docs]</a>    <span class="k">def</span> <span class="nf">set_date_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span> <span class="o">=</span> <span class="n">date</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_event</span> <span class="o">=</span> <span class="n">event</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">symbol_date_event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="nb">str</span><span class="p">,</span>
+            <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">Tuple</span><span class="p">[</span>
+                <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
+                <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">slice</span><span class="p">,</span> <span class="nb">object</span><span class="p">]],</span>
+                <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]],</span>
+            <span class="p">],</span>
+        <span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expects a tuple of (ticker_symbol, date, &#39;open&#39; or &#39;close&#39;)</span>
+<span class="sd">        and returns the price</span>
+<span class="sd">        for said symbol at that point in time.</span>
+<span class="sd">        ````</span>
+<span class="sd">        my_price_provider[&#39;AAPL&#39;, date(2015,1,1), &#39;open&#39;]</span>
+<span class="sd">        ````</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bt</span><span class="o">.</span><span class="n">current_date</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bt</span><span class="o">.</span><span class="n">event</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">symbol_date_event</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">len_t</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbol_date_event</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">len_t</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">len_t</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol_date_event</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">)</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span>
+        <span class="k">if</span> <span class="n">len_t</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol_date_event</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">len_t</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">symbol_date_event</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">date</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_leak_allowed</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">TimeLeakError</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">,</span>
+                        <span class="n">date</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                        </span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2"> is more recent than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">                        resulting in time leak</span>
+<span class="s2">                        &quot;&quot;&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">date</span> <span class="o">==</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">date</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">date</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">date</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+                <span class="n">stop_date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">stop</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">relativedelta</span><span class="p">):</span>
+                    <span class="n">date</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span> <span class="o">+</span> <span class="n">date</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">relativedelta</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">stop_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">stop_date</span><span class="p">)</span>
+                    <span class="n">date</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">stop_date</span> <span class="o">+</span> <span class="n">date</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+                <span class="n">stop_date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">stop</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">date</span><span class="o">.</span><span class="n">stop</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">date</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span>
+                        <span class="n">date</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span> <span class="o">-</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">date</span><span class="o">.</span><span class="n">stop</span><span class="p">),</span>
+                        <span class="n">date</span><span class="o">.</span><span class="n">step</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">date</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">stop_date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">stop</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_date</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                        <span class="n">stop_date</span> <span class="o">=</span> <span class="n">stop_date</span><span class="o">.</span><span class="n">stop</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">stop_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">stop_date</span><span class="p">)</span>
+                    <span class="n">date</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span>
+                        <span class="n">stop_date</span> <span class="o">-</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">date</span><span class="o">.</span><span class="n">start</span><span class="p">),</span>
+                        <span class="n">date</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span>
+                        <span class="n">date</span><span class="o">.</span><span class="n">step</span><span class="p">,</span>
+                    <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_cached</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_leak_allowed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_leaky_vals</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+
+    <span class="nd">@cached</span><span class="p">(</span><span class="n">thread_safe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">custom_key_maker</span><span class="o">=</span><span class="n">_get_arg_key</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_get_cached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+<div class="viewcode-block" id="DailyDataProvider.get"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.DailyDataProvider.get">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">slice</span><span class="p">,</span> <span class="n">date</span><span class="p">],</span> <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">columns_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DailyPriceProvider"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.DailyPriceProvider">[docs]</a><span class="k">class</span> <span class="nc">DailyPriceProvider</span><span class="p">(</span><span class="n">DailyDataProvider</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">highlow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlow</span> <span class="o">=</span> <span class="n">highlow</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">highlow</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">columns_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">highlow</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="DailyPriceProvider.get"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.DailyPriceProvider.get">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">slice</span><span class="p">,</span> <span class="n">date</span><span class="p">],</span> <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="YahooFinanceProvider"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.YahooFinanceProvider">[docs]</a><span class="k">class</span> <span class="nc">YahooFinanceProvider</span><span class="p">(</span><span class="n">DailyPriceProvider</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">highlow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">adjust_prices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adjust_prices</span> <span class="o">=</span> <span class="n">adjust_prices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlow</span> <span class="o">=</span> <span class="n">highlow</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Yahoo Finance Prices&quot;</span>
+
+<div class="viewcode-block" id="YahooFinanceProvider.get"><a class="viewcode-back" href="../../api/simple_back.html#simple_back.data_providers.YahooFinanceProvider.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">slice</span><span class="p">,</span> <span class="n">date</span><span class="p">],</span> <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_cache</span><span class="p">(</span><span class="n">symbol</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PriceUnavailableError</span><span class="p">(</span>
+                    <span class="n">symbol</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Price for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2"> could not be found.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_cache</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">date</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">adj</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;adjclose&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjust_prices</span><span class="p">:</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adj</span> <span class="o">*</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">]</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;adjclose&quot;</span><span class="p">]</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;high&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adj</span> <span class="o">*</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;high&quot;</span><span class="p">]</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adj</span> <span class="o">*</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">entry</span><span class="p">[</span><span class="n">event</span><span class="p">]</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Christoph Minixhofer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

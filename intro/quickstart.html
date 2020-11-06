@@ -1,0 +1,1174 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Creating a Simple Strategy &mdash; simple-back  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Debugging a Strategy" href="debugging.html" />
+    <link rel="prev" title="simple-back" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> simple-back
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Creating a Simple Strategy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Building-a-Backtest">Building a Backtest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Running-the-Backtest">Running the Backtest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Creating-a-Strategy">Creating a Strategy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Inspecting-Metrics">Inspecting Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Metrics">Metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Strategies">Strategies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging a Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slippage.html">Strategy Objects &amp; Slippage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fees.html">Fees &amp; Trade Costs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Example Code</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../adv/data_sources.html">Using External Data &amp; Machine Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/simple_back.html">simple_back package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">simple-back</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Creating a Simple Strategy</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/intro/quickstart.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Creating-a-Simple-Strategy">
+<h1>Creating a Simple Strategy<a class="headerlink" href="#Creating-a-Simple-Strategy" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://colab.research.google.com/github/MiniXC/simple-back/blob/master/docs/intro/quickstart.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p>In this tutorial, we will build a <a class="reference external" href="https://www.investopedia.com/articles/active-trading/052014/how-use-moving-average-buy-stocks.asp">crossover strategy</a> that exclusively buys and sells JNUG. It will enter a long position whenever the price goes above its 20-day MA and enter a short position when it goes below.</p>
+<div class="section" id="Building-a-Backtest">
+<h2>Building a Backtest<a class="headerlink" href="#Building-a-Backtest" title="Permalink to this headline">¶</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">.BacktesterBuilder</span></code> to configure and create a <code class="docutils literal notranslate"><span class="pre">.Backtester</span></code> object.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">simple_back.backtester</span> <span class="kn">import</span> <span class="n">BacktesterBuilder</span>
+
+<span class="n">builder</span> <span class="o">=</span> <span class="p">(</span>
+   <span class="n">BacktesterBuilder</span><span class="p">()</span>
+   <span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="s1">&#39;JNUG 20-Day Crossover&#39;</span><span class="p">)</span>
+   <span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="mi">10_000</span><span class="p">)</span>
+   <span class="o">.</span><span class="n">calendar</span><span class="p">(</span><span class="s1">&#39;NYSE&#39;</span><span class="p">)</span>
+   <span class="o">.</span><span class="n">compare</span><span class="p">([</span><span class="s1">&#39;JNUG&#39;</span><span class="p">])</span> <span class="c1"># strategies to compare with</span>
+   <span class="o">.</span><span class="n">live_progress</span><span class="p">()</span> <span class="c1"># show a progress bar using tqdm</span>
+   <span class="o">.</span><span class="n">live_plot</span><span class="p">()</span> <span class="c1"># we assume we are running this in a Jupyter Notebook</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Running-the-Backtest">
+<h2>Running the Backtest<a class="headerlink" href="#Running-the-Backtest" title="Permalink to this headline">¶</a></h2>
+<p>We can now treat the <em>bt</em> object like an iterator with a date index.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2019-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="k">pass</span>
+    <span class="c1"># code here will be called</span>
+    <span class="c1"># on &#39;open&#39; and &#39;close&#39; events on trading days</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_quickstart_6_0.png" src="../_images/intro_quickstart_6_0.png" />
+</div>
+</div>
+<p>Note that we wrote <code class="docutils literal notranslate"><span class="pre">.compare(['JNUG'])</span></code> before so we could compare our strategy to just buying and holding <strong>JNUG</strong>. Because we do not do anything so far, the <em>JNUG 20-Day Crossover</em> strategy results in a flat line.</p>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle"><strong>Note:</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">.BacktesterBuilder.compare</span></code> normally only accepts a list of <code class="docutils literal notranslate"><span class="pre">.Strategy</span></code> objects, but for each string that is passed, it automatically creates a <code class="docutils literal notranslate"><span class="pre">.BuyAndHold</span></code> strategy for the symbol represented by the string.</p>
+</div>
+</div>
+<div class="section" id="Creating-a-Strategy">
+<h2>Creating a Strategy<a class="headerlink" href="#Creating-a-Strategy" title="Permalink to this headline">¶</a></h2>
+<p>We are now ready to create the strategy. Although not necessary for this strategy, we will only act on market open by checking that <code class="docutils literal notranslate"><span class="pre">event</span> <span class="pre">==</span> <span class="pre">'open'</span></code></p>
+<p>We then calculate the 20-day moving average of <strong>JNUGs</strong> close prices.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">no_live_plot</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2019-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s1">&#39;open&#39;</span><span class="p">:</span>
+        <span class="n">jnug_ma</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span><span class="o">-</span><span class="mi">20</span><span class="p">:][</span><span class="s1">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+100%|██████████| 504/504 [00:02&lt;00:00, 179.12it/s]
+</pre></div></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle"><strong>Note:</strong></p>
+<p>The second indexer of <code class="docutils literal notranslate"><span class="pre">b.prices</span></code> (implemented in <code class="docutils literal notranslate"><span class="pre">.DailyPriceProvider</span></code>) can be a date range or single date that allows you to use <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">dateutil.relativedelta.relativedelta</span></code> or <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code> values.</p>
+</div>
+<p>We can check if the current price is above or below the moving average using <code class="docutils literal notranslate"><span class="pre">b.price('JNUG')</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">no_live_plot</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2019-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s1">&#39;open&#39;</span><span class="p">:</span>
+        <span class="n">jnug_ma</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span><span class="o">-</span><span class="mi">20</span><span class="p">:][</span><span class="s1">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="c1"># price is above MA</span>
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="c1"># price is below MA</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+100%|██████████| 504/504 [00:01&lt;00:00, 285.25it/s]
+</pre></div></div>
+</div>
+<p>Now we should only need to buy when the price is above, and sell when the price is below the MA.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">no_live_plot</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2019-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s1">&#39;open&#39;</span><span class="p">:</span>
+        <span class="n">jnug_ma</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span><span class="o">-</span><span class="mi">20</span><span class="p">:][</span><span class="s1">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+            <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># as percent of total value</span>
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+            <span class="n">b</span><span class="o">.</span><span class="n">short</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># as percent of total value</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+  1%|          | 3/504 [00:00&lt;00:06, 79.13it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">InsufficientCapitalError</span><span class="ansi-red-fg">:</span>
+                        not enough capital available:
+                        ordered 1 * 10563.648455632008
+                        with only 449.31090733719975 available
+
+
+</pre></div></div>
+</div>
+<p>But as you might already have expected, this fails with an <code class="docutils literal notranslate"><span class="pre">.InsufficientCapitalError</span></code> This is because we repeatedly try to invest 100% of our assets into <strong>JNUG</strong>, even when we already hold <strong>JNUG</strong> shares.</p>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle"><strong>Note:</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">.Backtester.long</span></code> and <code class="docutils literal notranslate"><span class="pre">.Backtester.short</span></code> allow for use of the following arguments: <strong>percent</strong>: order as percent of total value; <strong>percent_available</strong>: order as percent of the available cash; <strong>absolute</strong>: order as absolute cash value; <strong>nshares</strong>: order as number of shares.</p>
+</div>
+<p>To fix the previous error we now check if the corresponding positions are already in our portfolio, and liquidate positions of the wrong kind. We liquidate long positions before we go short and vice versa:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2019-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s1">&#39;open&#39;</span><span class="p">:</span>
+        <span class="n">jnug_ma</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span><span class="o">-</span><span class="mi">20</span><span class="p">:][</span><span class="s1">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="p">:</span> <span class="c1"># check if we already are long JNUG</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all short JNUG positions</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># long JNUG</span>
+
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">jnug_ma</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">short</span><span class="p">:</span> <span class="c1"># check if we already are short JNUG</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;JNUG&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span> <span class="c1"># liquidate any/all long JNUG positions</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">short</span><span class="p">(</span><span class="s1">&#39;JNUG&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># short JNUG</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_quickstart_19_0.png" src="../_images/intro_quickstart_19_0.png" />
+</div>
+</div>
+<p>While running, the <code class="docutils literal notranslate"><span class="pre">.Backtester.portfolio</span></code> (with the shorthand <code class="docutils literal notranslate"><span class="pre">.Backtester.pf</span></code>) object keeps track of positions. If we hold a position at the very end of the backtest, it will remain in this object. <code class="docutils literal notranslate"><span class="pre">.Backtester.portfolio.df</span></code> holds a dataframe of said positions.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="o">.</span><span class="n">df</span> <span class="c1"># shorthand: b.pf.df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>event</th>
+      <th>initial_value</th>
+      <th>nshares</th>
+      <th>order_type</th>
+      <th>price</th>
+      <th>profit_loss_abs</th>
+      <th>profit_loss_pct</th>
+      <th>start_price</th>
+      <th>symbol</th>
+      <th>value</th>
+      <th>value_pershare</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2019-12-24</td>
+      <td>open</td>
+      <td>4238.278808</td>
+      <td>6.0</td>
+      <td>long</td>
+      <td>832.202148</td>
+      <td>754.934082</td>
+      <td>0.178123</td>
+      <td>706.379801</td>
+      <td>JNUG</td>
+      <td>4993.212891</td>
+      <td>832.202148</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="Inspecting-Metrics">
+<h2>Inspecting Metrics<a class="headerlink" href="#Inspecting-Metrics" title="Permalink to this headline">¶</a></h2>
+<p>Now that our Backtest is complete, we can use <code class="docutils literal notranslate"><span class="pre">.Backtester.metrics</span></code> and <code class="docutils literal notranslate"><span class="pre">.Backtester.summary</span></code> to get more details. Both of these will return DataFrames.</p>
+<div class="section" id="Metrics">
+<h3>Metrics<a class="headerlink" href="#Metrics" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span><span class="o">.</span><span class="n">metrics</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>Max Drawdown (%)</th>
+      <th>Annual Return</th>
+      <th>Portfolio Value</th>
+      <th>Total Value</th>
+      <th>Total Return (%)</th>
+      <th>Daily Profit/Loss</th>
+    </tr>
+    <tr>
+      <th>Backtest</th>
+      <th>Date</th>
+      <th>Event</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">JNUG 20-Day Crossover</th>
+      <th rowspan="2" valign="top">2019-01-02</th>
+      <th>open</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>0.000000</td>
+      <td>10000.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>close</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>9696.819855</td>
+      <td>10146.130762</td>
+      <td>1.461308</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">2019-01-03</th>
+      <th>open</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>10114.337548</td>
+      <td>10563.648456</td>
+      <td>5.636485</td>
+      <td>563.648456</td>
+    </tr>
+    <tr>
+      <th>close</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>10751.050232</td>
+      <td>11200.361139</td>
+      <td>12.003611</td>
+      <td>1054.230377</td>
+    </tr>
+    <tr>
+      <th>2019-01-04</th>
+      <th>open</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>10197.839717</td>
+      <td>10647.150624</td>
+      <td>6.471506</td>
+      <td>83.502169</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">JNUG (Buy &amp; Hold)</th>
+      <th>2019-12-27</th>
+      <th>close</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>16358.200195</td>
+      <td>16807.511103</td>
+      <td>68.075111</td>
+      <td>-718.145142</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">2019-12-30</th>
+      <th>open</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>16615.727700</td>
+      <td>17065.038607</td>
+      <td>70.650386</td>
+      <td>-343.369146</td>
+    </tr>
+    <tr>
+      <th>close</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>17553.713379</td>
+      <td>18003.024286</td>
+      <td>80.030243</td>
+      <td>1195.513184</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">2019-12-31</th>
+      <th>open</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>18221.607392</td>
+      <td>18670.918299</td>
+      <td>86.709183</td>
+      <td>1605.879692</td>
+    </tr>
+    <tr>
+      <th>close</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>17476.245117</td>
+      <td>17925.556025</td>
+      <td>79.255560</td>
+      <td>-77.468262</td>
+    </tr>
+  </tbody>
+</table>
+<p>1008 rows × 6 columns</p>
+</div></div>
+</div>
+</div>
+<div class="section" id="Summary">
+<h3>Summary<a class="headerlink" href="#Summary" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span><span class="o">.</span><span class="n">summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Max Drawdown (%)</th>
+      <th>Annual Return</th>
+      <th>Portfolio Value (Last Value)</th>
+      <th>Total Value (Last Value)</th>
+      <th>Total Return (%) (Last Value)</th>
+      <th>Daily Profit/Loss (Last Value)</th>
+    </tr>
+    <tr>
+      <th>Backtest</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>JNUG 20-Day Crossover</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>4993.212891</td>
+      <td>5276.118290</td>
+      <td>-47.238817</td>
+      <td>-22.133789</td>
+    </tr>
+    <tr>
+      <th>JNUG (Buy &amp; Hold)</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>17476.245117</td>
+      <td>17925.556025</td>
+      <td>79.255560</td>
+      <td>-77.468262</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Strategies">
+<h2>Strategies<a class="headerlink" href="#Strategies" title="Permalink to this headline">¶</a></h2>
+<p>You can also use <code class="docutils literal notranslate"><span class="pre">.Backtester.strategies</span></code> which returns a <code class="docutils literal notranslate"><span class="pre">.StrategySequence</span></code>, with their own <code class="docutils literal notranslate"><span class="pre">.Backtester.metrics</span></code> and <code class="docutils literal notranslate"><span class="pre">.Backtester.summary</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span><span class="o">.</span><span class="n">strategies</span><span class="p">[</span><span class="s1">&#39;JNUG 20-Day Crossover&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">metrics</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>Max Drawdown (%)</th>
+      <th>Annual Return</th>
+      <th>Portfolio Value</th>
+      <th>Total Value</th>
+      <th>Total Return (%)</th>
+      <th>Daily Profit/Loss</th>
+    </tr>
+    <tr>
+      <th>Backtest</th>
+      <th>Date</th>
+      <th>Event</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">JNUG 20-Day Crossover</th>
+      <th rowspan="2" valign="top">2019-01-02</th>
+      <th>open</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>0.000000</td>
+      <td>10000.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>close</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>9696.819855</td>
+      <td>10146.130762</td>
+      <td>1.461308</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">2019-01-03</th>
+      <th>open</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>10114.337548</td>
+      <td>10563.648456</td>
+      <td>5.636485</td>
+      <td>563.648456</td>
+    </tr>
+    <tr>
+      <th>close</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>10751.050232</td>
+      <td>11200.361139</td>
+      <td>12.003611</td>
+      <td>1054.230377</td>
+    </tr>
+    <tr>
+      <th>2019-01-04</th>
+      <th>open</th>
+      <td>-71.121124</td>
+      <td>0.525525</td>
+      <td>10197.839717</td>
+      <td>10647.150624</td>
+      <td>6.471506</td>
+      <td>83.502169</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">JNUG (Buy &amp; Hold)</th>
+      <th>2019-12-27</th>
+      <th>close</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>16358.200195</td>
+      <td>16807.511103</td>
+      <td>68.075111</td>
+      <td>-718.145142</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">2019-12-30</th>
+      <th>open</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>16615.727700</td>
+      <td>17065.038607</td>
+      <td>70.650386</td>
+      <td>-343.369146</td>
+    </tr>
+    <tr>
+      <th>close</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>17553.713379</td>
+      <td>18003.024286</td>
+      <td>80.030243</td>
+      <td>1195.513184</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">2019-12-31</th>
+      <th>open</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>18221.607392</td>
+      <td>18670.918299</td>
+      <td>86.709183</td>
+      <td>1605.879692</td>
+    </tr>
+    <tr>
+      <th>close</th>
+      <td>-49.921226</td>
+      <td>1.799052</td>
+      <td>17476.245117</td>
+      <td>17925.556025</td>
+      <td>79.255560</td>
+      <td>-77.468262</td>
+    </tr>
+  </tbody>
+</table>
+<p>1008 rows × 6 columns</p>
+</div></div>
+</div>
+<p>The advantage of using using <code class="docutils literal notranslate"><span class="pre">.StrategySequence</span></code> is that we can also use it for plotting.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span><span class="o">.</span><span class="n">strategies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_quickstart_30_0.png" src="../_images/intro_quickstart_30_0.png" />
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="debugging.html" class="btn btn-neutral float-right" title="Debugging a Strategy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral float-left" title="simple-back" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Christoph Minixhofer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

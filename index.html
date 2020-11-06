@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simple-back &mdash; simple-back  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Creating a Simple Strategy" href="intro/quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> simple-back
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro/quickstart.html">Creating a Simple Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro/debugging.html">Debugging a Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro/slippage.html">Strategy Objects &amp; Slippage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro/fees.html">Fees &amp; Trade Costs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro/example.html">Example Code</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="adv/data_sources.html">Using External Data &amp; Machine Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/simple_back.html">simple_back package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">simple-back</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>simple-back </li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="simple-back-version">
+<h1>simple-back <a class="headerlink" href="#simple-back-version" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://github.com/MiniXC/simple-back"><img alt="Build Status" src="https://github.com/MiniXC/simple-back/workflows/build/badge.svg" /></a> <a class="reference external" href="https://pypi.org/project/simple-back/"><img alt="PyPi" src="https://img.shields.io/pypi/v/simple-back" /></a> <img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-000000.svg" /> <a class="reference external" href="https://codecov.io/gh/MiniXC/simple-back"><img alt="codecov" src="https://codecov.io/gh/MiniXC/simple-back/branch/master/graph/badge.svg" /></a></p>
+<blockquote>
+<div></div></blockquote>
+<p><strong>simple-back</strong> is a backtester providing easy ways to test trading
+strategies, with minimal amounts of code, while avoiding time leaks.
+At the same time, we aim to make it easy to use your own data and price sources.</p>
+<p>This package is especially useful when used in Jupyter Notebooks,
+as it provides ways to show you live feedback
+while your backtests are being run.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>simple-back</strong> is under active development.
+Any update could introduce breaking changes or even bugs (although we try to avoid the latter as much as possible).
+As soon as the API is finalized, version 1.0 will be released and this disclaimer will be removed.</p>
+<p>To get a sense of how far we are along, you can have a look at the <a class="reference external" href="https://github.com/MiniXC/simple-back/milestone/1">1.0 milestone</a>.</p>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>simple-back</strong> uses <a class="reference external" href="https://matplotlib.org/">matplotlib</a> for live plotting.
+Make sure to install matplotlib using <cite>pip install matplotlib</cite> if you want to use live plotting.</p>
+</div>
+<div class="section" id="intro-quickstart">
+<h3><a class="reference internal" href="intro/quickstart.html"><span class="doc">Creating a Simple Strategy</span></a><a class="headerlink" href="#intro-quickstart" title="Permalink to this headline">¶</a></h3>
+<p>Build and test a simple strategy using simple-back.</p>
+</div>
+<div class="section" id="intro-debugging">
+<h3><a class="reference internal" href="intro/debugging.html"><span class="doc">Debugging a Strategy</span></a><a class="headerlink" href="#intro-debugging" title="Permalink to this headline">¶</a></h3>
+<p>Visualize and improve your strategy.</p>
+</div>
+<div class="section" id="intro-slippage">
+<h3><a class="reference internal" href="intro/slippage.html"><span class="doc">Strategy Objects &amp; Slippage</span></a><a class="headerlink" href="#intro-slippage" title="Permalink to this headline">¶</a></h3>
+<p>Move from stateless iterators to stateful strategy objects and configure slippage.</p>
+</div>
+<div class="section" id="intro-fees">
+<h3><a class="reference internal" href="intro/fees.html"><span class="doc">Fees &amp; Trade Costs</span></a><a class="headerlink" href="#intro-fees" title="Permalink to this headline">¶</a></h3>
+<p>Test if your strategies hold up against potential broker fees.</p>
+</div>
+<div class="section" id="intro-example">
+<h3><a class="reference internal" href="intro/example.html"><span class="doc">Example Code</span></a><a class="headerlink" href="#intro-example" title="Permalink to this headline">¶</a></h3>
+<p>Just copy example code and get started yourself.</p>
+</div>
+</div>
+<div class="section" id="advanced">
+<h2>Advanced<a class="headerlink" href="#advanced" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="adv-data-sources">
+<h3><a class="reference internal" href="adv/data_sources.html"><span class="doc">Using External Data &amp; Machine Learning</span></a><a class="headerlink" href="#adv-data-sources" title="Permalink to this headline">¶</a></h3>
+<p>Use text data and machine learning to predict stock prices.
+The api used for this tutorial will change in version <strong>0.7</strong>.</p>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="intro/quickstart.html" class="btn btn-neutral float-right" title="Creating a Simple Strategy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Christoph Minixhofer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

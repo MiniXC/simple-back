@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Example Code &mdash; simple-back  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using External Data &amp; Machine Learning" href="../adv/data_sources.html" />
+    <link rel="prev" title="Fees &amp; Trade Costs" href="fees.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> simple-back
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Creating a Simple Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging a Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slippage.html">Strategy Objects &amp; Slippage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fees.html">Fees &amp; Trade Costs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example Code</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../adv/data_sources.html">Using External Data &amp; Machine Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/simple_back.html">simple_back package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">simple-back</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Example Code</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/intro/example.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="example-code">
+<h1>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">simple_back.backtester</span> <span class="kn">import</span> <span class="n">BacktesterBuilder</span>
+
+<span class="n">builder</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">BacktesterBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="s2">&quot;My First Strategy&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="mi">10_000</span><span class="p">)</span>  <span class="c1"># define your starting balance</span>
+    <span class="o">.</span><span class="n">live_progress</span><span class="p">()</span>  <span class="c1"># show a progress bar (requires tqdm)</span>
+    <span class="c1"># .live_plot()      # shows a live plot when working in a notebook</span>
+    <span class="o">.</span><span class="n">compare</span><span class="p">([</span><span class="s2">&quot;MSFT&quot;</span><span class="p">])</span>  <span class="c1"># compare to buying and holding MSFT</span>
+    <span class="o">.</span><span class="n">calendar</span><span class="p">(</span><span class="s2">&quot;NYSE&quot;</span><span class="p">)</span>  <span class="c1"># trade on days the NYSE is open</span>
+<span class="p">)</span>
+
+<span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># build the backtester</span>
+
+<span class="c1"># you can now use bt like you would any iterator</span>
+<span class="c1"># specify a date range, and the code inside will be run</span>
+<span class="c1"># on open and close of every trading day in that range</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s2">&quot;2019-1-1&quot;</span><span class="p">:</span><span class="s2">&quot;2020-1-1&quot;</span><span class="p">]:</span>
+
+    <span class="c1"># you can get the current prices of securities</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">price</span><span class="p">(</span><span class="s2">&quot;MSFT&quot;</span><span class="p">)</span>  <span class="c1"># the current price of MSFT</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">prices</span><span class="p">[</span><span class="s2">&quot;MSFT&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">30</span><span class="p">:][</span><span class="s2">&quot;open&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="c1"># ^ gets the mean open price over the last 30 days</span>
+
+    <span class="c1"># you can now order stocks using</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s2">&quot;MSFT&quot;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>  <span class="c1"># allocate .5 of your funds to MSFT</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span>
+        <span class="s2">&quot;MSFT&quot;</span><span class="p">,</span> <span class="n">percent_available</span><span class="o">=</span><span class="mf">0.1</span>
+    <span class="p">)</span>  <span class="c1"># allocate .1 of your cash still available to MSFT</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s2">&quot;MSFT&quot;</span><span class="p">,</span> <span class="n">absolute</span><span class="o">=</span><span class="mi">1_000</span><span class="p">)</span>  <span class="c1"># buy 1,000 worth of MSFT</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s2">&quot;MSFT&quot;</span><span class="p">,</span> <span class="n">nshares</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># buy 1 MSFT share</span>
+
+    <span class="c1"># you can access your protfolio using</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span>
+    <span class="c1"># or in dataframe form using</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">portfolio</span><span class="o">.</span><span class="n">df</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">df</span>
+
+    <span class="c1"># you can use the portfolio object to get out of positions</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>  <span class="c1"># liquidate all positions</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">long</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>  <span class="c1"># liquidate all long positions</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="p">[</span><span class="s2">&quot;MSFT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>  <span class="c1"># liquidate all MSFT positions</span>
+
+    <span class="c1"># you can also filter the portfolio using</span>
+    <span class="c1"># the portfolio dataframe, or using .filter</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">profit_loss_pct</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">]</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">profit_loss_pct</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>
+    <span class="c1"># ^ both liquidate all positions that have lost more than 5%</span>
+
+    <span class="c1"># you can use the metric dict to get current metrics</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">metric</span><span class="p">[</span><span class="s2">&quot;Portfolio Value&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># gets the last computed value</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">metric</span><span class="p">[</span><span class="s2">&quot;Portfolio Value&quot;</span><span class="p">]()</span>  <span class="c1"># computes the current value</span>
+
+
+<span class="c1"># AFTER THE BACKTEST</span>
+
+<span class="c1"># get all metrics in dataframe form</span>
+<span class="n">bt</span><span class="o">.</span><span class="n">metrics</span>
+
+<span class="c1"># get a summary of the backtest as a dataframe</span>
+<span class="n">bt</span><span class="o">.</span><span class="n">summary</span>
+<span class="c1"># ^ this is useful for comparison when running several strategies</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../adv/data_sources.html" class="btn btn-neutral float-right" title="Using External Data &amp; Machine Learning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="fees.html" class="btn btn-neutral float-left" title="Fees &amp; Trade Costs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Christoph Minixhofer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

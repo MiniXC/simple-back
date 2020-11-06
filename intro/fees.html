@@ -1,0 +1,919 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Fees &amp; Trade Costs &mdash; simple-back  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Example Code" href="example.html" />
+    <link rel="prev" title="Strategy Objects &amp; Slippage" href="slippage.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> simple-back
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Creating a Simple Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging a Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slippage.html">Strategy Objects &amp; Slippage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Fees &amp; Trade Costs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Flat-Fees">Flat Fees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Custom-Fees">Custom Fees</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Example Code</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../adv/data_sources.html">Using External Data &amp; Machine Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/simple_back.html">simple_back package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">simple-back</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Fees &amp; Trade Costs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/intro/fees.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Fees-&amp;-Trade-Costs">
+<h1>Fees &amp; Trade Costs<a class="headerlink" href="#Fees-&-Trade-Costs" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://colab.research.google.com/github/MiniXC/simple-back/blob/master/docs/intro/fees.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p>Some strategies can fall apart when broker commissions are taken into account. The <code class="docutils literal notranslate"><span class="pre">FlatPerFee</span></code> and <code class="docutils literal notranslate"><span class="pre">FlatPerShare</span></code> fees come with simple-back, but you can define your own fees by extending the <code class="docutils literal notranslate"><span class="pre">Fee</span></code> class.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>%%capture
+!pip install --upgrade simple_back
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">simple_back.backtester</span> <span class="kn">import</span> <span class="n">BacktesterBuilder</span>
+
+<span class="n">builder</span> <span class="o">=</span> <span class="p">(</span>
+   <span class="n">BacktesterBuilder</span><span class="p">()</span>
+   <span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="s1">&#39;AAPL without Fees&#39;</span><span class="p">)</span>
+   <span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="mi">10_000</span><span class="p">)</span>
+   <span class="o">.</span><span class="n">calendar</span><span class="p">(</span><span class="s1">&#39;NYSE&#39;</span><span class="p">)</span>
+   <span class="o">.</span><span class="n">compare</span><span class="p">([</span><span class="s1">&#39;AAPL&#39;</span><span class="p">])</span>
+   <span class="o">.</span><span class="n">live_progress</span><span class="p">()</span>
+   <span class="o">.</span><span class="n">live_plot</span><span class="p">()</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2015-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_fees_3_0.png" src="../_images/intro_fees_3_0.png" />
+</div>
+</div>
+<div class="section" id="Flat-Fees">
+<h2>Flat Fees<a class="headerlink" href="#Flat-Fees" title="Permalink to this headline">¶</a></h2>
+<p>As you can see, selling &amp; buying AAPL at every open and close results in the same as simply buying it once and holding it. But for many brokers, this is not realistic. Let’s assume we have to pay a flat commission of 1 dollar per trade. We can do this using <code class="docutils literal notranslate"><span class="pre">FlatPerTrade</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">simple_back.fees</span> <span class="kn">import</span> <span class="n">FlatPerTrade</span>
+
+<span class="n">bt</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">builder</span>
+    <span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="s1">&#39;AAPL (fee per trade)&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">trade_cost</span><span class="p">(</span><span class="n">FlatPerTrade</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2015-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_fees_6_0.png" src="../_images/intro_fees_6_0.png" />
+</div>
+</div>
+<p>We can also assume a flat commission of 5 cents per share.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">simple_back.fees</span> <span class="kn">import</span> <span class="n">FlatPerShare</span>
+
+<span class="n">bt</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">builder</span>
+    <span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="s1">&#39;AAPL (fee per share)&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">trade_cost</span><span class="p">(</span><span class="n">FlatPerShare</span><span class="p">(</span><span class="o">.</span><span class="mi">05</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2015-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_fees_8_0.png" src="../_images/intro_fees_8_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Custom-Fees">
+<h2>Custom Fees<a class="headerlink" href="#Custom-Fees" title="Permalink to this headline">¶</a></h2>
+<p>Let’s now build a custom <code class="docutils literal notranslate"><span class="pre">Fee</span></code> that charges a percentage of the total cost.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">simple_back.fees</span> <span class="kn">import</span> <span class="n">Fee</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">PercentageFee</span><span class="p">(</span><span class="n">Fee</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fee_percent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fee_percent</span> <span class="o">=</span> <span class="n">fee_percent</span>
+
+    <span class="k">def</span> <span class="nf">nshares</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">capital</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">capital</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fee_percent</span><span class="p">)))</span> <span class="o">//</span> <span class="n">price</span>
+
+    <span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">nshares</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">price</span> <span class="o">*</span> <span class="n">nshares</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fee_percent</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>For testing we can treat our <code class="docutils literal notranslate"><span class="pre">Fee</span></code> object like a callable.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">PercentageFee</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">)(</span><span class="n">price</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">capital</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;nshares&#39;: 66.0, &#39;total&#39;: 990.0, &#39;fee&#39;: 330.0}
+</pre></div></div>
+</div>
+<p>The above means that when we have a security with price 10 and our capital is 1000, we can buy 66 shares for a total of 990 and of that 990, 330 will be fees.</p>
+<p>Now, we can use our <code class="docutils literal notranslate"><span class="pre">PercentageFee</span></code> in our backtest.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">builder</span>
+    <span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="s1">&#39;AAPL (fee per share)&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">trade_cost</span><span class="p">(</span><span class="n">PercentageFee</span><span class="p">(</span><span class="o">.</span><span class="mi">0005</span><span class="p">))</span> <span class="c1"># 0.05 %</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2015-1-1&#39;</span><span class="p">:</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">long</span><span class="p">(</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/intro_fees_16_0.png" src="../_images/intro_fees_16_0.png" />
+</div>
+</div>
+<p>Fees are saved in the trade history as well.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bt</span><span class="o">.</span><span class="n">trades</span><span class="o">.</span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>end_date</th>
+      <th>end_event</th>
+      <th>event</th>
+      <th>fee</th>
+      <th>initial_value</th>
+      <th>nshares</th>
+      <th>order_type</th>
+      <th>price</th>
+      <th>profit_loss_abs</th>
+      <th>profit_loss_pct</th>
+      <th>start_price</th>
+      <th>symbol</th>
+      <th>value</th>
+      <th>value_pershare</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2015-01-02</td>
+      <td>2015-01-02</td>
+      <td>close</td>
+      <td>open</td>
+      <td>4.989624</td>
+      <td>9984.238150</td>
+      <td>98.0</td>
+      <td>long</td>
+      <td>99.945885</td>
+      <td>-189.541449</td>
+      <td>-0.018984</td>
+      <td>101.829067</td>
+      <td>AAPL</td>
+      <td>9794.696701</td>
+      <td>99.945885</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2015-01-02</td>
+      <td>2015-01-05</td>
+      <td>open</td>
+      <td>close</td>
+      <td>4.897348</td>
+      <td>9799.594049</td>
+      <td>98.0</td>
+      <td>long</td>
+      <td>98.995143</td>
+      <td>-98.070049</td>
+      <td>-0.010008</td>
+      <td>99.945885</td>
+      <td>AAPL</td>
+      <td>9701.524001</td>
+      <td>98.995143</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2015-01-05</td>
+      <td>2015-01-05</td>
+      <td>close</td>
+      <td>open</td>
+      <td>4.850762</td>
+      <td>9706.374763</td>
+      <td>98.0</td>
+      <td>long</td>
+      <td>97.130241</td>
+      <td>-187.611106</td>
+      <td>-0.019329</td>
+      <td>98.995143</td>
+      <td>AAPL</td>
+      <td>9518.763657</td>
+      <td>97.130241</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2015-01-05</td>
+      <td>2015-01-06</td>
+      <td>open</td>
+      <td>close</td>
+      <td>4.759382</td>
+      <td>9523.523038</td>
+      <td>98.0</td>
+      <td>long</td>
+      <td>97.395385</td>
+      <td>21.224719</td>
+      <td>0.002229</td>
+      <td>97.130241</td>
+      <td>AAPL</td>
+      <td>9544.747758</td>
+      <td>97.395385</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2015-01-06</td>
+      <td>2015-01-06</td>
+      <td>close</td>
+      <td>open</td>
+      <td>4.723676</td>
+      <td>9452.076049</td>
+      <td>97.0</td>
+      <td>long</td>
+      <td>97.139420</td>
+      <td>-29.552352</td>
+      <td>-0.003127</td>
+      <td>97.395385</td>
+      <td>AAPL</td>
+      <td>9422.523697</td>
+      <td>97.139420</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2510</th>
+      <td>2019-12-27</td>
+      <td>2019-12-27</td>
+      <td>close</td>
+      <td>open</td>
+      <td>3.910230</td>
+      <td>7824.369503</td>
+      <td>27.0</td>
+      <td>long</td>
+      <td>288.333313</td>
+      <td>-39.370053</td>
+      <td>-0.005032</td>
+      <td>289.646640</td>
+      <td>AAPL</td>
+      <td>7784.999451</td>
+      <td>288.333313</td>
+    </tr>
+    <tr>
+      <th>2511</th>
+      <td>2019-12-27</td>
+      <td>2019-12-30</td>
+      <td>open</td>
+      <td>close</td>
+      <td>3.892500</td>
+      <td>7788.891950</td>
+      <td>27.0</td>
+      <td>long</td>
+      <td>287.995045</td>
+      <td>-13.025743</td>
+      <td>-0.001672</td>
+      <td>288.333313</td>
+      <td>AAPL</td>
+      <td>7775.866207</td>
+      <td>287.995045</td>
+    </tr>
+    <tr>
+      <th>2512</th>
+      <td>2019-12-30</td>
+      <td>2019-12-30</td>
+      <td>close</td>
+      <td>open</td>
+      <td>3.887933</td>
+      <td>7779.754140</td>
+      <td>27.0</td>
+      <td>long</td>
+      <td>290.044617</td>
+      <td>51.450510</td>
+      <td>0.006613</td>
+      <td>287.995045</td>
+      <td>AAPL</td>
+      <td>7831.204651</td>
+      <td>290.044617</td>
+    </tr>
+    <tr>
+      <th>2513</th>
+      <td>2019-12-30</td>
+      <td>2019-12-31</td>
+      <td>open</td>
+      <td>close</td>
+      <td>3.915602</td>
+      <td>7835.120253</td>
+      <td>27.0</td>
+      <td>long</td>
+      <td>288.462644</td>
+      <td>-46.628859</td>
+      <td>-0.005951</td>
+      <td>290.044617</td>
+      <td>AAPL</td>
+      <td>7788.491394</td>
+      <td>288.462644</td>
+    </tr>
+    <tr>
+      <th>2514</th>
+      <td>2019-12-31</td>
+      <td>2019-12-31</td>
+      <td>close</td>
+      <td>open</td>
+      <td>3.894246</td>
+      <td>7792.385640</td>
+      <td>27.0</td>
+      <td>long</td>
+      <td>292.163818</td>
+      <td>96.037456</td>
+      <td>0.012325</td>
+      <td>288.462644</td>
+      <td>AAPL</td>
+      <td>7888.423096</td>
+      <td>292.163818</td>
+    </tr>
+  </tbody>
+</table>
+<p>2515 rows × 15 columns</p>
+</div></div>
+</div>
+<p>Profit and loss also includes the fees.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="example.html" class="btn btn-neutral float-right" title="Example Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="slippage.html" class="btn btn-neutral float-left" title="Strategy Objects &amp; Slippage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Christoph Minixhofer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

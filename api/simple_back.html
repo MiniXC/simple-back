@@ -1,0 +1,1661 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simple_back package &mdash; simple-back  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Using External Data &amp; Machine Learning" href="../adv/data_sources.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> simple-back
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/quickstart.html">Creating a Simple Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/debugging.html">Debugging a Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/slippage.html">Strategy Objects &amp; Slippage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/fees.html">Fees &amp; Trade Costs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/example.html">Example Code</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../adv/data_sources.html">Using External Data &amp; Machine Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">simple_back package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simple_back.backtester">simple_back.backtester module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simple_back.data_providers">simple_back.data_providers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simple_back.exceptions">simple_back.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simple_back.fees">simple_back.fees module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simple_back.metrics">simple_back.metrics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simple_back.strategy">simple_back.strategy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simple_back.utils">simple_back.utils module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">simple-back</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>simple_back package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/simple_back.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="module-simple_back">
+<span id="simple-back-package"></span><h1>simple_back package<a class="headerlink" href="#module-simple_back" title="Permalink to this headline">¶</a></h1>
+<p>A backtester with minimal setup and sensible defaults.</p>
+<p><strong>simple_back</strong> is a backtester providing easy ways to test trading
+strategies, often ones that use external data, with minimal amount of
+code, while avoiding time leaks.</p>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-simple_back.backtester">
+<span id="simple-back-backtester-module"></span><h2>simple_back.backtester module<a class="headerlink" href="#module-simple_back.backtester" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="simple_back.backtester.Backtester">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.backtester.</code><code class="sig-name descname">Backtester</code><a class="reference internal" href="../_modules/simple_back/backtester.html#Backtester"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Backtester" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <a class="reference internal" href="#simple_back.backtester.Backtester" title="simple_back.backtester.Backtester"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backtester</span></code></a> object is yielded alongside
+the current day and event (open or close)
+when it is called with a date range,
+which can be of the following forms.
+The <a class="reference internal" href="#simple_back.backtester.Backtester" title="simple_back.backtester.Backtester"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backtester</span></code></a> object stores information
+about the backtest after it has completed.</p>
+<p class="rubric">Examples</p>
+<p>Initialize with dates as strings:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2010-1-1&#39;</span><span class="p">,</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="c1"># or</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;2010-1-1&#39;</span><span class="p">,</span><span class="s1">&#39;2020-1-1&#39;</span><span class="p">]:</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>Initialize with dates as <code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code> objects:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2010</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Initialize with dates as <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="p">[</span><span class="o">-</span><span class="mi">100</span><span class="p">:]</span> <span class="c1"># backtest 100 days into the past</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.add_line">
+<code class="sig-name descname">add_line</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Backtester.add_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Backtester.add_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a vertical line on the plot on the current date + event.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.add_metric">
+<code class="sig-name descname">add_metric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Backtester.add_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Backtester.add_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called inside the backtest, adds a metric that is visually tracked.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the metric name</p></li>
+<li><p><strong>value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – the numerical value of the metric</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.balance">
+<em class="property">property </em><code class="sig-name descname">balance</code><a class="headerlink" href="#simple_back.backtester.Backtester.balance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current or starting balance.</p>
+<p class="rubric">Examples</p>
+<p>Get the current balance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="o">.</span><span class="n">balance</span><span class="o">.</span><span class="n">current</span>
+</pre></div>
+</div>
+<p>Get the starting balance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="o">.</span><span class="n">balance</span><span class="o">.</span><span class="n">start</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Balance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.log">
+<code class="sig-name descname">log</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">text</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Backtester.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Backtester.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a log text on the current day and event that can be accessed using <a class="reference internal" href="#simple_back.backtester.Backtester.logs" title="simple_back.backtester.Backtester.logs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logs</span></code></a>
+after the backtest has completed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – text to log</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.logs">
+<em class="property">property </em><code class="sig-name descname">logs</code><a class="headerlink" href="#simple_back.backtester.Backtester.logs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> for logs collected during the backtest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.long">
+<code class="sig-name descname">long</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Backtester.long"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Backtester.long" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enter a long position of the given symbol.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the ticker to buy</p></li>
+<li><p><strong>kwargs</strong> – one of either
+“percent” as a percentage of total value (cash + positions),
+“absolute” as an absolute value,
+“percent_available” as a percentage of remaining funds (excluding positions)
+“nshares” as a number of shares</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.metrics">
+<em class="property">property </em><code class="sig-name descname">metrics</code><a class="headerlink" href="#simple_back.backtester.Backtester.metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a dataframe of all metrics collected during the backtest(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.pf">
+<em class="property">property </em><code class="sig-name descname">pf</code><a class="headerlink" href="#simple_back.backtester.Backtester.pf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shorthand for <cite>portfolio</cite>, returns the backtesters portfolio.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#simple_back.backtester.Portfolio" title="simple_back.backtester.Portfolio"><code class="xref py py-class docutils literal notranslate"><span class="pre">Portfolio</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.price">
+<code class="sig-name descname">price</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Backtester.price"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Backtester.price" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current price of a given symbol.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>symbol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the ticker</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Backtester.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Backtester.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the backtesters strategies without using an iterator.
+This is only possible if strategies have been set using <a class="reference internal" href="#simple_back.backtester.BacktesterBuilder.strategies" title="simple_back.backtester.BacktesterBuilder.strategies"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BacktesterBuilder.strategies()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.short">
+<code class="sig-name descname">short</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Backtester.short"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Backtester.short" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enter a short position of the given symbol.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the ticker to short</p></li>
+<li><p><strong>kwargs</strong> – one of either
+“percent” as a percentage of total value (cash + positions),
+“absolute” as an absolute value,
+“percent_available” as a percentage of remaining funds (excluding positions)
+“nshares” as a number of shares</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.show">
+<code class="sig-name descname">show</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">start</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Backtester.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Backtester.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the backtester as a plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> – the start date</p></li>
+<li><p><strong>end</strong> – the end date</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.strategies">
+<em class="property">property </em><code class="sig-name descname">strategies</code><a class="headerlink" href="#simple_back.backtester.Backtester.strategies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides access to sub-strategies, returning a <a class="reference internal" href="#simple_back.backtester.StrategySequence" title="simple_back.backtester.StrategySequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">StrategySequence</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.summary">
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#simple_back.backtester.Backtester.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a dataframe showing the last and overall values of all metrics
+collected during the backtest.
+This can be helpful for comparing backtests at a glance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Backtester.timestamp">
+<em class="property">property </em><code class="sig-name descname">timestamp</code><a class="headerlink" href="#simple_back.backtester.Backtester.timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current timestamp, which includes the correct open/close time,
+depending on the calendar that was set using <a class="reference internal" href="#simple_back.backtester.BacktesterBuilder.calendar" title="simple_back.backtester.BacktesterBuilder.calendar"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BacktesterBuilder.calendar()</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.backtester.BacktesterBuilder">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.backtester.</code><code class="sig-name descname">BacktesterBuilder</code><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Used to configure a <a class="reference internal" href="#simple_back.backtester.Backtester" title="simple_back.backtester.Backtester"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backtester</span></code></a>
+and then creating it with <a class="reference internal" href="#simple_back.backtester.BacktesterBuilder.build" title="simple_back.backtester.BacktesterBuilder.build"><code class="xref py py-meth docutils literal notranslate"><span class="pre">build()</span></code></a></p>
+<p class="rubric">Example</p>
+<p>Create a new <a class="reference internal" href="#simple_back.backtester.Backtester" title="simple_back.backtester.Backtester"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backtester</span></code></a> with 10,000 starting balance
+which runs on days the <a class="reference external" href="https://www.nyse.com/index">NYSE</a> is open:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span> <span class="o">=</span> <span class="n">BacktesterBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="mi">10_000</span><span class="p">)</span><span class="o">.</span><span class="n">calendar</span><span class="p">(</span><span class="s1">&#39;NYSE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.balance">
+<code class="sig-name descname">balance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">amount</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.balance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.balance" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Required</strong>, set the starting balance for all <a class="reference internal" href="#simple_back.strategy.Strategy" title="simple_back.strategy.Strategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Strategy</span></code></a> objects
+run with the <a class="reference internal" href="#simple_back.backtester.Backtester" title="simple_back.backtester.Backtester"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backtester</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>amount</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The starting balance.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a <a class="reference internal" href="#simple_back.backtester.Backtester" title="simple_back.backtester.Backtester"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backtester</span></code></a> given the previous configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#simple_back.backtester.Backtester" title="simple_back.backtester.Backtester"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backtester</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.calendar">
+<code class="sig-name descname">calendar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">calendar</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.calendar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.calendar" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, set a <a class="reference external" href="https://pandas-market-calendars.readthedocs.io/en/latest/calendars.html">pandas market calendar</a> to be used.
+If not called, “NYSE” is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>calendar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the calendar identifier</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.clear_metrics">
+<code class="sig-name descname">clear_metrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.clear_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.clear_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, remove all default metrics,
+except <a class="reference internal" href="#simple_back.metrics.PortfolioValue" title="simple_back.metrics.PortfolioValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">PortfolioValue</span></code></a>, which is needed internally.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.compare">
+<code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">strategies</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, alias for <a class="reference internal" href="#simple_back.backtester.BacktesterBuilder.strategies" title="simple_back.backtester.BacktesterBuilder.strategies"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BacktesterBuilder.strategies()</span></code></a>,
+should be used when comparing to <a class="reference internal" href="#simple_back.strategy.BuyAndHold" title="simple_back.strategy.BuyAndHold"><code class="xref py py-class docutils literal notranslate"><span class="pre">BuyAndHold</span></code></a> of a ticker instead of other strategies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>strategies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#simple_back.backtester.Backtester" title="simple_back.backtester.Backtester"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backtester</span></code></a>], <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>], <a class="reference internal" href="#simple_back.strategy.Strategy" title="simple_back.strategy.Strategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Strategy</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – should be the string of the ticker to compare to,
+but <a class="reference internal" href="#simple_back.strategy.Strategy" title="simple_back.strategy.Strategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Strategy</span></code></a> objects can be passed as well</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.data">
+<code class="sig-name descname">data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.data" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, add a <a class="reference internal" href="#simple_back.data_providers.DataProvider" title="simple_back.data_providers.DataProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataProvider</span></code></a> to use external data without time leaks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference internal" href="#simple_back.data_providers.DataProvider" title="simple_back.data_providers.DataProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataProvider</span></code></a>) – The data provider.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.live_metrics">
+<code class="sig-name descname">live_metrics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">every</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.live_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.live_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, shows all metrics live in output. This can be useful
+when running simple-back from terminal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>every</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – how often metrics should be updated</p></li>
+<li><p><strong>events</strong> (<em>(</em><em>in</em>) – </p></li>
+<li><p><strong>10 = 5 days</strong><strong>)</strong> (<em>e.g.</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.live_plot">
+<code class="sig-name descname">live_plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">every</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'Total Value'</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">min_y</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">blocking</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.live_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.live_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, shows the backtest results live using matplotlib.
+Can only be used in notebooks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>every</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – how often metrics should be updated
+(in events, e.g. 10 = 5 days)
+the regular default is 10,
+blocking default is 100</p></li>
+<li><p><strong>metric</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – which metric to plot</p></li>
+<li><p><strong>figsize</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – size of the plot</p></li>
+<li><p><strong>min_y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – minimum value on the y axis, set to <cite>None</cite>
+for no lower limit</p></li>
+<li><p><strong>blocking</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – will disable threading for plots and
+allow live plotting in terminal,
+this will slow down the backtester
+significantly</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.live_progress">
+<code class="sig-name descname">live_progress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">every</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.live_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.live_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, shows a live progress bar using <code class="xref py py-class docutils literal notranslate"><span class="pre">tqdm</span></code>, either
+as port of a plot or as text output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.metrics">
+<code class="sig-name descname">metrics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">metrics</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, set additional <a class="reference internal" href="#simple_back.metrics.Metric" title="simple_back.metrics.Metric"><code class="xref py py-class docutils literal notranslate"><span class="pre">Metric</span></code></a> objects to be used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>metrics</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="#simple_back.metrics.Metric" title="simple_back.metrics.Metric"><code class="xref py py-class docutils literal notranslate"><span class="pre">Metric</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#simple_back.metrics.Metric" title="simple_back.metrics.Metric"><code class="xref py py-class docutils literal notranslate"><span class="pre">Metric</span></code></a>]]) – one or more <a class="reference internal" href="#simple_back.metrics.Metric" title="simple_back.metrics.Metric"><code class="xref py py-class docutils literal notranslate"><span class="pre">Metric</span></code></a> objects</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.name">
+<code class="sig-name descname">name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, name will be set to “Backtest 0” if not specified.</p>
+<p>Set the name of the strategy run using the <a class="reference internal" href="#simple_back.backtester.Backtester" title="simple_back.backtester.Backtester"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backtester</span></code></a> iterator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The strategy name.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.no_live_metrics">
+<code class="sig-name descname">no_live_metrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.no_live_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.no_live_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disables showing live metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.no_live_plot">
+<code class="sig-name descname">no_live_plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.no_live_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.no_live_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disables showing live plots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.no_live_progress">
+<code class="sig-name descname">no_live_progress</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.no_live_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.no_live_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disables the live progress bar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.prices">
+<code class="sig-name descname">prices</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prices</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.prices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.prices" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, set the <a class="reference internal" href="#simple_back.data_providers.DailyPriceProvider" title="simple_back.data_providers.DailyPriceProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">DailyPriceProvider</span></code></a> used to get prices during
+a backtest. If this is not called, <code class="xref py py-class docutils literal notranslate"><span class="pre">YahooPriceProvider</span></code>
+is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>prices</strong> (<a class="reference internal" href="#simple_back.data_providers.DailyPriceProvider" title="simple_back.data_providers.DailyPriceProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">DailyPriceProvider</span></code></a>) – The price provider.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.slippage">
+<code class="sig-name descname">slippage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slippage</span><span class="o">=</span><span class="default_value">0.0005</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.slippage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.slippage" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, sets slippage which will create a (lower bound) strategy.
+The orginial strategies will run without slippage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>slippage</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – the slippage in percent of the base price,
+default is equivalent to quantopian default for US Equities</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.strategies">
+<code class="sig-name descname">strategies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">strategies</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.strategies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.strategies" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, sets <a class="reference internal" href="#simple_back.strategy.Strategy" title="simple_back.strategy.Strategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Strategy</span></code></a> objects to run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>strategies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#simple_back.backtester.Backtester" title="simple_back.backtester.Backtester"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backtester</span></code></a>], <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>], <a class="reference internal" href="#simple_back.strategy.Strategy" title="simple_back.strategy.Strategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Strategy</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – list of <a class="reference internal" href="#simple_back.strategy.Strategy" title="simple_back.strategy.Strategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Strategy</span></code></a> objects or tickers to <a class="reference internal" href="#simple_back.strategy.BuyAndHold" title="simple_back.strategy.BuyAndHold"><code class="xref py py-class docutils literal notranslate"><span class="pre">BuyAndHold</span></code></a></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.BacktesterBuilder.trade_cost">
+<code class="sig-name descname">trade_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trade_cost</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#BacktesterBuilder.trade_cost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.BacktesterBuilder.trade_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Optional</strong>, set a <a class="reference internal" href="#simple_back.fees.Fee" title="simple_back.fees.Fee"><code class="xref py py-class docutils literal notranslate"><span class="pre">Fee</span></code></a> to be applied when buying shares.
+When not set, <a class="reference internal" href="#simple_back.fees.NoFee" title="simple_back.fees.NoFee"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoFee</span></code></a> is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trade_cost</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="#simple_back.fees.Fee" title="simple_back.fees.Fee"><code class="xref py py-class docutils literal notranslate"><span class="pre">Fee</span></code></a>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]) – one ore more <a class="reference internal" href="#simple_back.fees.Fee" title="simple_back.fees.Fee"><code class="xref py py-class docutils literal notranslate"><span class="pre">Fee</span></code></a> objects or callables.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#simple_back.backtester.BacktesterBuilder" title="simple_back.backtester.BacktesterBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">BacktesterBuilder</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.backtester.Portfolio">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.backtester.</code><code class="sig-name descname">Portfolio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em>, <em class="sig-param"><span class="n">positions</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Portfolio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Portfolio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.MutableSequence</span></code></p>
+<p>A portfolio is a collection of <a class="reference internal" href="#simple_back.backtester.Position" title="simple_back.backtester.Position"><code class="xref py py-class docutils literal notranslate"><span class="pre">Position</span></code></a> objects,
+and can be used to <a class="reference internal" href="#simple_back.backtester.Portfolio.liquidate" title="simple_back.backtester.Portfolio.liquidate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">liquidate()</span></code></a> a subset of them.</p>
+<dl class="py method">
+<dt id="simple_back.backtester.Portfolio.attr">
+<code class="sig-name descname">attr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attribute</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Portfolio.attr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Portfolio.attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of values for a certain value for all posititions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>attribute</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – String name of the attribute to get.
+Can be any attribute of <a class="reference internal" href="#simple_back.backtester.Position" title="simple_back.backtester.Position"><code class="xref py py-class docutils literal notranslate"><span class="pre">Position</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Portfolio.df">
+<em class="property">property </em><code class="sig-name descname">df</code><a class="headerlink" href="#simple_back.backtester.Portfolio.df" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Portfolio.filter">
+<code class="sig-name descname">filter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Portfolio.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Portfolio.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filters positions using any :class`.Callable`</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>func</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#simple_back.backtester.Position" title="simple_back.backtester.Position"><code class="xref py py-class docutils literal notranslate"><span class="pre">Position</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]) – The function/callable to do the filtering.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#simple_back.backtester.Portfolio" title="simple_back.backtester.Portfolio"><code class="xref py py-class docutils literal notranslate"><span class="pre">Portfolio</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Portfolio.insert">
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Portfolio.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Portfolio.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>S.insert(index, value) – insert value before index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Portfolio.liquidate">
+<code class="sig-name descname">liquidate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nshares</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">_bt</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Portfolio.liquidate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Portfolio.liquidate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Liquidate all positions in the current “view” of the portfolio.
+If no view is given using <cite>[‘some_ticker’]</cite>, <a class="reference internal" href="#simple_back.backtester.Portfolio.filter" title="simple_back.backtester.Portfolio.filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">filter()</span></code></a>,
+<a class="reference internal" href="#simple_back.backtester.Portfolio.long" title="simple_back.backtester.Portfolio.long"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Portfolio.long()</span></code></a> or <a class="reference internal" href="#simple_back.backtester.Portfolio.short" title="simple_back.backtester.Portfolio.short"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Portfolio.short()</span></code></a>,
+an attempt to liquidate all positions is made.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>nshares</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of shares to be liquidated.
+This should only be used when a ticker is selected using <cite>[‘some_ticker’]</cite>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Select all <cite>MSFT</cite> positions and liquidate them:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;MSFT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Liquidate 10 <cite>MSFT</cite> shares:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="o">.</span><span class="n">portfolio</span><span class="p">[</span><span class="s1">&#39;MSFT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">liquidate</span><span class="p">(</span><span class="n">nshares</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Liquidate all long positions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="o">.</span><span class="n">portfolio</span><span class="o">.</span><span class="n">long</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Liquidate all positions that have lost more than 5% in value.
+We can either use <a class="reference internal" href="#simple_back.backtester.Portfolio.filter" title="simple_back.backtester.Portfolio.filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">filter()</span></code></a> or the dataframe as indexer
+(in this case in combination with the pf shorthand):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="o">.</span><span class="n">pf</span><span class="p">[</span><span class="n">bt</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;profit_loss_pct&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">]</span><span class="o">.</span><span class="n">liquidate</span><span class="p">()</span>
+<span class="c1"># or</span>
+<span class="n">bt</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">profit_loss_pct</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Portfolio.long">
+<em class="property">property </em><code class="sig-name descname">long</code><a class="headerlink" href="#simple_back.backtester.Portfolio.long" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a view of the portfolio (which can be treated as its own <a class="reference internal" href="#simple_back.backtester.Portfolio" title="simple_back.backtester.Portfolio"><code class="xref py py-class docutils literal notranslate"><span class="pre">Portfolio</span></code></a>)
+containing all <em>long</em> positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#simple_back.backtester.Portfolio" title="simple_back.backtester.Portfolio"><code class="xref py py-class docutils literal notranslate"><span class="pre">Portfolio</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Portfolio.short">
+<em class="property">property </em><code class="sig-name descname">short</code><a class="headerlink" href="#simple_back.backtester.Portfolio.short" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a view of the portfolio (which can be treated as its own <a class="reference internal" href="#simple_back.backtester.Portfolio" title="simple_back.backtester.Portfolio"><code class="xref py py-class docutils literal notranslate"><span class="pre">Portfolio</span></code></a>)
+containing all <em>short</em> positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#simple_back.backtester.Portfolio" title="simple_back.backtester.Portfolio"><code class="xref py py-class docutils literal notranslate"><span class="pre">Portfolio</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Portfolio.total_value">
+<em class="property">property </em><code class="sig-name descname">total_value</code><a class="headerlink" href="#simple_back.backtester.Portfolio.total_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total value of the portfolio.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.backtester.Position">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.backtester.</code><code class="sig-name descname">Position</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em>, <em class="sig-param"><span class="n">symbol</span></em>, <em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">event</span></em>, <em class="sig-param"><span class="n">nshares</span></em>, <em class="sig-param"><span class="n">uid</span></em>, <em class="sig-param"><span class="n">fee</span></em>, <em class="sig-param"><span class="n">slippage</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#Position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.Position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Tracks a single position in a portfolio or trade history.</p>
+<dl class="py method">
+<dt id="simple_back.backtester.Position.initial_value">
+<em class="property">property </em><code class="sig-name descname">initial_value</code><a class="headerlink" href="#simple_back.backtester.Position.initial_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the initial value of the position, including fees.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Position.nshares">
+<em class="property">property </em><code class="sig-name descname">nshares</code><a class="headerlink" href="#simple_back.backtester.Position.nshares" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of shares in the position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Position.order_type">
+<em class="property">property </em><code class="sig-name descname">order_type</code><a class="headerlink" href="#simple_back.backtester.Position.order_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns “long” or “short” based on the position type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Position.price">
+<em class="property">property </em><code class="sig-name descname">price</code><a class="headerlink" href="#simple_back.backtester.Position.price" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current price if the position is held in a portfolio.
+Returns the last price if the position was liquidated and is part of a trade history.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Position.profit_loss_abs">
+<em class="property">property </em><code class="sig-name descname">profit_loss_abs</code><a class="headerlink" href="#simple_back.backtester.Position.profit_loss_abs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the profit/loss associated with the position (not including commission)
+in absolute terms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Position.profit_loss_pct">
+<em class="property">property </em><code class="sig-name descname">profit_loss_pct</code><a class="headerlink" href="#simple_back.backtester.Position.profit_loss_pct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the profit/loss associated with the position (not including commission)
+in relative terms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Position.value">
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#simple_back.backtester.Position.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current market value of the position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.backtester.Position.value_pershare">
+<em class="property">property </em><code class="sig-name descname">value_pershare</code><a class="headerlink" href="#simple_back.backtester.Position.value_pershare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the position per share.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.backtester.StrategySequence">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.backtester.</code><code class="sig-name descname">StrategySequence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#StrategySequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.StrategySequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A sequence of strategies than can be accessed by name or <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> index.    Returned by <a class="reference internal" href="#simple_back.backtester.Backtester.strategies" title="simple_back.backtester.Backtester.strategies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backtester.strategies</span></code></a> and should not be used elsewhere.</p>
+<p class="rubric">Examples</p>
+<p>Access by <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="o">.</span><span class="n">strategies</span><span class="p">[</span><span class="s1">&#39;Some Strategy Name&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Access by <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bt</span><span class="o">.</span><span class="n">strategies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Use as iterator:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">bt</span><span class="o">.</span><span class="n">strategies</span><span class="p">:</span>
+    <span class="c1"># do something</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="simple_back.backtester.display_side_by_side">
+<code class="sig-prename descclassname">simple_back.backtester.</code><code class="sig-name descname">display_side_by_side</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bts</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/backtester.html#display_side_by_side"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.backtester.display_side_by_side" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-simple_back.data_providers">
+<span id="simple-back-data-providers-module"></span><h2>simple_back.data_providers module<a class="headerlink" href="#module-simple_back.data_providers" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="simple_back.data_providers.CachedProvider">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.data_providers.</code><code class="sig-name descname">CachedProvider</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#CachedProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.CachedProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="py method">
+<dt id="simple_back.data_providers.CachedProvider.clear_cache">
+<code class="sig-name descname">clear_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#CachedProvider.clear_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.CachedProvider.clear_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.CachedProvider.get_cache">
+<code class="sig-name descname">get_cache</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#CachedProvider.get_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.CachedProvider.get_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.CachedProvider.get_key">
+<code class="sig-name descname">get_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#CachedProvider.get_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.CachedProvider.get_key" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.CachedProvider.in_cache">
+<code class="sig-name descname">in_cache</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#CachedProvider.in_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.CachedProvider.in_cache" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.CachedProvider.name">
+<em class="property">abstract property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.data_providers.CachedProvider.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.CachedProvider.rem_cache">
+<code class="sig-name descname">rem_cache</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#CachedProvider.rem_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.CachedProvider.rem_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.CachedProvider.set_cache">
+<code class="sig-name descname">set_cache</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">val</span></em>, <em class="sig-param"><span class="n">expire_days</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#CachedProvider.set_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.CachedProvider.set_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.data_providers.DailyDataProvider">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.data_providers.</code><code class="sig-name descname">DailyDataProvider</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#DailyDataProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.DailyDataProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.data_providers.CachedProvider" title="simple_back.data_providers.CachedProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.data_providers.CachedProvider</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.data_providers.DailyDataProvider.columns">
+<em class="property">abstract property </em><code class="sig-name descname">columns</code><a class="headerlink" href="#simple_back.data_providers.DailyDataProvider.columns" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.DailyDataProvider.columns_order">
+<em class="property">abstract property </em><code class="sig-name descname">columns_order</code><a class="headerlink" href="#simple_back.data_providers.DailyDataProvider.columns_order" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.DailyDataProvider.get">
+<em class="property">abstract </em><code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em>, <em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#DailyDataProvider.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.DailyDataProvider.get" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.DailyDataProvider.set_date_event">
+<code class="sig-name descname">set_date_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#DailyDataProvider.set_date_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.DailyDataProvider.set_date_event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.data_providers.DailyPriceProvider">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.data_providers.</code><code class="sig-name descname">DailyPriceProvider</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">highlow</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#DailyPriceProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.DailyPriceProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.data_providers.DailyDataProvider" title="simple_back.data_providers.DailyDataProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.data_providers.DailyDataProvider</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.data_providers.DailyPriceProvider.columns">
+<em class="property">property </em><code class="sig-name descname">columns</code><a class="headerlink" href="#simple_back.data_providers.DailyPriceProvider.columns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.DailyPriceProvider.columns_order">
+<em class="property">property </em><code class="sig-name descname">columns_order</code><a class="headerlink" href="#simple_back.data_providers.DailyPriceProvider.columns_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.DailyPriceProvider.get">
+<em class="property">abstract </em><code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em>, <em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#DailyPriceProvider.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.DailyPriceProvider.get" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.data_providers.DataProvider">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.data_providers.</code><code class="sig-name descname">DataProvider</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#DataProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.DataProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.data_providers.CachedProvider" title="simple_back.data_providers.CachedProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.data_providers.CachedProvider</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.data_providers.DataProvider.dates">
+<em class="property">abstract </em><code class="sig-name descname">dates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#DataProvider.dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.DataProvider.dates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.DataProvider.get">
+<em class="property">abstract </em><code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datetime</span></em>, <em class="sig-param"><span class="n">symbol</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#DataProvider.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.DataProvider.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.DataProvider.name">
+<em class="property">abstract property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.data_providers.DataProvider.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.data_providers.SpProvider">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.data_providers.</code><code class="sig-name descname">SpProvider</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#SpProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.SpProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.data_providers.WikipediaProvider" title="simple_back.data_providers.WikipediaProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.data_providers.WikipediaProvider</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.data_providers.SpProvider.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.data_providers.SpProvider.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.SpProvider.process_html">
+<code class="sig-name descname">process_html</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">html</span></em>, <em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#SpProvider.process_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.SpProvider.process_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.SpProvider.transform_symbol">
+<code class="sig-name descname">transform_symbol</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#SpProvider.transform_symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.SpProvider.transform_symbol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.data_providers.WikipediaProvider">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.data_providers.</code><code class="sig-name descname">WikipediaProvider</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#WikipediaProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.WikipediaProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.data_providers.DataProvider" title="simple_back.data_providers.DataProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.data_providers.DataProvider</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.data_providers.WikipediaProvider.dates">
+<code class="sig-name descname">dates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#WikipediaProvider.dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.WikipediaProvider.dates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.WikipediaProvider.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datetime</span></em>, <em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#WikipediaProvider.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.WikipediaProvider.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.WikipediaProvider.get_revisions">
+<code class="sig-name descname">get_revisions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">title</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#WikipediaProvider.get_revisions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.WikipediaProvider.get_revisions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.WikipediaProvider.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.data_providers.WikipediaProvider.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.WikipediaProvider.process_html">
+<em class="property">abstract </em><code class="sig-name descname">process_html</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">html</span></em>, <em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#WikipediaProvider.process_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.WikipediaProvider.process_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.WikipediaProvider.transform_symbol">
+<code class="sig-name descname">transform_symbol</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#WikipediaProvider.transform_symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.WikipediaProvider.transform_symbol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.data_providers.YahooFinanceProvider">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.data_providers.</code><code class="sig-name descname">YahooFinanceProvider</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">highlow</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">adjust_prices</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#YahooFinanceProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.YahooFinanceProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.data_providers.DailyPriceProvider" title="simple_back.data_providers.DailyPriceProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.data_providers.DailyPriceProvider</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.data_providers.YahooFinanceProvider.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em>, <em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/data_providers.html#YahooFinanceProvider.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.data_providers.YahooFinanceProvider.get" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.data_providers.YahooFinanceProvider.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.data_providers.YahooFinanceProvider.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-simple_back.exceptions">
+<span id="simple-back-exceptions-module"></span><h2>simple_back.exceptions module<a class="headerlink" href="#module-simple_back.exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="py exception">
+<dt id="simple_back.exceptions.BacktestRunError">
+<em class="property">exception </em><code class="sig-prename descclassname">simple_back.exceptions.</code><code class="sig-name descname">BacktestRunError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/exceptions.html#BacktestRunError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.exceptions.BacktestRunError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="simple_back.exceptions.InsufficientCapitalError">
+<em class="property">exception </em><code class="sig-prename descclassname">simple_back.exceptions.</code><code class="sig-name descname">InsufficientCapitalError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/exceptions.html#InsufficientCapitalError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.exceptions.InsufficientCapitalError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="simple_back.exceptions.LongShortLiquidationError">
+<em class="property">exception </em><code class="sig-prename descclassname">simple_back.exceptions.</code><code class="sig-name descname">LongShortLiquidationError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/exceptions.html#LongShortLiquidationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.exceptions.LongShortLiquidationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="simple_back.exceptions.MissingMetricsError">
+<em class="property">exception </em><code class="sig-prename descclassname">simple_back.exceptions.</code><code class="sig-name descname">MissingMetricsError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">metrics</span></em>, <em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/exceptions.html#MissingMetricsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.exceptions.MissingMetricsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="simple_back.exceptions.NegativeValueError">
+<em class="property">exception </em><code class="sig-prename descclassname">simple_back.exceptions.</code><code class="sig-name descname">NegativeValueError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/exceptions.html#NegativeValueError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.exceptions.NegativeValueError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="simple_back.exceptions.PriceUnavailableError">
+<em class="property">exception </em><code class="sig-prename descclassname">simple_back.exceptions.</code><code class="sig-name descname">PriceUnavailableError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em>, <em class="sig-param"><span class="n">requested_date</span></em>, <em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/exceptions.html#PriceUnavailableError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.exceptions.PriceUnavailableError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="simple_back.exceptions.TimeLeakError">
+<em class="property">exception </em><code class="sig-prename descclassname">simple_back.exceptions.</code><code class="sig-name descname">TimeLeakError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_date</span></em>, <em class="sig-param"><span class="n">requested_date</span></em>, <em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/exceptions.html#TimeLeakError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.exceptions.TimeLeakError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simple_back.fees">
+<span id="simple-back-fees-module"></span><h2>simple_back.fees module<a class="headerlink" href="#module-simple_back.fees" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="simple_back.fees.Fee">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.fees.</code><code class="sig-name descname">Fee</code><a class="reference internal" href="../_modules/simple_back/fees.html#Fee"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.Fee" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Abstract <code class="docutils literal notranslate"><span class="pre">Callable</span></code> that calculates the total cost and number of shares
+given an asset price and the capital to be allocated to it.
+It returns the total cost and the number of shares aquired for that cost.</p>
+<dl class="py method">
+<dt id="simple_back.fees.Fee.cost">
+<em class="property">abstract </em><code class="sig-name descname">cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">price</span></em>, <em class="sig-param"><span class="n">nshares</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/fees.html#Fee.cost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.Fee.cost" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.fees.Fee.nshares">
+<em class="property">abstract </em><code class="sig-name descname">nshares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">price</span></em>, <em class="sig-param"><span class="n">capital</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/fees.html#Fee.nshares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.Fee.nshares" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.fees.FlatPerShare">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.fees.</code><code class="sig-name descname">FlatPerShare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fee</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/fees.html#FlatPerShare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.FlatPerShare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.fees.Fee" title="simple_back.fees.Fee"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.fees.Fee</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.fees.FlatPerShare.cost">
+<code class="sig-name descname">cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">price</span></em>, <em class="sig-param"><span class="n">nshares</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/fees.html#FlatPerShare.cost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.FlatPerShare.cost" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.fees.FlatPerShare.nshares">
+<code class="sig-name descname">nshares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">price</span></em>, <em class="sig-param"><span class="n">capital</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/fees.html#FlatPerShare.nshares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.FlatPerShare.nshares" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.fees.FlatPerTrade">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.fees.</code><code class="sig-name descname">FlatPerTrade</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fee</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/fees.html#FlatPerTrade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.FlatPerTrade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.fees.Fee" title="simple_back.fees.Fee"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.fees.Fee</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.fees.FlatPerTrade.cost">
+<code class="sig-name descname">cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">price</span></em>, <em class="sig-param"><span class="n">nshares</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/fees.html#FlatPerTrade.cost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.FlatPerTrade.cost" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.fees.FlatPerTrade.nshares">
+<code class="sig-name descname">nshares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">price</span></em>, <em class="sig-param"><span class="n">capital</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/fees.html#FlatPerTrade.nshares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.FlatPerTrade.nshares" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.fees.NoFee">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.fees.</code><code class="sig-name descname">NoFee</code><a class="reference internal" href="../_modules/simple_back/fees.html#NoFee"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.NoFee" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.fees.Fee" title="simple_back.fees.Fee"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.fees.Fee</span></code></a></p>
+<p>Returns the number of shares possible to buy with given capital,
+and calculates to total cost of buying said shares.</p>
+<p class="rubric">Example</p>
+<p>How many shares of an asset costing 10 can be bought using 415,
+and what is the total cost:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NoFee</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">415</span><span class="p">)</span>
+<span class="go">41, 410</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="simple_back.fees.NoFee.cost">
+<code class="sig-name descname">cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">price</span></em>, <em class="sig-param"><span class="n">nshares</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/fees.html#NoFee.cost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.NoFee.cost" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.fees.NoFee.nshares">
+<code class="sig-name descname">nshares</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">price</span></em>, <em class="sig-param"><span class="n">capital</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/fees.html#NoFee.nshares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.fees.NoFee.nshares" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-simple_back.metrics">
+<span id="simple-back-metrics-module"></span><h2>simple_back.metrics module<a class="headerlink" href="#module-simple_back.metrics" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="simple_back.metrics.AnnualReturn">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">AnnualReturn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#AnnualReturn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.AnnualReturn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.SingleMetric" title="simple_back.metrics.SingleMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.SingleMetric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.AnnualReturn.get_value">
+<code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#AnnualReturn.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.AnnualReturn.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.AnnualReturn.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.AnnualReturn.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.AnnualReturn.requires">
+<em class="property">property </em><code class="sig-name descname">requires</code><a class="headerlink" href="#simple_back.metrics.AnnualReturn.requires" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.DailyProfitLoss">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">DailyProfitLoss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#DailyProfitLoss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.DailyProfitLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.SeriesMetric" title="simple_back.metrics.SeriesMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.SeriesMetric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.DailyProfitLoss.get_value">
+<code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#DailyProfitLoss.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.DailyProfitLoss.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.DailyProfitLoss.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.DailyProfitLoss.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.DailyProfitLoss.requires">
+<em class="property">property </em><code class="sig-name descname">requires</code><a class="headerlink" href="#simple_back.metrics.DailyProfitLoss.requires" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.DailyProfitLossPct">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">DailyProfitLossPct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#DailyProfitLossPct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.DailyProfitLossPct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.SeriesMetric" title="simple_back.metrics.SeriesMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.SeriesMetric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.DailyProfitLossPct.get_value">
+<code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#DailyProfitLossPct.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.DailyProfitLossPct.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.DailyProfitLossPct.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.DailyProfitLossPct.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.DailyProfitLossPct.requires">
+<em class="property">property </em><code class="sig-name descname">requires</code><a class="headerlink" href="#simple_back.metrics.DailyProfitLossPct.requires" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.MaxDrawdown">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">MaxDrawdown</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#MaxDrawdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.MaxDrawdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.SingleMetric" title="simple_back.metrics.SingleMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.SingleMetric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.MaxDrawdown.get_value">
+<code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#MaxDrawdown.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.MaxDrawdown.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.MaxDrawdown.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.MaxDrawdown.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.Metric">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">Metric</code><a class="reference internal" href="../_modules/simple_back/metrics.html#Metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.Metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="py method">
+<dt id="simple_back.metrics.Metric.get_value">
+<em class="property">abstract </em><code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#Metric.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.Metric.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.Metric.name">
+<em class="property">abstract property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.Metric.name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.Metric.requires">
+<em class="property">property </em><code class="sig-name descname">requires</code><a class="headerlink" href="#simple_back.metrics.Metric.requires" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.Metric.set_values">
+<code class="sig-name descname">set_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#Metric.set_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.Metric.set_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.PortfolioValue">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">PortfolioValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#PortfolioValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.PortfolioValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.SeriesMetric" title="simple_back.metrics.SeriesMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.SeriesMetric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.PortfolioValue.get_value">
+<code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#PortfolioValue.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.PortfolioValue.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.PortfolioValue.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.PortfolioValue.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.SeriesMetric">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">SeriesMetric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#SeriesMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.SeriesMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.Metric" title="simple_back.metrics.Metric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.Metric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.SeriesMetric.df">
+<em class="property">property </em><code class="sig-name descname">df</code><a class="headerlink" href="#simple_back.metrics.SeriesMetric.df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.SeriesMetric.get_value">
+<em class="property">abstract </em><code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#SeriesMetric.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.SeriesMetric.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.SeriesMetric.name">
+<em class="property">abstract property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.SeriesMetric.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.SeriesMetric.values">
+<em class="property">property </em><code class="sig-name descname">values</code><a class="headerlink" href="#simple_back.metrics.SeriesMetric.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.SharpeRatio">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">SharpeRatio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">risk_free_rate</span><span class="o">=</span><span class="default_value">0.0445</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#SharpeRatio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.SharpeRatio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.SingleMetric" title="simple_back.metrics.SingleMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.SingleMetric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.SharpeRatio.get_value">
+<code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#SharpeRatio.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.SharpeRatio.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.SharpeRatio.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.SharpeRatio.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.SharpeRatio.requires">
+<em class="property">property </em><code class="sig-name descname">requires</code><a class="headerlink" href="#simple_back.metrics.SharpeRatio.requires" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.SingleMetric">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">SingleMetric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#SingleMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.SingleMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.Metric" title="simple_back.metrics.Metric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.Metric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.SingleMetric.get_value">
+<em class="property">abstract </em><code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#SingleMetric.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.SingleMetric.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.SingleMetric.name">
+<em class="property">abstract property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.SingleMetric.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.TotalReturn">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">TotalReturn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#TotalReturn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.TotalReturn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.SeriesMetric" title="simple_back.metrics.SeriesMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.SeriesMetric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.TotalReturn.get_value">
+<code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#TotalReturn.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.TotalReturn.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.TotalReturn.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.TotalReturn.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.TotalReturn.requires">
+<em class="property">property </em><code class="sig-name descname">requires</code><a class="headerlink" href="#simple_back.metrics.TotalReturn.requires" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.TotalValue">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">TotalValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#TotalValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.TotalValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.SeriesMetric" title="simple_back.metrics.SeriesMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.SeriesMetric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.TotalValue.get_value">
+<code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#TotalValue.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.TotalValue.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.TotalValue.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.TotalValue.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.TotalValue.requires">
+<em class="property">property </em><code class="sig-name descname">requires</code><a class="headerlink" href="#simple_back.metrics.TotalValue.requires" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.metrics.Volatility">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.metrics.</code><code class="sig-name descname">Volatility</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#Volatility"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.Volatility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.metrics.SingleMetric" title="simple_back.metrics.SingleMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.metrics.SingleMetric</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.metrics.Volatility.get_value">
+<code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/metrics.html#Volatility.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.metrics.Volatility.get_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.Volatility.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.metrics.Volatility.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.metrics.Volatility.requires">
+<em class="property">property </em><code class="sig-name descname">requires</code><a class="headerlink" href="#simple_back.metrics.Volatility.requires" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-simple_back.strategy">
+<span id="simple-back-strategy-module"></span><h2>simple_back.strategy module<a class="headerlink" href="#module-simple_back.strategy" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="simple_back.strategy.BuyAndHold">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.strategy.</code><code class="sig-name descname">BuyAndHold</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ticker</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/strategy.html#BuyAndHold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.strategy.BuyAndHold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.strategy.Strategy" title="simple_back.strategy.Strategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.strategy.Strategy</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.strategy.BuyAndHold.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.strategy.BuyAndHold.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.strategy.BuyAndHold.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">event</span></em>, <em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/strategy.html#BuyAndHold.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.strategy.BuyAndHold.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.strategy.SellAndHold">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.strategy.</code><code class="sig-name descname">SellAndHold</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ticker</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/strategy.html#SellAndHold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.strategy.SellAndHold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simple_back.strategy.Strategy" title="simple_back.strategy.Strategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">simple_back.strategy.Strategy</span></code></a></p>
+<dl class="py method">
+<dt id="simple_back.strategy.SellAndHold.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.strategy.SellAndHold.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.strategy.SellAndHold.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">event</span></em>, <em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/strategy.html#SellAndHold.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.strategy.SellAndHold.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simple_back.strategy.Strategy">
+<em class="property">class </em><code class="sig-prename descclassname">simple_back.strategy.</code><code class="sig-name descname">Strategy</code><a class="reference internal" href="../_modules/simple_back/strategy.html#Strategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.strategy.Strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="py method">
+<dt id="simple_back.strategy.Strategy.name">
+<em class="property">abstract property </em><code class="sig-name descname">name</code><a class="headerlink" href="#simple_back.strategy.Strategy.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="simple_back.strategy.Strategy.run">
+<em class="property">abstract </em><code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">event</span></em>, <em class="sig-param"><span class="n">bt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/strategy.html#Strategy.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.strategy.Strategy.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-simple_back.utils">
+<span id="simple-back-utils-module"></span><h2>simple_back.utils module<a class="headerlink" href="#module-simple_back.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="simple_back.utils.is_notebook">
+<code class="sig-prename descclassname">simple_back.utils.</code><code class="sig-name descname">is_notebook</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simple_back/utils.html#is_notebook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_back.utils.is_notebook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../adv/data_sources.html" class="btn btn-neutral float-left" title="Using External Data &amp; Machine Learning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Christoph Minixhofer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
