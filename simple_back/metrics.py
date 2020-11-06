@@ -213,35 +213,38 @@ class TotalReturn(SeriesMetric):
     def get_value(self, bt):
         return ((bt.metric["Total Value"][-1] / bt.balance.start) - 1) * 100
 
+
 class SharpeRatio(SingleMetric):
     def __init__(self, risk_free_rate=0.0445):
         self.risk_free_rate = 0.0445
         super().__init__()
-    
+
     @property
     def requires(self):
         return ["Volatility (Annualized)", "Annual Return"]
-    
+
     @property
     def name(self):
         return "Sharpe Ratio"
-    
+
     def get_value(self, bt):
-        return ((bt.metrics["Annual Return"][-1]-1)-self.risk_free_rate)/bt.metrics["Volatility (Annualized)"][-1]
+        return (
+            (bt.metrics["Annual Return"][-1] - 1) - self.risk_free_rate
+        ) / bt.metrics["Volatility (Annualized)"][-1]
+
 
 class Volatility(SingleMetric):
-    
     @property
     def requires(self):
         return ["Daily Profit/Loss (%)"]
-    
+
     @property
     def name(self):
         return "Volatility (Annualized)"
-    
+
     def get_value(self, bt):
         return bt.metric["Daily Profit/Loss (%)"].values.std() * math.sqrt(252)
-    
+
 
 class DailyProfitLossPct(SeriesMetric):
     @property
@@ -254,6 +257,6 @@ class DailyProfitLossPct(SeriesMetric):
 
     def get_value(self, bt):
         try:
-            return bt.metric["Daily Profit/Loss"][-1]/bt.metric["Total Value"][-1]
+            return bt.metric["Daily Profit/Loss"][-1] / bt.metric["Total Value"][-1]
         except IndexError:
             return 0
