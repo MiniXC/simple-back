@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 import numpy as np
 import pandas as pd
+import math
 
 from .exceptions import MissingMetricsError
 
@@ -211,3 +212,48 @@ class TotalReturn(SeriesMetric):
 
     def get_value(self, bt):
         return ((bt.metric["Total Value"][-1] / bt.balance.start) - 1) * 100
+
+class SharpeRatio(SingleMetric):
+    def __init__(self, risk_free_rate=0.0445):
+        self.risk_free_rate = 0.0445
+        super().__init__()
+    
+    @property
+    def requires(self):
+        return ["Volatility (Annualized)", "Annual Return"]
+    
+    @property
+    def name(self):
+        return "Sharpe Ratio"
+    
+    def get_value(self, bt):
+        return ((bt.metrics["Annual Return"][-1]-1)-self.risk_free_rate)/bt.metrics["Volatility (Annualized)"][-1]
+
+class Volatility(SingleMetric):
+    
+    @property
+    def requires(self):
+        return ["Daily Profit/Loss (%)"]
+    
+    @property
+    def name(self):
+        return "Volatility (Annualized)"
+    
+    def get_value(self, bt):
+        return bt.metric["Daily Profit/Loss (%)"].values.std() * math.sqrt(252)
+    
+
+class DailyProfitLossPct(SeriesMetric):
+    @property
+    def name(self):
+        return "Daily Profit/Loss (%)"
+
+    @property
+    def requires(self):
+        return ["Daily Profit/Loss", "Total Value"]
+
+    def get_value(self, bt):
+        try:
+            return bt.metric["Daily Profit/Loss"][-1]/bt.metric["Total Value"][-1]
+        except IndexError:
+            return 0
