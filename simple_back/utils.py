@@ -1,7 +1,12 @@
 from io import StringIO
 import sys
 import os
-from IPython.display import clear_output
+
+try:
+    from IPython.display import clear_output as _ipython_clear_output
+    _has_ipython = True
+except ImportError:
+    _has_ipython = False
 
 
 def is_notebook():
@@ -18,5 +23,6 @@ def is_notebook():
 
 
 def _cls():
-    clear_output(wait=True)
+    if _has_ipython:
+        _ipython_clear_output(wait=True)
     os.system("cls" if os.name == "nt" else "clear")

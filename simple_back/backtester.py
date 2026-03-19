@@ -10,7 +10,18 @@ import json
 from typing import Union, List, Tuple, Callable, overload
 from warnings import warn
 import os
-from IPython.display import clear_output, display, HTML, display_html
+
+try:
+    from IPython.display import clear_output, display, HTML, display_html
+    _has_ipython = True
+except ImportError:
+    _has_ipython = False
+    def display(*args, **kwargs): pass
+    def display_html(*args, **kwargs): pass
+    def clear_output(*args, **kwargs): pass
+    class HTML:
+        def __init__(self, *args, **kwargs): pass
+
 from dataclasses import dataclass
 import multiprocessing
 import threading
@@ -22,6 +33,7 @@ import tabulate
 from .data_providers import (
     DailyPriceProvider,
     YahooFinanceProvider,
+    AlpacaProvider,
     DailyDataProvider,
     PriceUnavailableError,
     DataProvider,
@@ -871,8 +883,7 @@ class Backtester:
         self.dates = []
         self.assume_nyse = False
 
-        self.prices = YahooFinanceProvider()
-        self.prices.bt = self
+        self.prices = None  # must be set via BacktesterBuilder.prices()
 
         self.portfolio = Portfolio(self)
         self.trades = copy.deepcopy(Portfolio(self))
@@ -949,6 +960,11 @@ class Backtester:
         global _live_progress_pbar
         if bt is None:
             bt = self
+        if bt.prices is None:
+            raise ValueError(
+                "no price provider set. Use .prices(AlpacaProvider(...)) "
+                "or .prices(YahooFinanceProvider()) on the builder."
+            )
         if bt.assume_nyse:
             self._warn.append("no market calendar specified, assuming NYSE calendar")
         if bt._available_capital is None or bt._capital is None:

@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod
-from yahoo_fin.stock_info import get_data
+try:
+    import yfinance as yf
+    _has_yfinance = True
+except ImportError:
+    _has_yfinance = False
 from typing import Union, List, Optional, Tuple
 import pandas as pd
 from dateutil.relativedelta import relativedelta
@@ -260,9 +264,14 @@ class DailyDataProvider(CachedProvider):
     def _remove_leaky_vals(self, df, cols, date):
         if isinstance(self.current_date, str):
             self.current_date = datetime.date.fromisoformat(self.current_date)
+        # Normalise Timestamp/str → datetime.date so comparisons work (pandas 2.x+)
+        if isinstance(self.current_date, pd.Timestamp):
+            self.current_date = self.current_date.date()
+        if isinstance(date, pd.Timestamp):
+            date = date.date()
+        elif isinstance(date, str):
+            date = datetime.date.fromisoformat(date)
         if isinstance(df, pd.DataFrame):
-            if isinstance(date, str):
-                date = pd.to_datetime(date)
             istoday = (not isinstance(date, slice)) and date == self.current_date
             if istoday or (df is not None and self.current_date in df.index):
                 cur_order = self.columns.index(self.current_event)
@@ -450,10 +459,32 @@ class DailyPriceProvider(DailyDataProvider):
 
 
 class YahooFinanceProvider(DailyPriceProvider):
-    def __init__(self, highlow=False, adjust_prices=True, debug=False):
+    """Daily price provider using the *yfinance* package.
+
+    Args:
+        highlow: Include high/low columns (default False).
+        adjust_prices: Use adjusted close to scale OHLC (default True).
+        impersonate: curl_cffi browser fingerprint to use (default
+            ``"chrome120"``).  The latest ``"chrome"`` target is blocked
+            by Yahoo from many datacenter IPs; older targets work.
+        debug: Disable caching for debugging.
+    """
+
+    def __init__(self, highlow=False, adjust_prices=True, impersonate="chrome120", debug=False):
+        if not _has_yfinance:
+            raise ImportError(
+                "yfinance is required for YahooFinanceProvider. "
+                "Install with: pip install 'simple-back[yahoo]'"
+            )
         self.adjust_prices = adjust_prices
         self.highlow = highlow
+        self._impersonate = impersonate
         super().__init__(debug=debug)
+
+    def _make_session(self):
+        """Build a curl_cffi session with a working impersonate target."""
+        from curl_cffi.requests import Session as CffiSession
+        return CffiSession(impersonate=self._impersonate)
 
     @property
     def name(self):
@@ -464,21 +495,139 @@ class YahooFinanceProvider(DailyPriceProvider):
     ) -> pd.DataFrame:
         if not self.in_cache(symbol):
             try:
-                df = get_data(symbol)
-            except AssertionError:
+                session = self._make_session()
+                tk = yf.Ticker(symbol, session=session)
+                df = tk.history(period="max", auto_adjust=False)
+                if df.empty:
+                    raise ValueError("empty dataframe")
+                # Normalise column names to lowercase
+                df.columns = [c.lower() for c in df.columns]
+                # Ensure tz-naive date index for consistent slicing
+                if df.index.tz is not None:
+                    df.index = df.index.tz_localize(None)
+            except Exception as exc:
                 raise PriceUnavailableError(
-                    symbol, date, f"Price for {symbol} could not be found."
+                    symbol, date, f"Price for {symbol} could not be found: {exc}"
                 )
             self.set_cache(symbol, df)
         else:
             df = self.get_cache(symbol)
-        if df.isna().any().any() == 0:
-            df.dropna(inplace=True, axis=0)
+        df.dropna(subset=["open", "close"], inplace=True)
+        # Convert date to Timestamp for .loc[] (pandas 2.x compat)
+        if isinstance(date, slice):
+            date = slice(
+                pd.Timestamp(date.start) if date.start is not None else None,
+                pd.Timestamp(date.stop) if date.stop is not None else None,
+                date.step,
+            )
+        else:
+            date = pd.Timestamp(date)
         entry = df.loc[date].copy()
-        adj = entry["adjclose"] / entry["close"]
-        if self.adjust_prices:
+        _fields = entry.columns if isinstance(entry, pd.DataFrame) else entry.index
+        if self.adjust_prices and "adj close" in _fields:
+            adj = entry["adj close"] / entry["close"]
             entry["open"] = adj * entry["open"]
-            entry["close"] = entry["adjclose"]
+            entry["close"] = entry["adj close"]
             entry["high"] = adj * entry["high"]
             entry["low"] = adj * entry["low"]
+        return entry[event]
+
+
+class AlpacaProvider(DailyPriceProvider):
+    """Daily price provider using Alpaca Markets historical bars API.
+
+    Requires ALPACA_API_KEY and ALPACA_SECRET_KEY environment variables,
+    or pass them directly.
+
+    Args:
+        api_key: Alpaca API key (falls back to ALPACA_API_KEY env var).
+        secret_key: Alpaca secret key (falls back to ALPACA_SECRET_KEY env var).
+        paper: Use paper trading endpoint (default True).
+        highlow: Include high/low columns (default True).
+        debug: Disable caching for debugging.
+    """
+
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        secret_key: Optional[str] = None,
+        paper: bool = True,
+        highlow: bool = True,
+        debug: bool = False,
+    ):
+        import os as _os
+
+        self._api_key = api_key or _os.environ.get("ALPACA_API_KEY", "")
+        self._secret_key = secret_key or _os.environ.get("ALPACA_SECRET_KEY", "")
+        if not self._api_key or not self._secret_key:
+            raise ValueError(
+                "Alpaca credentials required. Set ALPACA_API_KEY and "
+                "ALPACA_SECRET_KEY environment variables or pass them directly."
+            )
+        self._paper = paper
+        self.highlow = highlow
+        super().__init__(highlow=highlow, debug=debug)
+
+    @property
+    def name(self):
+        return "Alpaca Prices"
+
+    def _fetch_bars(self, symbol: str) -> pd.DataFrame:
+        """Fetch all available daily bars for *symbol* from Alpaca."""
+        from alpaca.data.historical import StockHistoricalDataClient
+        from alpaca.data.requests import StockBarsRequest
+        from alpaca.data.timeframe import TimeFrame
+
+        client = StockHistoricalDataClient(self._api_key, self._secret_key)
+        request = StockBarsRequest(
+            symbol_or_symbols=symbol,
+            timeframe=TimeFrame.Day,
+            # Alpaca keeps ~7 years of daily bars; omit start for max history
+            start=datetime.datetime(2015, 1, 1),
+        )
+        bars = client.get_stock_bars(request)
+        df = bars.df
+        # bars.df has a MultiIndex (symbol, timestamp) – drop symbol level
+        if isinstance(df.index, pd.MultiIndex):
+            df = df.droplevel("symbol")
+        # Normalise index to date-only (tz-naive, midnight) so Timestamp lookups work
+        df.index = pd.to_datetime(df.index).tz_localize(None).normalize()
+        # Rename to match DailyPriceProvider conventions
+        df = df.rename(
+            columns={
+                "open": "open",
+                "close": "close",
+                "high": "high",
+                "low": "low",
+                "volume": "volume",
+                "vwap": "vwap",
+            }
+        )
+        return df
+
+    def get(
+        self, symbol: str, date: Union[slice, date], event: Union[str, List[str]]
+    ) -> pd.DataFrame:
+        if not self.in_cache(symbol):
+            try:
+                df = self._fetch_bars(symbol)
+            except Exception as exc:
+                raise PriceUnavailableError(
+                    symbol, date, f"Alpaca: price for {symbol} unavailable – {exc}"
+                )
+            self.set_cache(symbol, df, expire_days=1)
+        else:
+            df = self.get_cache(symbol)
+
+        df.dropna(subset=["open", "close"], inplace=True)
+        # Convert date to Timestamp for .loc[] (pandas 2.x compat)
+        if isinstance(date, slice):
+            date = slice(
+                pd.Timestamp(date.start) if date.start is not None else None,
+                pd.Timestamp(date.stop) if date.stop is not None else None,
+                date.step,
+            )
+        else:
+            date = pd.Timestamp(date)
+        entry = df.loc[date].copy()
         return entry[event]
